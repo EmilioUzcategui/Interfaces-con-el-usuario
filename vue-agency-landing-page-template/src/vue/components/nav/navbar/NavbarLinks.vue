@@ -4,7 +4,7 @@
             <li v-for="link in parsedLinks">
                 <Link :url="link.path">
                     <button class="foxy-nav-link"
-                            :class="[link.buttonClass, link.isLogin ? 'foxy-nav-link-login' : '']"
+                            :class="[link.buttonClass, link.isAuth ? 'foxy-nav-link-auth' : '']"
                             @click="_onLinkClicked">
                         <i v-if="link.faIcon"
                            :class="link.faIcon"
@@ -39,7 +39,7 @@ const parsedLinks = computed(() => {
         path: item.path,
         label: item.label,
         faIcon: item.faIcon,
-        isLogin: item.path === '/login',
+        isAuth: item.path === '/login' || item.path === '/register',
         buttonClass: {
             active: item.isActive,
             hidden: transitionLinks.value.indexOf(index) === -1
@@ -150,7 +150,7 @@ button.foxy-nav-link:hover, button.foxy-nav-link.active {
     }
 }
 
-button.foxy-nav-link-login {
+button.foxy-nav-link-auth {
     background: linear-gradient(135deg, $primary 0%, darken($primary, 10%) 100%);
     color: white !important;
     border-radius: 20px;

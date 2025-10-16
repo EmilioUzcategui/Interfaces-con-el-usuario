@@ -1,14 +1,26 @@
 // db.js
-import pkg from 'pg';
+import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
 
 dotenv.config();
-const { Pool } = pkg;
 
-export const pool = new Pool({
-    host: process.env.PGHOST,
-    user: process.env.PGUSER,
-    password: process.env.PGPASSWORD,
-    database: process.env.PGDATABASE,
-    port: process.env.PGPORT,
+export const pool = mysql.createPool({
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'vue_agency_db',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
+
+// Función para probar la conexión
+export async function testConnection() {
+    try {
+        const connection = await pool.getConnection();
+        console.log('✅ Conectado a MySQL');
+        connection.release();
+    } catch (err) {
+        console.error('❌ Error al conectar a MySQL:', err);
+    }
+}

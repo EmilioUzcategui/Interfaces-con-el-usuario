@@ -41,7 +41,10 @@ const MAP = {
     "login_success_message": "Welcome back, {name}! You have successfully signed in.",
     "login_time": "Login Time",
     "go_to_dashboard": "Go to Dashboard",
-    "logout": "Sign Out"
+    "logout": "Sign Out",
+    "register_title": "Crear Cuenta",
+    "register_subtitle": "Únete a nosotros",
+    "register_description": "Completa el formulario para crear tu cuenta y comenzar a usar nuestros servicios."
 }
 
 export function useStrings() {
@@ -63,6 +66,14 @@ export function useStrings() {
     }
 
     /**
+     * @param {String} key
+     * @param {String} value
+     */
+    const set = (key, value) => {
+        MAP[key] = value
+    }
+
+    /**
      * @param {String|Number} year
      * @param {String} holder
      * @param {String} url
@@ -77,6 +88,7 @@ export function useStrings() {
 
     return {
         get,
+        set,
         getCopyrightMessage
     }
 }

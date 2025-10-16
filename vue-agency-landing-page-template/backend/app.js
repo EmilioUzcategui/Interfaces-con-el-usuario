@@ -2,18 +2,30 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import authRoutes from './routes/auth.js';
+import { testConnection } from './DB/db.js';
 
-// app.js
-import { pool } from './DB/db.js';
+dotenv.config();
 
-async function testConnection() {
-    try {
-        const result = await pool.query('SELECT NOW()');
-        console.log('✅ Conectado a PostgreSQL:');
-        console.log('Hora del servidor:', result.rows[0]);
-    } catch (err) {
-        console.error('❌ Error al conectar a PostgreSQL:', err);
-    }
-}
+const app = express();
+const PORT = process.env.PORT || 3000;
 
+// Middleware
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Rutas
+app.use('/api', authRoutes);
+
+// Ruta de prueba
+app.get('/api/test', (req, res) => {
+    res.json({ message: 'Backend funcionando correctamente' });
+});
+
+// Probar conexión a la base de datos
 testConnection();
+
+app.listen(PORT, () => {
+    console.log(`🚀 Servidor ejecutándose en http://localhost:${PORT}`);
+});

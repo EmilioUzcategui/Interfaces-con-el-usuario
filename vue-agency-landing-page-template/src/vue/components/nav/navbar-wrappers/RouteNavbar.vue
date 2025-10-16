@@ -66,15 +66,23 @@ const linkList = computed(() => {
         }
     ]
 
-    // Agregar enlace de login al final
-    const loginLink = {
-        path: '/login',
-        label: 'Login',
-        faIcon: 'fa-solid fa-user',
-        isActive: route.path === '/login'
-    }
+    // Agregar enlaces de autenticación al final
+    const authLinks = [
+        {
+            path: '/register',
+            label: 'Register',
+            faIcon: 'fa-solid fa-user-plus',
+            isActive: route.path === '/register'
+        },
+        {
+            path: '/login',
+            label: 'Login',
+            faIcon: 'fa-solid fa-user',
+            isActive: route.path === '/login'
+        }
+    ]
 
-    return [...staticLinks, loginLink]
+    return [...staticLinks, ...authLinks]
 })
 </script>
 

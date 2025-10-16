@@ -37,7 +37,7 @@ const shouldDisplayFormFields = computed(() => {
 
 const errorMessage = computed(() => {
     if(apiResponse.value && !apiResponse.value.success)
-        return strings.get("error_login_failed")
+        return apiResponse.value.error || strings.get("error_login_failed")
 
     if(validationError.value)
         return strings.get(validationError.value)
@@ -81,28 +81,52 @@ const _validate = () => {
 const _submit = async () => {
     setSpinnerEnabled && setSpinnerEnabled(true, strings.get('logging_in'))
 
-    // Simular autenticación - aquí integrarías con tu API real
-    const success = await _mockLogin(email.value, password.value, rememberMe.value)
-    
-    _resetScroll()
-    setSpinnerEnabled && setSpinnerEnabled(false)
-    
-    // Redirección automática después del login exitoso
-    if (success) {
-        // Redirigir inmediatamente sin mostrar mensaje de éxito
-        router.push('/dashboard')
-    } else {
-        // Solo mostrar error si el login falla
-        apiResponse.value = {success: false, user: null}
-    }
-}
+    try {
+        const response = await fetch('http://localhost:3000/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: email.value,
+                password: password.value
+            })
+        })
 
-const _mockLogin = async (email, password, rememberMe) => {
-    // Simular delay de API
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    // Simular validación básica
-    return email === "admin@example.com" && password === "password123"
+        const data = await response.json()
+        
+        _resetScroll()
+        setSpinnerEnabled && setSpinnerEnabled(false)
+        
+        if (response.ok) {
+            // Guardar usuario en localStorage
+            localStorage.setItem('currentUser', JSON.stringify(data.user))
+            
+            // Redirigir según el ID del usuario
+            if (data.user.id === 1) {
+                // Es admin, va al dashboard
+                router.push('/dashboard')
+            } else {
+                // Es usuario normal, va al home
+                router.push('/')
+            }
+        } else {
+            // Mostrar error
+            apiResponse.value = {
+                success: false, 
+                user: null,
+                error: data.error || 'Error en el login'
+            }
+        }
+    } catch (error) {
+        console.error('Error en login:', error)
+        setSpinnerEnabled && setSpinnerEnabled(false)
+        apiResponse.value = {
+            success: false, 
+            user: null,
+            error: 'Error de conexión. Intenta de nuevo.'
+        }
+    }
 }
 
 const _resetScroll = () => {

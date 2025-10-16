@@ -4,6 +4,7 @@ import {createRouter, createWebHistory} from "vue-router"
 import App from "/src/vue/stack/App.vue"
 import HomePage from "/src/vue/content/pages/HomePage.vue"
 import LoginPage from "/src/vue/content/pages/LoginPage.vue"
+import RegisterPage from "/src/vue/content/pages/RegisterPage.vue"
 import DashboardPage from "/src/vue/content/pages/DashboardPage.vue"
 import LicensePage from "/src/vue/content/pages/LicensePage.vue"
 import PolicyPage from "/src/vue/content/pages/PolicyPage.vue"
@@ -31,6 +32,19 @@ const router = createRouter({
             props: {
                 label: "Login",
                 faIcon: "fa-solid fa-user",
+                inPageNavbar: false,
+                shouldAlwaysPreload: false,
+                breadcrumbs: []
+            }
+        },
+
+        {
+            path: "/register",
+            name: "register",
+            component: RegisterPage,
+            props: {
+                label: "Register",
+                faIcon: "fa-solid fa-user-plus",
                 inPageNavbar: false,
                 shouldAlwaysPreload: false,
                 breadcrumbs: []

@@ -2,8 +2,8 @@
     <ActivitySpinner :visible="Boolean(spinnerActive)"
                      :message="String(spinnerMessage)"/>
 
-    <Loader v-if="loaderEnabled"
-            :visible="Boolean(loaderActive)"
+    <Loader v-if="loaderEnabled && !isExcludedRoute"
+            :visible="Boolean(loaderActive && !isExcludedRoute)"
             :refresh-count="Number(loaderPageRefreshCount)"
             :smooth-transition-enabled="Boolean(loaderSmoothTransitionEnabled)"
             @rendered="_onLoaderRendered"
@@ -15,7 +15,8 @@
 </template>
 
 <script setup>
-import {inject, provide, ref, watch} from "vue"
+import {inject, provide, ref, watch, computed} from "vue"
+import {useRoute} from "vue-router"
 import ActivitySpinner from "/src/vue/components/loaders/ActivitySpinner.vue"
 import Loader from "/src/vue/components/loaders/Loader.vue"
 
@@ -28,7 +29,18 @@ const loaderAnimationStatus = inject("loaderAnimationStatus")
 const spinnerActive = inject("spinnerActive")
 const spinnerMessage = inject("spinnerMessage")
 
-const isReady = ref(!loaderEnabled)
+const route = useRoute()
+const excludedNames = new Set(["dashboard", "login", "register"]) 
+const isExcludedRoute = computed(() => excludedNames.has(route.name))
+
+const isReady = computed(() => {
+    if(!loaderEnabled)
+        return true
+    if(isExcludedRoute.value)
+        return true
+    return loaderAnimationStatus.value === LoaderAnimationStatus.TRACKING_PROGRESS ||
+           loaderAnimationStatus.value === LoaderAnimationStatus.LEAVING
+})
 
 watch(() => loaderEnabled.value, () => {
     if(loaderEnabled.value) {
@@ -41,7 +53,6 @@ const _onLoaderRendered = () => {
 }
 
 const _onLoaderReady = () => {
-    isReady.value = true
     loaderAnimationStatus.value = LoaderAnimationStatus.TRACKING_PROGRESS
 }
 

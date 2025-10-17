@@ -97,34 +97,37 @@
                                     <div class="font-input-group">
                                         <label class="font-label">Tamaño de Títulos (px)</label>
                                         <input 
-                                            type="number" 
-                                            v-model="fontConfig.titleSize"
-                                            class="font-input"
-                                            min="20"
-                                            max="80"
+                                            type="text" 
+                                            :value="fontConfig.titleSize"
+                                            @input="(e) => onFontSizeInput('titleSize', e.target.value)"
+                                            :class="['font-input', { 'error': hasFontError('titleSize') }]"
+                                            placeholder="20 - 80"
                                         />
+                                        <div v-if="hasFontError('titleSize')" class="input-error-message">{{ getFontError('titleSize') }}</div>
                                     </div>
                                     
                                     <div class="font-input-group">
                                         <label class="font-label">Tamaño de Subtítulos (px)</label>
                                         <input 
-                                            type="number" 
-                                            v-model="fontConfig.subtitleSize"
-                                            class="font-input"
-                                            min="16"
-                                            max="60"
+                                            type="text" 
+                                            :value="fontConfig.subtitleSize"
+                                            @input="(e) => onFontSizeInput('subtitleSize', e.target.value)"
+                                            :class="['font-input', { 'error': hasFontError('subtitleSize') }]"
+                                            placeholder="16 - 60"
                                         />
+                                        <div v-if="hasFontError('subtitleSize')" class="input-error-message">{{ getFontError('subtitleSize') }}</div>
                                     </div>
                                     
                                     <div class="font-input-group">
                                         <label class="font-label">Tamaño de Párrafos (px)</label>
                                         <input 
-                                            type="number" 
-                                            v-model="fontConfig.paragraphSize"
-                                            class="font-input"
-                                            min="12"
-                                            max="24"
+                                            type="text" 
+                                            :value="fontConfig.paragraphSize"
+                                            @input="(e) => onFontSizeInput('paragraphSize', e.target.value)"
+                                            :class="['font-input', { 'error': hasFontError('paragraphSize') }]"
+                                            placeholder="12 - 24"
                                         />
+                                        <div v-if="hasFontError('paragraphSize')" class="input-error-message">{{ getFontError('paragraphSize') }}</div>
                                     </div>
                                 </div>
                                 
@@ -136,8 +139,9 @@
                                                 type="file" 
                                                 ref="primaryFontInput"
                                                 @change="handlePrimaryFontUpload"
-                                                accept=".ttf,.otf,.woff,.woff2"
+                                                accept=".ttf"
                                                 class="file-input"
+                                                :class="{ 'error': hasFontError('primaryFont') }"
                                             />
                                             <button class="file-upload-btn" @click="$refs.primaryFontInput.click()">
                                                 <i class="fa-solid fa-upload me-2"></i>
@@ -148,6 +152,7 @@
                                             <i class="fa-solid fa-check-circle text-success me-1"></i>
                                             {{ fontConfig.primaryFont }}
                                         </div>
+                                        <div v-if="hasFontError('primaryFont')" class="input-error-message">{{ getFontError('primaryFont') }}</div>
                                     </div>
                                     
                                     <div class="font-upload-group">
@@ -157,8 +162,9 @@
                                                 type="file" 
                                                 ref="secondaryFontInput"
                                                 @change="handleSecondaryFontUpload"
-                                                accept=".ttf,.otf,.woff,.woff2"
+                                                accept=".ttf"
                                                 class="file-input"
+                                                :class="{ 'error': hasFontError('secondaryFont') }"
                                             />
                                             <button class="file-upload-btn" @click="$refs.secondaryFontInput.click()">
                                                 <i class="fa-solid fa-upload me-2"></i>
@@ -169,6 +175,7 @@
                                             <i class="fa-solid fa-check-circle text-success me-1"></i>
                                             {{ fontConfig.secondaryFont }}
                                         </div>
+                                        <div v-if="hasFontError('secondaryFont')" class="input-error-message">{{ getFontError('secondaryFont') }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -195,28 +202,58 @@
                             </h5>
                             
                             <!-- Preview de Tipografía -->
-                            <div class="typography-preview" :style="{ 
-                                fontFamily: fontConfig.primaryFont || 'Arial, sans-serif',
-                                fontSize: fontConfig.paragraphSize + 'px'
-                            }">
-                                <div class="preview-icon">
-                                    <i class="fa-solid fa-map-pin"></i>
+                            
+
+                            <!-- Vista Previa Combinada (Colores + Tipografía) -->
+                            <div class="combined-preview"
+                                 :style="{ fontFamily: fontConfig.primaryFont || 'Saira, Arial, sans-serif' }">
+                                <div class="combined-header"
+                                     :style="{ backgroundColor: colorConfig[0].value, color: '#ffffff' }">
+                                    <div class="combined-logo">
+                                        <span class="logo-mark" :style="{ backgroundColor: colorConfig[1].value }"></span>
+                                        <span class="logo-text" :style="{ fontFamily: fontConfig.secondaryFont || 'Patua One, serif' }">Agency</span>
+                                    </div>
+                                    <div class="combined-menu">
+                                        <span>Inicio</span>
+                                        <span>Servicios</span>
+                                        <span>Portafolio</span>
+                                        <button class="cta-btn"
+                                                :style="{ backgroundColor: colorConfig[1].value, color: '#fff' }">Contáctanos</button>
+                                    </div>
                                 </div>
-                                <h1 class="preview-title-text" :style="{ 
-                                    fontSize: fontConfig.titleSize + 'px',
-                                    fontFamily: fontConfig.secondaryFont || 'Arial, sans-serif'
-                                }">
-                                    Travel Guide
-                                </h1>
-                                <p class="preview-text">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
-                                </p>
+                                <div class="combined-hero" :style="{ backgroundColor: colorConfig[4].value }">
+                                    <h2 class="hero-title" :style="{ fontSize: fontConfig.titleSize + 'px', fontFamily: fontConfig.secondaryFont || 'Patua One, serif', color: colorConfig[2].value === '#000000' ? '#111' : colorConfig[2].value }">
+                                        Creamos experiencias digitales
+                                    </h2>
+                                    <p class="hero-subtitle" :style="{ fontSize: fontConfig.subtitleSize + 'px', color: '#555' }">
+                                        Diseño, desarrollo y estrategia para tu marca
+                                    </p>
+                                    <div class="hero-actions">
+                                        <button class="xl-btn primary"
+                                                :style="{ backgroundColor: colorConfig[1].value, color: '#fff' }">Empieza ahora</button>
+                                        <button class="xl-btn ghost"
+                                                :style="{ borderColor: colorConfig[1].value, color: colorConfig[1].value }">Ver trabajos</button>
+                                    </div>
+                                </div>
+                                <div class="combined-cards">
+                                    <div class="c-card" :style="{ backgroundColor: '#fff', borderColor: '#eee' }">
+                                        <i class="fa-solid fa-bolt" :style="{ color: colorConfig[1].value }"></i>
+                                        <h6 :style="{ fontFamily: fontConfig.secondaryFont || 'Patua One, serif' }">Rápido</h6>
+                                        <p :style="{ fontSize: fontConfig.paragraphSize + 'px' }">Implementaciones veloces y de calidad.</p>
+                                    </div>
+                                    <div class="c-card" :style="{ backgroundColor: '#fff', borderColor: '#eee' }">
+                                        <i class="fa-solid fa-shield" :style="{ color: colorConfig[1].value }"></i>
+                                        <h6 :style="{ fontFamily: fontConfig.secondaryFont || 'Patua One, serif' }">Seguro</h6>
+                                        <p :style="{ fontSize: fontConfig.paragraphSize + 'px' }">Buenas prácticas y seguridad.</p>
+                                    </div>
+                                    <div class="c-card" :style="{ backgroundColor: '#fff', borderColor: '#eee' }">
+                                        <i class="fa-solid fa-star" :style="{ color: colorConfig[1].value }"></i>
+                                        <h6 :style="{ fontFamily: fontConfig.secondaryFont || 'Patua One, serif' }">Calidad</h6>
+                                        <p :style="{ fontSize: fontConfig.paragraphSize + 'px' }">Diseños pulidos y modernos.</p>
+                                    </div>
+                                </div>
                             </div>
-                            
-                            
-                            
-                            
-                            
+
                             <div class="preview-container">
                                 <!-- Header Preview -->
                                 <div class="preview-header" :style="{ backgroundColor: colorConfig[0].value }">
@@ -229,7 +266,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Content Preview -->
                                 <div class="preview-content">
                                     <div class="preview-cards">
@@ -246,7 +283,7 @@
                                             <span>Estadística 3</span>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="preview-section" :style="{ backgroundColor: colorConfig[4].value }">
                                         <h6>Sección de Contenido</h6>
                                         <p>Este es un ejemplo de cómo se verá tu dashboard con los colores seleccionados.</p>
@@ -257,59 +294,110 @@
                     </div>
                 </div>
                 
-                <!-- Sección de Paletas Guardadas -->
+                <!-- Sección de Paletas / Tipografías Guardadas -->
                 <div class="row mt-5">
                     <div class="col-12">
                         <div class="saved-palettes-section">
                             <h4 class="section-title">
                                 <i class="fa-solid fa-save me-2"></i>
-                                Paletas Guardadas
-                                <span class="palette-count">({{ savedPalettes.length }})</span>
+                                <span v-if="activeTab === 'colors'">Paletas Guardadas</span>
+                                <span v-else>Tipografías Guardadas</span>
+                                <span class="palette-count">({{ activeTab === 'colors' ? savedPalettes.length : savedTypography.length }})</span>
                             </h4>
-                            
-                            <div v-if="savedPalettes.length === 0" class="no-palettes">
-                                <i class="fa-solid fa-palette"></i>
-                                <p>No tienes paletas guardadas aún</p>
-                                <small>Configura los colores arriba y guárdalos para crear tu primera paleta</small>
+
+                            <div v-if="activeTab === 'colors'">
+                                <div v-if="savedPalettes.length === 0" class="no-palettes">
+                                    <i class="fa-solid fa-palette"></i>
+                                    <p>No tienes paletas guardadas aún</p>
+                                    <small>Configura los colores arriba y guárdalos para crear tu primera paleta</small>
+                                </div>
+
+                                <div v-else class="palettes-grid">
+                                    <div 
+                                        v-for="palette in savedPalettes" 
+                                        :key="palette.id"
+                                        class="palette-card"
+                                    >
+                                        <div class="palette-header">
+                                            <h6 class="palette-name">{{ palette.name }}</h6>
+                                            <small class="palette-date">{{ formatDate(palette.createdAt) }}</small>
+                                        </div>
+
+                                        <div class="palette-colors">
+                                            <div 
+                                                v-for="color in palette.colors" 
+                                                :key="color.id"
+                                                class="color-preview"
+                                                :style="{ backgroundColor: color.value }"
+                                                :title="color.label"
+                                            ></div>
+                                        </div>
+
+                                        <div class="palette-actions">
+                                            <button 
+                                                class="btn btn-sm btn-primary"
+                                                @click="loadPalette(palette)"
+                                                title="Cargar paleta"
+                                            >
+                                                <i class="fa-solid fa-upload me-1"></i>
+                                                Cargar
+                                            </button>
+                                            <button 
+                                                class="btn btn-sm btn-outline-danger"
+                                                @click="deletePalette(palette.id)"
+                                                title="Eliminar paleta"
+                                            >
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            
-                            <div v-else class="palettes-grid">
-                                <div 
-                                    v-for="palette in savedPalettes" 
-                                    :key="palette.id"
-                                    class="palette-card"
-                                >
-                                    <div class="palette-header">
-                                        <h6 class="palette-name">{{ palette.name }}</h6>
-                                        <small class="palette-date">{{ formatDate(palette.createdAt) }}</small>
+
+                            <div v-else>
+                                <!-- UI para guardar nuevas tipografías -->
+                                <div class="typography-save">
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control" v-model="newTypographyName" placeholder="Nombre de la tipografía (ej: Corporativa)" />
                                     </div>
-                                    
-                                    <div class="palette-colors">
-                                        <div 
-                                            v-for="color in palette.colors" 
-                                            :key="color.id"
-                                            class="color-preview"
-                                            :style="{ backgroundColor: color.value }"
-                                            :title="color.label"
-                                        ></div>
+                                    <div class="mb-3">
+                                        <button class="btn btn-success btn-sm me-2" @click="saveCurrentTypography">
+                                            <i class="fa-solid fa-save me-1"></i>
+                                            Guardar Tipografía
+                                        </button>
                                     </div>
-                                    
-                                    <div class="palette-actions">
-                                        <button 
-                                            class="btn btn-sm btn-primary"
-                                            @click="loadPalette(palette)"
-                                            title="Cargar paleta"
-                                        >
-                                            <i class="fa-solid fa-upload me-1"></i>
-                                            Cargar
-                                        </button>
-                                        <button 
-                                            class="btn btn-sm btn-outline-danger"
-                                            @click="deletePalette(palette.id)"
-                                            title="Eliminar paleta"
-                                        >
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
+                                </div>
+
+                                <div v-if="savedTypography.length === 0" class="no-palettes">
+                                    <i class="fa-solid fa-font"></i>
+                                    <p>No tienes tipografías guardadas aún</p>
+                                    <small>Configura los tamaños y fuentes arriba y guárdalos para crear tu primera tipografía</small>
+                                </div>
+
+                                <div v-else class="typographies-grid">
+                                    <div v-for="item in savedTypography" :key="item.id" class="palette-card">
+                                        <div class="palette-header">
+                                            <h6 class="palette-name">{{ item.name }}</h6>
+                                            <small class="palette-date">{{ formatDate(item.createdAt) }}</small>
+                                        </div>
+                                        <div class="palette-colors">
+                                            <div class="color-preview" style="background:#fff; border:1px solid #dee2e6;" title="Tamaños">
+                                                <div style="padding:10px; color:#333;">
+                                                    <div><strong>Títulos:</strong> {{ item.fonts.titleSize }}px</div>
+                                                    <div><strong>Subtítulos:</strong> {{ item.fonts.subtitleSize }}px</div>
+                                                    <div><strong>Párrafos:</strong> {{ item.fonts.paragraphSize }}px</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="palette-actions">
+                                            <button class="btn btn-sm btn-primary" @click="loadTypography(item)">
+                                                <i class="fa-solid fa-upload me-1"></i>
+                                                Cargar
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" @click="deleteTypography(item.id)">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -326,32 +414,33 @@ import PageSection from "/src/vue/components/layout/PageSection.vue"
 import PageSectionHeader from "/src/vue/components/layout/PageSectionHeader.vue"
 import PageSectionContent from "/src/vue/components/layout/PageSectionContent.vue"
 import {ref} from "vue"
+import Swal from 'sweetalert2'
 
 const colorConfig = ref([
     {
         id: 'primary-color',
-        label: 'Color Primario',
-        value: '#667eea'
+        label: 'Color 1',
+        value: '#212529' // dark header/nav
     },
     {
         id: 'secondary-color',
-        label: 'Color Secundario',
-        value: '#764ba2'
+        label: 'Color 2',
+        value: '#ff5900' // primary orange
     },
     {
         id: 'accent-color',
-        label: 'Color de Acento',
-        value: '#f093fb'
+        label: 'Color 3',
+        value: '#000000' // black accent
     },
     {
         id: 'success-color',
-        label: 'Color de Éxito',
-        value: '#4facfe'
+        label: 'Color 4',
+        value: '#343a40' // dark gray
     },
     {
         id: 'background-color',
-        label: 'Color de Fondo',
-        value: '#f8f9fa'
+        label: 'Color 5',
+        value: '#fcfcfc' // light background
     }
 ])
 
@@ -368,26 +457,105 @@ const activeTab = ref('colors')
 // Variables para gestión de paletas
 const newPaletteName = ref('')
 const savedPalettes = ref([])
+const newTypographyName = ref('')
+const savedTypography = ref([])
 
 // Variables para validación de colores
 const colorErrors = ref({})
 
+// Refs para los inputs de archivo (para limpiar en caso de error)
+const primaryFontInput = ref(null)
+const secondaryFontInput = ref(null)
+
+// Errores relacionados con tipografía (validación en tiempo real)
+const fontErrors = ref({
+    titleSize: null,
+    subtitleSize: null,
+    paragraphSize: null,
+    primaryFont: null,
+    secondaryFont: null
+})
+
+const hasFontError = (field) => {
+    return !!fontErrors.value[field]
+}
+
+const getFontError = (field) => {
+    return fontErrors.value[field] || ''
+}
+
+const onFontSizeInput = (field, rawValue) => {
+    // Eliminar todo lo que no sea dígito
+    const digits = String(rawValue).replace(/[^0-9]/g, '')
+    if (digits === '') {
+        fontErrors.value[field] = 'Introduce un número válido'
+        // No sobrescribimos con NaN: dejamos el texto temporalmente
+        fontConfig.value[field] = rawValue
+        return
+    }
+
+    const num = parseInt(digits, 10)
+    fontConfig.value[field] = num
+
+    // Rango por campo
+    if (field === 'titleSize') {
+        if (num < 20 || num > 80) {
+            fontErrors.value[field] = 'El valor debe estar entre 20 y 80'
+            return
+        }
+    }
+    if (field === 'subtitleSize') {
+        if (num < 16 || num > 60) {
+            fontErrors.value[field] = 'El valor debe estar entre 16 y 60'
+            return
+        }
+    }
+    if (field === 'paragraphSize') {
+        if (num < 12 || num > 24) {
+            fontErrors.value[field] = 'El valor debe estar entre 12 y 24'
+            return
+        }
+    }
+
+    // Si todo está bien, limpiar error
+    fontErrors.value[field] = null
+}
+
 const handlePrimaryFontUpload = (event) => {
     const file = event.target.files[0]
-    if (file) {
-        fontConfig.value.primaryFont = file.name
-        // Aquí podrías cargar la fuente dinámicamente
-        loadFont(file, 'primary-font')
+    if (!file) return
+
+    // Validar extensión .ttf
+    if (!/\.ttf$/i.test(file.name)) {
+        fontErrors.value.primaryFont = 'Archivo inválido: sube un .ttf'
+        // Limpiar input
+        try {
+            if (primaryFontInput && primaryFontInput.value) primaryFontInput.value.value = ''
+        } catch (e) {}
+        return
     }
+
+    // Si es válido, limpiar error y procesar
+    fontErrors.value.primaryFont = null
+    fontConfig.value.primaryFont = file.name
+    loadFont(file, 'primary-font')
 }
 
 const handleSecondaryFontUpload = (event) => {
     const file = event.target.files[0]
-    if (file) {
-        fontConfig.value.secondaryFont = file.name
-        // Aquí podrías cargar la fuente dinámicamente
-        loadFont(file, 'secondary-font')
+    if (!file) return
+
+    if (!/\.ttf$/i.test(file.name)) {
+        fontErrors.value.secondaryFont = 'Archivo inválido: sube un .ttf'
+        try {
+            if (secondaryFontInput && secondaryFontInput.value) secondaryFontInput.value.value = ''
+        } catch (e) {}
+        return
     }
+
+    fontErrors.value.secondaryFont = null
+    fontConfig.value.secondaryFont = file.name
+    loadFont(file, 'secondary-font')
 }
 
 const loadFont = (file, fontName) => {
@@ -479,6 +647,76 @@ const saveCurrentPalette = () => {
     alert('Paleta guardada exitosamente!')
 }
 
+const saveCurrentTypography = () => {
+    if (!newTypographyName.value.trim()) {
+        alert('Por favor ingresa un nombre para la tipografía')
+        return
+    }
+
+    // Validar tamaños antes de guardar
+    if (!validateFontSizes()) return
+
+    const newItem = {
+        id: Date.now().toString(),
+        name: newTypographyName.value.trim(),
+        fonts: {
+            titleSize: fontConfig.value.titleSize,
+            subtitleSize: fontConfig.value.subtitleSize,
+            paragraphSize: fontConfig.value.paragraphSize,
+            primaryFont: fontConfig.value.primaryFont,
+            secondaryFont: fontConfig.value.secondaryFont
+        },
+        createdAt: new Date().toISOString()
+    }
+
+    savedTypography.value.unshift(newItem)
+    saveTypographiesToStorage()
+    newTypographyName.value = ''
+    alert('Tipografía guardada exitosamente!')
+}
+
+const loadTypography = (item) => {
+    if (!item || !item.fonts) return
+    fontConfig.value = {
+        titleSize: item.fonts.titleSize,
+        subtitleSize: item.fonts.subtitleSize,
+        paragraphSize: item.fonts.paragraphSize,
+        primaryFont: item.fonts.primaryFont || '',
+        secondaryFont: item.fonts.secondaryFont || ''
+    }
+    alert('Tipografía cargada exitosamente!')
+}
+
+const deleteTypography = (id) => {
+    const item = savedTypography.value.find(p => p.id === id)
+    if (item && confirm(`¿Eliminar la tipografía "${item.name}"?`)) {
+        savedTypography.value = savedTypography.value.filter(p => p.id !== id)
+        saveTypographiesToStorage()
+        alert('Tipografía eliminada exitosamente!')
+    }
+}
+
+const saveTypographiesToStorage = () => {
+    try {
+        localStorage.setItem('dashboard-typographies', JSON.stringify(savedTypography.value))
+    } catch (error) {
+        console.error('Error guardando tipografías en localStorage:', error)
+        alert('Error al guardar la tipografía. Inténtalo de nuevo.')
+    }
+}
+
+const loadTypographiesFromStorage = () => {
+    try {
+        const stored = localStorage.getItem('dashboard-typographies')
+        if (stored) {
+            savedTypography.value = JSON.parse(stored)
+        }
+    } catch (error) {
+        console.error('Error cargando tipografías desde localStorage:', error)
+        savedTypography.value = []
+    }
+}
+
 const loadPalette = (palette) => {
     if (confirm(`¿Cargar la paleta "${palette.name}"? Esto reemplazará los colores actuales.`)) {
         // Cargar los colores de la paleta
@@ -489,11 +727,25 @@ const loadPalette = (palette) => {
 
 const deletePalette = (paletteId) => {
     const palette = savedPalettes.value.find(p => p.id === paletteId)
-    if (palette && confirm(`¿Eliminar la paleta "${palette.name}"?`)) {
+    Swal.fire({
+    title: "Are you sure?",
+    text: "You won't be able to revert this!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+    if (result.isConfirmed) {
+        Swal.fire({
+        title: "Deleted!",
+        text: "Your file has been deleted.",
+        icon: "success"
+        });
         savedPalettes.value = savedPalettes.value.filter(p => p.id !== paletteId)
         savePalettesToStorage()
-        alert('Paleta eliminada exitosamente!')
     }
+    });
 }
 
 const savePalettesToStorage = () => {
@@ -530,6 +782,25 @@ const formatDate = (dateString) => {
 
 // Cargar paletas al inicializar el componente
 loadPalettesFromStorage()
+loadTypographiesFromStorage()
+
+//validar los tamaños de fuente
+const validateFontSizes = () => {
+    let isValid = true;
+    if (fontConfig.value.titleSize < 20 || fontConfig.value.titleSize > 80) {
+        isValid = false;
+        alert('Tamaño de títulos inválido: debe estar entre 20 y 80 px');
+    }
+    if (fontConfig.value.subtitleSize < 16 || fontConfig.value.subtitleSize > 60) {
+        isValid = false;
+        alert('Tamaño de subtítulos inválido: debe estar entre 16 y 60 px');
+    }
+    if (fontConfig.value.paragraphSize < 12 || fontConfig.value.paragraphSize > 24) {
+        isValid = false;
+        alert('Tamaño de párrafos inválido: debe estar entre 12 y 24 px');
+    }
+    return isValid;
+}
 
 // Funciones de validación de colores
 const isValidHexColor = (color) => {
@@ -1076,6 +1347,113 @@ const getColorError = (colorId) => {
     }
 }
 
+.combined-preview {
+    border: 2px solid #ecf0f1;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    background: #ffffff;
+}
+
+.combined-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+}
+
+.combined-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+}
+
+.logo-mark {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+.combined-menu {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    
+    span {
+        opacity: 0.9;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+}
+
+.cta-btn {
+    border: none;
+    border-radius: 999px;
+    padding: 0.45rem 0.9rem;
+    font-weight: 600;
+}
+
+.combined-hero {
+    padding: 2rem 1.25rem;
+    border-top: 1px solid #ecf0f1;
+}
+
+.hero-title {
+    margin: 0 0 0.5rem 0;
+    line-height: 1.15;
+}
+
+.hero-subtitle {
+    margin: 0 0 1.25rem 0;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.xl-btn {
+    padding: 0.6rem 1.1rem;
+    border-radius: 10px;
+    font-weight: 700;
+    border: 2px solid transparent;
+}
+
+.xl-btn.ghost {
+    background: transparent;
+}
+
+.combined-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    padding: 1rem 1.25rem 1.25rem;
+}
+
+.c-card {
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: left;
+    
+    i {
+        font-size: 1.25rem;
+        margin-bottom: 0.35rem;
+        display: inline-block;
+    }
+    h6 {
+        margin: 0 0 0.25rem 0;
+        font-weight: 700;
+    }
+    p {
+        margin: 0;
+        color: #6c757d;
+        line-height: 1.5;
+    }
+}
+
 @include media-breakpoint-down(lg) {
     .config-sidebar {
         position: static;
@@ -1322,5 +1700,17 @@ const getColorError = (colorId) => {
             }
         }
     }
+}
+
+/* Estilos para validaciones de tipografía */
+.font-input.error, .file-input.error {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 3px rgba(220,53,69,0.08);
+}
+
+.input-error-message {
+    color: #dc3545;
+    font-size: 0.85rem;
+    margin-top: 0.4rem;
 }
 </style>

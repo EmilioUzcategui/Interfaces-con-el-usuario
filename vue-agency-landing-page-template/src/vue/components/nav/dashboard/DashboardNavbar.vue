@@ -69,12 +69,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Link from "/src/vue/components/generic/Link.vue"
 
+
+
 const route = useRoute()
 const router = useRouter()
+
+const setSpinnerEnabled = inject("setSpinnerEnabled")
 
 const props = defineProps({
     brandLabel: {
@@ -133,8 +137,22 @@ const toggleUserMenu = () => {
     showUserMenu.value = !showUserMenu.value
 }
 
-const handleLogout = () => {
-    // Handle logout logic here
+const handleLogout = async () => {
+    // Limpiar sesión y notificar al resto de la app
+    setSpinnerEnabled && setSpinnerEnabled(true, 'Cerrando sesión...')
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    setSpinnerEnabled && setSpinnerEnabled(false)
+
+    try {
+        localStorage.removeItem('currentUser')
+    } catch(e) {
+        console.warn('Could not remove currentUser from localStorage', e)
+    }
+
+    // Disparar evento personalizado para que otros componentes actualicen estado
+    window.dispatchEvent(new CustomEvent('userLogout'))
+
+    // Redirigir al home público
     router.push('/')
 }
 

@@ -9,11 +9,12 @@
 
 <script setup>
 import {computed, inject, onMounted, watch} from "vue"
-import {useRouter} from "vue-router"
+import {useRouter, useRoute} from "vue-router"
 import ProjectModal from "/src/vue/components/projects/ProjectModal.vue"
 import {useUtils} from "/src/composables/utils.js"
 
 const router = useRouter()
+const route = useRoute()
 const utils = useUtils()
 
 const loaderEnabled = inject("loaderEnabled")
@@ -24,9 +25,15 @@ const projectModalTarget = inject("projectModalTarget")
 const LoaderAnimationStatus = inject("LoaderAnimationStatus")
 const loaderAnimationStatus = inject("loaderAnimationStatus")
 
+const excludedNames = new Set(["dashboard", "login", "register"]) 
+const isExcludedRoute = computed(() => excludedNames.has(route.name))
+
 const shouldSlot = computed(() => {
-    return !loaderEnabled ||
-        loaderAnimationStatus.value === LoaderAnimationStatus.TRACKING_PROGRESS ||
+    if(!loaderEnabled)
+        return true
+    if(isExcludedRoute.value)
+        return true
+    return loaderAnimationStatus.value === LoaderAnimationStatus.TRACKING_PROGRESS ||
         loaderAnimationStatus.value === LoaderAnimationStatus.LEAVING
 })
 
@@ -67,6 +74,15 @@ watch(() => loaderAnimationStatus.value, () => {
 router.beforeEach((to, from, next) => {
     if(from.name === to.name || !loaderEnabled) {
         next()
+        return
+    }
+
+    // Saltar preloader una sola vez (por ejemplo, al redirigir tras login)
+    const skipOnce = localStorage.getItem('skipPreloaderOnce') === '1'
+    if (skipOnce) {
+        localStorage.removeItem('skipPreloaderOnce')
+        next()
+        window.scrollTo({top: 0, behavior: "instant"})
         return
     }
 

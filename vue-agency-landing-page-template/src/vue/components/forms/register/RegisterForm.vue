@@ -9,6 +9,8 @@
                     id="name" 
                     v-model="form.name"
                     :class="{ 'is-invalid': errors.name }"
+                    @input="validateField('name')"
+                    @blur="validateField('name')"
                     required
                 >
                 <div v-if="errors.name" class="invalid-feedback">
@@ -24,6 +26,8 @@
                     id="email" 
                     v-model="form.email"
                     :class="{ 'is-invalid': errors.email }"
+                    @input="validateField('email')"
+                    @blur="validateField('email')"
                     required
                 >
                 <div v-if="errors.email" class="invalid-feedback">
@@ -39,6 +43,8 @@
                     id="password" 
                     v-model="form.password"
                     :class="{ 'is-invalid': errors.password }"
+                    @input="validateField('password')"
+                    @blur="validateField('password')"
                     required
                 >
                 <div v-if="errors.password" class="invalid-feedback">
@@ -54,6 +60,8 @@
                     id="confirmPassword" 
                     v-model="form.confirmPassword"
                     :class="{ 'is-invalid': errors.confirmPassword }"
+                    @input="validateField('confirmPassword')"
+                    @blur="validateField('confirmPassword')"
                     required
                 >
                 <div v-if="errors.confirmPassword" class="invalid-feedback">
@@ -73,7 +81,7 @@
             </div>
 
             <div class="text-center mt-3">
-                <p>¿Ya tienes cuenta? <a href="/login" class="text-decoration-none">Inicia sesión</a></p>
+                <p>¿Ya tienes cuenta? <a href="login" class="text-decoration-none">Inicia sesión</a></p>
             </div>
         </form>
     </div>
@@ -93,9 +101,80 @@ const form = reactive({
 });
 
 const errors = reactive({});
+const touched = reactive({
+    name: false,
+    email: false,
+    password: false,
+    confirmPassword: false
+});
 const message = ref('');
 const messageType = ref('');
 const loading = ref(false);
+
+const validateField = (fieldName) => {
+    // Marcar el campo como tocado
+    touched[fieldName] = true;
+    
+    // Limpiar error anterior para este campo
+    delete errors[fieldName];
+    
+    let isValid = true;
+
+    switch (fieldName) {
+        case 'name':
+            if (!form.name.trim()) {
+                errors.name = 'El nombre es requerido';
+                isValid = false;
+            }
+            //validar que el nombre no tenga numeros
+            else if (/\d/.test(form.name)) {
+                errors.name = 'El nombre no puede contener números';
+                isValid = false;
+            }
+            //validar que el nombre tenga al menos 3 caracteres
+            else if (form.name.trim().length < 3) {
+                errors.name = 'El nombre debe tener al menos 3 caracteres';
+                isValid = false;
+            }
+            break;
+            
+        case 'email':
+            if (!form.email.trim()) {
+                errors.email = 'El email es requerido';
+                isValid = false;
+            } else if (!/\S+@\S+\.\S+/.test(form.email)) {
+                errors.email = 'El email no es válido';
+                isValid = false;
+            }
+            break;
+            
+        case 'password':
+            if (!form.password) {
+                errors.password = 'La contraseña es requerida';
+                isValid = false;
+            } else if (form.password.length < 6) {
+                errors.password = 'La contraseña debe tener al menos 6 caracteres';
+                isValid = false;
+            }
+            // Si hay confirmPassword, validarlo también
+            if (touched.confirmPassword) {
+                validateField('confirmPassword');
+            }
+            break;
+            
+        case 'confirmPassword':
+            if (!form.confirmPassword) {
+                errors.confirmPassword = 'Confirma tu contraseña';
+                isValid = false;
+            } else if (form.password !== form.confirmPassword) {
+                errors.confirmPassword = 'Las contraseñas no coinciden';
+                isValid = false;
+            }
+            break;
+    }
+    
+    return isValid;
+};
 
 const validateForm = () => {
     // Limpiar errores anteriores
@@ -103,44 +182,21 @@ const validateForm = () => {
     
     let isValid = true;
 
-    // Validar nombre
-    if (!form.name.trim()) {
-        errors.name = 'El nombre es requerido';
-        isValid = false;
-    }
-
-    // Validar email
-    if (!form.email.trim()) {
-        errors.email = 'El email es requerido';
-        isValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(form.email)) {
-        errors.email = 'El email no es válido';
-        isValid = false;
-    }
-
-    // Validar contraseña
-    if (!form.password) {
-        errors.password = 'La contraseña es requerida';
-        isValid = false;
-    } else if (form.password.length < 6) {
-        errors.password = 'La contraseña debe tener al menos 6 caracteres';
-        isValid = false;
-    }
-
-    // Validar confirmación de contraseña
-    if (!form.confirmPassword) {
-        errors.confirmPassword = 'Confirma tu contraseña';
-        isValid = false;
-    } else if (form.password !== form.confirmPassword) {
-        errors.confirmPassword = 'Las contraseñas no coinciden';
-        isValid = false;
-    }
+    // Validar todos los campos
+    const fields = ['name', 'email', 'password', 'confirmPassword'];
+    fields.forEach(field => {
+        if (!validateField(field)) {
+            isValid = false;
+        }
+    });
 
     return isValid;
 };
 
 const handleSubmit = async () => {
     if (!validateForm()) {
+        message.value = 'Por favor corrige los errores antes de enviar.';
+        messageType.value = 'alert-danger';
         return;
     }
 
@@ -182,7 +238,8 @@ const handleSubmit = async () => {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import "/src/scss/_theming.scss";
 .register-form {
     background: white;
     padding: 2rem;
@@ -191,19 +248,23 @@ const handleSubmit = async () => {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, $primary 0%, $primary 100%);
     border: none;
     padding: 12px;
     font-weight: 600;
+    border-radius: 30px;
+    transition: background 0.5s ease;
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    background: linear-gradient(135deg, #d35309 0%, #d35309 100%);
     transform: translateY(-1px);
+    
+;
 }
 
 .form-control:focus {
     border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    box-shadow: 0 0 0 0.2rem $primary
 }
 </style>

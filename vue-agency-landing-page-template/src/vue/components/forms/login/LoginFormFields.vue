@@ -73,21 +73,15 @@
             </XLButton>
         </div>
 
-        <!-- Demo Credentials -->
-        <div class="mt-4 p-3 bg-light rounded">
-            <small class="text-muted">
-                <strong>{{ strings.get('demo_credentials') }}:</strong><br>
-                Email: admin@example.com<br>
-                Password: password123
-            </small>
-        </div>
-
         <!-- Register Link -->
         <div class="text-center mt-4">
             <span class="text-muted">{{ strings.get('no_account') }}</span>
-            <Link :href="'/register'"
-                  :label="strings.get('register_link')"
-                  :class="'ms-2 text-decoration-none fw-bold'"/>
+            <router-link
+                to="/register"
+                class="ms-2 text-decoration-none fw-bold"
+            >
+                {{ strings.get('register_link') }}
+            </router-link>
         </div>
     </div>
 </template>

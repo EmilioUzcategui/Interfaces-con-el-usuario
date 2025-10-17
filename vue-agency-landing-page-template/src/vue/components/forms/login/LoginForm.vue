@@ -79,7 +79,10 @@ const _validate = () => {
 }
 
 const _submit = async () => {
+    // Iniciar spinner y que dure un segundo mínimo
     setSpinnerEnabled && setSpinnerEnabled(true, strings.get('logging_in'))
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
 
     try {
         const response = await fetch('http://localhost:3000/api/login', {
@@ -102,12 +105,21 @@ const _submit = async () => {
             // Guardar usuario en localStorage
             localStorage.setItem('currentUser', JSON.stringify(data.user))
             
+            // Forzar actualización inmediata de la navbar
+            window.dispatchEvent(new CustomEvent('userLogin'))
+            
+            // Pequeño delay para asegurar que el evento se procese
+            await new Promise(resolve => setTimeout(resolve, 100))
+            
             // Redirigir según el ID del usuario
-            if (data.user.id === 1) {
+            console.log('Login exitoso:', data)
+            if (data.user.id_user === 1) {
                 // Es admin, va al dashboard
                 router.push('/dashboard')
             } else {
                 // Es usuario normal, va al home
+                // Marcar para saltar preloader en el siguiente cambio de ruta
+                localStorage.setItem('skipPreloaderOnce', '1')
                 router.push('/')
             }
         } else {

@@ -31,6 +31,27 @@ const props = defineProps({
     label: String
 })
 
+const isLoggedIn = ref(false)
+
+const checkLoginStatus = () => {
+    const userData = localStorage.getItem('currentUser')
+    isLoggedIn.value = userData !== null
+}
+
+onMounted(() => {
+    // Monitorear cambios en localStorage y eventos de login/logout
+    checkLoginStatus()
+    window.addEventListener('storage', checkLoginStatus)
+    window.addEventListener('userLogin', checkLoginStatus)
+    window.addEventListener('userLogout', checkLoginStatus)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('storage', checkLoginStatus)
+    window.removeEventListener('userLogin', checkLoginStatus)
+    window.removeEventListener('userLogout', checkLoginStatus)
+})
+
 const linkList = computed(() => {
     const sections = currentPageSections?.value
     const sectionLinks = sections && sections.length ? sections.map(section => {
@@ -42,15 +63,19 @@ const linkList = computed(() => {
         }
     }).filter(section => section.label && section.path) : []
 
-    // Agregar enlace de login al final
-    const loginLink = {
-        path: '/login',
-        label: 'Login',
-        faIcon: 'fa-solid fa-user',
-        isActive: route.path === '/login'
+    // Agregar enlace de login al final solo si NO está logueado
+    if (!isLoggedIn.value) {
+        const loginLink = {
+            path: '/login',
+            label: 'Login',
+            faIcon: 'fa-solid fa-user',
+            isActive: route.path === '/login'
+        }
+
+        return [...sectionLinks, loginLink]
     }
 
-    return [...sectionLinks, loginLink]
+    return sectionLinks
 })
 
 onMounted(() => {

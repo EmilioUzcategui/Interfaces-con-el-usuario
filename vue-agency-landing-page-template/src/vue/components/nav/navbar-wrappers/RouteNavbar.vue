@@ -8,7 +8,7 @@
 
 <script setup>
 import Navbar from "/src/vue/components/nav/navbar/Navbar.vue"
-import {computed} from "vue"
+import {computed, ref, onMounted, onUnmounted, watch, nextTick} from "vue"
 import {useRoute, useRouter} from "vue-router"
 
 const route = useRoute()
@@ -19,7 +19,39 @@ const props = defineProps({
     label: String
 })
 
+const isLoggedIn = ref(false)
+
+const checkLoginStatus = () => {
+    const userData = localStorage.getItem('currentUser')
+    isLoggedIn.value = userData !== null
+    console.log('Login status updated:', isLoggedIn.value, userData)
+}
+
+onMounted(() => {
+    checkLoginStatus()
+    // Listen for storage changes and custom login events
+    window.addEventListener('storage', checkLoginStatus)
+    window.addEventListener('userLogin', checkLoginStatus)
+    window.addEventListener('userLogout', checkLoginStatus)
+})
+
+// Watch para forzar reactividad
+watch(isLoggedIn, (newVal) => {
+    console.log('isLoggedIn changed to:', newVal)
+    nextTick(() => {
+        console.log('NextTick executed, forcing update')
+    })
+})
+
+onUnmounted(() => {
+    window.removeEventListener('storage', checkLoginStatus)
+    window.removeEventListener('userLogin', checkLoginStatus)
+    window.removeEventListener('userLogout', checkLoginStatus)
+})
+
 const linkList = computed(() => {
+    console.log('Computing linkList, isLoggedIn:', isLoggedIn.value)
+    
     // Enlaces fijos consistentes con la página principal
     const staticLinks = [
         {
@@ -66,7 +98,11 @@ const linkList = computed(() => {
         }
     ]
 
-    // Agregar enlaces de autenticación al final
+    // Solo agregar enlaces de autenticación si no está logueado
+    if (isLoggedIn.value) {
+        return staticLinks
+    }
+    
     const authLinks = [
         {
             path: '/register',

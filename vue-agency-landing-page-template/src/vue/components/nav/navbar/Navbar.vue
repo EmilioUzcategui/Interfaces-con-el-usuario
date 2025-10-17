@@ -12,6 +12,8 @@
                          :collapsed="isCollapsed"
                          @link-clicked="_onLinkClicked"/>
 
+            <UserAvatar v-if="isLoggedIn" />
+
             <NavbarToggleButton :collapsed="isCollapsed"
                                 @click="_onToggleClicked"/>
         </div>
@@ -19,11 +21,12 @@
 </template>
 
 <script setup>
-import {onMounted, onUnmounted, ref, watch} from "vue"
+import {onMounted, onUnmounted, ref, watch, computed} from "vue"
 import Link from "/src/vue/components/generic/Link.vue"
 import NavbarBrand from "/src/vue/components/nav/navbar/NavbarBrand.vue"
 import NavbarLinks from "/src/vue/components/nav/navbar/NavbarLinks.vue"
 import NavbarToggleButton from "/src/vue/components/nav/navbar/NavbarToggleButton.vue"
+import UserAvatar from "/src/vue/components/nav/navbar/UserAvatar.vue"
 import {useRoute} from "vue-router"
 import {useUtils} from "/src/composables/utils.js"
 
@@ -41,13 +44,29 @@ const props = defineProps({
 const isCollapsed = ref(true)
 const shouldExpand = ref(false)
 
+const isLoggedIn = ref(false)
+
+const checkLoginStatus = () => {
+    const userData = localStorage.getItem('currentUser')
+    isLoggedIn.value = userData !== null
+    console.log('Navbar login status updated:', isLoggedIn.value, userData)
+}
+
 onMounted(() => {
+    checkLoginStatus()
+    // Listen for storage changes and custom login events
+    window.addEventListener('storage', checkLoginStatus)
+    window.addEventListener('userLogin', checkLoginStatus)
+    window.addEventListener('userLogout', checkLoginStatus)
     window.addEventListener('scroll', _onWindowEvent)
     window.addEventListener('resize', _onWindowEvent)
     _onWindowEvent()
 })
 
 onUnmounted(() => {
+    window.removeEventListener('storage', checkLoginStatus)
+    window.removeEventListener('userLogin', checkLoginStatus)
+    window.removeEventListener('userLogout', checkLoginStatus)
     window.removeEventListener('scroll', _onWindowEvent)
     window.removeEventListener('resize', _onWindowEvent)
 })

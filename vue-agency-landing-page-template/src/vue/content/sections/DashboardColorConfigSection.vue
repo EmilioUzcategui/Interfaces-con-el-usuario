@@ -255,13 +255,13 @@
                             
 
                             <!-- Vista Previa Combinada (Colores + Tipografía) -->
-                            <div class="combined-preview"
-                                 :style="{ fontFamily: fontConfig.primaryFont || 'Saira, Arial, sans-serif' }">
+                       <div class="combined-preview"
+                           :style="{ fontFamily: fontConfig.secondaryFamily || fontConfig.secondaryFont || 'Saira, Arial, sans-serif' }">
                                 <div class="combined-header"
                                      :style="{ backgroundColor: colorConfig[0].value, color: '#ffffff' }">
                                     <div class="combined-logo">
                                         <span class="logo-mark" :style="{ backgroundColor: colorConfig[1].value }"></span>
-                                        <span class="logo-text" :style="{ fontFamily: fontConfig.secondaryFont || 'Patua One, serif' }">Agency</span>
+                                        <span class="logo-text" :style="{ fontFamily: fontConfig.primaryFamily || fontConfig.primaryFont || 'Patua One, serif' }">Agency</span>
                                     </div>
                                     <div class="combined-menu">
                                         <span>Inicio</span>
@@ -272,10 +272,10 @@
                                     </div>
                                 </div>
                                 <div class="combined-hero" :style="{ backgroundColor: colorConfig[4].value }">
-                                    <h2 class="hero-title" :style="{ fontSize: fontConfig.titleSize + 'px', fontFamily: fontConfig.secondaryFont || 'Patua One, serif', color: colorConfig[2].value === '#000000' ? '#111' : colorConfig[2].value }">
+                                    <h2 class="hero-title" :style="{ fontSize: fontConfig.titleSize + 'px', fontFamily: fontConfig.primaryFamily || fontConfig.primaryFont || 'Patua One, serif', color: colorConfig[2].value === '#000000' ? '#111' : colorConfig[2].value }">
                                         Creamos experiencias digitales
                                     </h2>
-                                    <p class="hero-subtitle" :style="{ fontSize: fontConfig.subtitleSize + 'px', color: '#555' }">
+                                    <p class="hero-subtitle" :style="{ fontSize: fontConfig.subtitleSize + 'px', color: '#555', fontFamily: fontConfig.secondaryFamily || fontConfig.secondaryFont || 'Patua One, serif' }">
                                         Diseño, desarrollo y estrategia para tu marca
                                     </p>
                                     <div class="hero-actions">
@@ -288,18 +288,18 @@
                                 <div class="combined-cards">
                                     <div class="c-card" :style="{ backgroundColor: '#fff', borderColor: '#eee' }">
                                         <i class="fa-solid fa-bolt" :style="{ color: colorConfig[1].value }"></i>
-                                        <h6 :style="{ fontFamily: fontConfig.secondaryFont || 'Patua One, serif' }">Rápido</h6>
-                                        <p :style="{ fontSize: fontConfig.paragraphSize + 'px' }">Implementaciones veloces y de calidad.</p>
+                                        <h6 :style="{ fontFamily: fontConfig.primaryFamily || fontConfig.primaryFont || 'Patua One, serif' }">Rápido</h6>
+                                        <p :style="{ fontSize: fontConfig.paragraphSize + 'px', fontFamily: fontConfig.secondaryFamily || fontConfig.secondaryFont || 'Saira, Arial, sans-serif' }">Implementaciones veloces y de calidad.</p>
                                     </div>
                                     <div class="c-card" :style="{ backgroundColor: '#fff', borderColor: '#eee' }">
                                         <i class="fa-solid fa-shield" :style="{ color: colorConfig[1].value }"></i>
-                                        <h6 :style="{ fontFamily: fontConfig.secondaryFont || 'Patua One, serif' }">Seguro</h6>
-                                        <p :style="{ fontSize: fontConfig.paragraphSize + 'px' }">Buenas prácticas y seguridad.</p>
+                                        <h6 :style="{ fontFamily: fontConfig.primaryFamily || fontConfig.primaryFont || 'Patua One, serif' }">Seguro</h6>
+                                        <p :style="{ fontSize: fontConfig.paragraphSize + 'px', fontFamily: fontConfig.secondaryFamily || fontConfig.secondaryFont || 'Saira, Arial, sans-serif' }">Buenas prácticas y seguridad.</p>
                                     </div>
                                     <div class="c-card" :style="{ backgroundColor: '#fff', borderColor: '#eee' }">
                                         <i class="fa-solid fa-star" :style="{ color: colorConfig[1].value }"></i>
-                                        <h6 :style="{ fontFamily: fontConfig.secondaryFont || 'Patua One, serif' }">Calidad</h6>
-                                        <p :style="{ fontSize: fontConfig.paragraphSize + 'px' }">Diseños pulidos y modernos.</p>
+                                        <h6 :style="{ fontFamily: fontConfig.primaryFamily || fontConfig.primaryFont || 'Patua One, serif' }">Calidad</h6>
+                                        <p :style="{ fontSize: fontConfig.paragraphSize + 'px', fontFamily: fontConfig.secondaryFamily || fontConfig.secondaryFont || 'Saira, Arial, sans-serif' }">Diseños pulidos y modernos.</p>
                                     </div>
                                 </div>
                             </div>
@@ -370,7 +370,7 @@
                                         <div class="palette-colors">
                                             <div class="color-preview" style="background:#fff; border:1px solid #dee2e6;" title="Tamaños">
                                                 <div class="typography-sample" style="padding:10px; color:#333;">
-                                                    <div class="sample-line" :style="{ fontSize: item.fonts.titleSize + 'px', fontFamily: item.fonts.secondaryFont || 'Patua One, serif' }">
+                                                    <div class="sample-line" :style="{ fontSize: item.fonts.titleSize + 'px', fontFamily: (item.fonts.secondaryFamily || item.fonts.secondaryFont) || 'Patua One, serif' }">
                                                         A
                                                         <div class="sample-label"><strong>Título</strong> — {{ item.fonts.titleSize }}px</div>
                                                     </div>
@@ -378,7 +378,7 @@
                                                         A
                                                         <div class="sample-label"><strong>Subtítulo</strong> — {{ item.fonts.subtitleSize }}px</div>
                                                     </div>
-                                                    <div class="sample-line" :style="{ fontSize: item.fonts.paragraphSize + 'px', fontFamily: item.fonts.primaryFont || 'Saira, Arial, sans-serif' }">
+                                                    <div class="sample-line" :style="{ fontSize: item.fonts.paragraphSize + 'px', fontFamily: (item.fonts.primaryFamily || item.fonts.primaryFont) || 'Saira, Arial, sans-serif' }">
                                                         A
                                                         <div class="sample-label"><strong>Párrafo</strong> — {{ item.fonts.paragraphSize }}px</div>
                                                     </div>
@@ -441,8 +441,12 @@ const fontConfig = ref({
     titleSize: 40,
     subtitleSize: 28,
     paragraphSize: 16,
+    // primaryFont / secondaryFont kept as display/url
     primaryFont: '',
-    secondaryFont: ''
+    secondaryFont: '',
+    // primaryFamily / secondaryFamily used for preview via FontFace
+    primaryFamily: '',
+    secondaryFamily: ''
 })
 
 const activeTab = ref('colors')
@@ -534,9 +538,12 @@ const handlePrimaryFontUpload = (event) => {
 
     // Si es válido, limpiar error y procesar
     fontErrors.value.primaryFont = null
+    // generar un family único para preview
+    const family = 'UploadedPrimary_' + Date.now().toString()
     fontConfig.value.primaryFont = file.name
+    fontConfig.value.primaryFamily = family
     primaryFontFile.value = file
-    loadFont(file, 'primary-font')
+    loadFontFromFile(file, family)
 }
 
 const openPrimaryFileChooser = () => {
@@ -570,9 +577,11 @@ const handleSecondaryFontUpload = (event) => {
     }
 
     fontErrors.value.secondaryFont = null
+    const family = 'UploadedSecondary_' + Date.now().toString()
     fontConfig.value.secondaryFont = file.name
+    fontConfig.value.secondaryFamily = family
     secondaryFontFile.value = file
-    loadFont(file, 'secondary-font')
+    loadFontFromFile(file, family)
 }
 
 const openSecondaryFileChooser = () => {
@@ -589,18 +598,43 @@ const openSecondaryFileChooser = () => {
     }, 500)
 }
 
-const loadFont = (file, fontName) => {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-        const fontData = e.target.result
-        const fontFace = new FontFace(fontName, fontData)
-        fontFace.load().then((loadedFont) => {
-            document.fonts.add(loadedFont)
-        }).catch((error) => {
-            console.error('Error loading font:', error)
-        })
+// Cargar una fuente a partir de un File usando Blob URL y registrarla con FontFace
+const loadFontFromFile = (file, familyName) => {
+    try {
+        const blobUrl = URL.createObjectURL(file)
+        const fontFace = new FontFace(familyName, `url(${blobUrl}) format('truetype')`)
+        fontFace.load().then((loaded) => {
+            document.fonts.add(loaded)
+            // liberar el object URL después de cargar
+            try { URL.revokeObjectURL(blobUrl) } catch (e) {}
+        }).catch(err => console.error('Error cargando fuente desde File:', err))
+    } catch (err) {
+        console.error('loadFontFromFile error:', err)
     }
-    reader.readAsArrayBuffer(file)
+}
+
+// Cargar una fuente a partir de una URL (por ejemplo /uploads/fonts/xxx.ttf)
+const loadFontFromUrl = async (url, familyName) => {
+    try {
+        // Intentamos crear directamente FontFace con la URL (permite cargar desde el servidor)
+        const fontFace = new FontFace(familyName, `url(${url}) format('truetype')`)
+        await fontFace.load()
+        document.fonts.add(fontFace)
+    } catch (err) {
+        // Como fallback intentamos fetch -> blob -> objectURL
+        try {
+            const resp = await fetch(url)
+            if (!resp.ok) throw new Error('fetch error ' + resp.status)
+            const blob = await resp.blob()
+            const blobUrl = URL.createObjectURL(blob)
+            const fontFace = new FontFace(familyName, `url(${blobUrl}) format('truetype')`)
+            await fontFace.load()
+            document.fonts.add(fontFace)
+            try { URL.revokeObjectURL(blobUrl) } catch (e) {}
+        } catch (e) {
+            console.error('No se pudo cargar fuente desde URL:', url, e)
+        }
+    }
 }
 
 const saveChanges = () => {
@@ -937,6 +971,16 @@ const saveCurrentTypography = () => {
             newItem.fonts.primaryFont = payload.font1
             newItem.fonts.secondaryFont = payload.font2
 
+            // intentar cargar las fuentes devueltas desde URL y asignar familias para preview inmediato
+            if (payload.font1) {
+                const fam = 'SavedPrimary_' + Date.now().toString()
+                loadFontFromUrl(payload.font1, fam).then(() => { newItem.fonts.primaryFamily = fam; fontConfig.value.primaryFamily = fam })
+            }
+            if (payload.font2) {
+                const fam2 = 'SavedSecondary_' + Date.now().toString()
+                loadFontFromUrl(payload.font2, fam2).then(() => { newItem.fonts.secondaryFamily = fam2; fontConfig.value.secondaryFamily = fam2 })
+            }
+
             savedTypography.value.unshift(newItem)
             saveTypographiesToStorage()
             newTypographyName.value = ''
@@ -945,12 +989,17 @@ const saveCurrentTypography = () => {
             secondaryFontFile.value = null
 
             Swal.fire({ icon: 'success', title: 'Tipografía guardada', text: 'Tu tipografía ha sido guardada exitosamente en el servidor!' })
+            // reset numeric/display fields but preserve any loaded families so preview remains
+            const preservedPrimaryFamily = fontConfig.value.primaryFamily || ''
+            const preservedSecondaryFamily = fontConfig.value.secondaryFamily || ''
             fontConfig.value = {
             titleSize: 40,
             subtitleSize: 28,
             paragraphSize: 16,
             primaryFont: '',
-            secondaryFont: ''
+            secondaryFont: '',
+            primaryFamily: preservedPrimaryFamily,
+            secondaryFamily: preservedSecondaryFamily
             }
         } catch (err) {
             console.error('Error guardando tipografía en servidor:', err)
@@ -986,7 +1035,10 @@ const fetchTypographiesFromAPI = async () => {
                         subtitleSize: row.tamanio_subtitulo || 28,
                         paragraphSize: row.tamanio_parrafo || 16,
                         primaryFont: row.font1 || '',
-                        secondaryFont: row.font2 || ''
+                        secondaryFont: row.font2 || '',
+                        // families serán cargadas cuando el usuario cargue la tipografía al preview
+                        primaryFamily: '',
+                        secondaryFamily: ''
                     },
                     createdAt: row.created_at || row.createdAt || new Date().toISOString()
                 }
@@ -1227,13 +1279,35 @@ const editTypography = async (item) => {
 
 const loadTypography = (item) => {
     if (!item || !item.fonts) return
-    fontConfig.value = {
-        titleSize: item.fonts.titleSize,
-        subtitleSize: item.fonts.subtitleSize,
-        paragraphSize: item.fonts.paragraphSize,
-        primaryFont: item.fonts.primaryFont || '',
-        secondaryFont: item.fonts.secondaryFont || ''
+    fontConfig.value.titleSize = item.fonts.titleSize
+    fontConfig.value.subtitleSize = item.fonts.subtitleSize
+    fontConfig.value.paragraphSize = item.fonts.paragraphSize
+    // asignar display/url
+    fontConfig.value.primaryFont = item.fonts.primaryFont || ''
+    fontConfig.value.secondaryFont = item.fonts.secondaryFont || ''
+
+    // intentar cargar fonts desde URL si parecen URLs
+    const tryLoadUrlAsFamily = async (url, which) => {
+        if (!url || typeof url !== 'string') return
+        // si comienza con / o http, intentamos cargar
+        if (url.startsWith('/') || url.startsWith('http')) {
+            const family = (which === 'primary' ? 'LoadedPrimary_' : 'LoadedSecondary_') + Date.now().toString()
+            await loadFontFromUrl(url, family)
+            if (which === 'primary') {
+                fontConfig.value.primaryFamily = family
+                // también guardar la family en el item para que la tarjeta muestre la fuente
+                try { item.fonts.primaryFamily = family } catch (e) {}
+            }
+            else {
+                fontConfig.value.secondaryFamily = family
+                try { item.fonts.secondaryFamily = family } catch (e) {}
+            }
+        }
     }
+
+    // kick off loads but don't block UI
+    tryLoadUrlAsFamily(fontConfig.value.primaryFont, 'primary')
+    tryLoadUrlAsFamily(fontConfig.value.secondaryFont, 'secondary')
     // Clear font errors when loading typography
     fontErrors.value.primaryFont = null
     fontErrors.value.secondaryFont = null

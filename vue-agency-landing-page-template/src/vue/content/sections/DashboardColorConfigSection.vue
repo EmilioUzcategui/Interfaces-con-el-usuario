@@ -288,18 +288,18 @@
                                 <div class="combined-cards">
                                     <div class="c-card" :style="{ backgroundColor: '#fff', borderColor: '#eee' }">
                                         <i class="fa-solid fa-bolt" :style="{ color: colorConfig[1].value }"></i>
-                                        <h6 :style="{ fontFamily: fontConfig.primaryFamily || fontConfig.primaryFont || 'Patua One, serif' }">Rápido</h6>
-                                        <p :style="{ fontSize: fontConfig.paragraphSize + 'px', fontFamily: fontConfig.secondaryFamily || fontConfig.secondaryFont || 'Saira, Arial, sans-serif' }">Implementaciones veloces y de calidad.</p>
+                                        <h6 :style="{ fontFamily: fontConfig.secondaryFamily || fontConfig.secondaryFont || 'Patua One, serif' }">Rápido</h6>
+                                        <p :style="{ fontSize: fontConfig.paragraphSize + 'px', fontFamily: fontConfig.primaryFamily || fontConfig.primaryFont || 'Saira, Arial, sans-serif' }">Implementaciones veloces y de calidad.</p>
                                     </div>
                                     <div class="c-card" :style="{ backgroundColor: '#fff', borderColor: '#eee' }">
                                         <i class="fa-solid fa-shield" :style="{ color: colorConfig[1].value }"></i>
-                                        <h6 :style="{ fontFamily: fontConfig.primaryFamily || fontConfig.primaryFont || 'Patua One, serif' }">Seguro</h6>
-                                        <p :style="{ fontSize: fontConfig.paragraphSize + 'px', fontFamily: fontConfig.secondaryFamily || fontConfig.secondaryFont || 'Saira, Arial, sans-serif' }">Buenas prácticas y seguridad.</p>
+                                        <h6 :style="{ fontFamily: fontConfig.secondaryFamily || fontConfig.secondaryFont || 'Patua One, serif' }">Seguro</h6>
+                                        <p :style="{ fontSize: fontConfig.paragraphSize + 'px', fontFamily: fontConfig.primaryFamily || fontConfig.primaryFont || 'Saira, Arial, sans-serif' }">Buenas prácticas y seguridad.</p>
                                     </div>
                                     <div class="c-card" :style="{ backgroundColor: '#fff', borderColor: '#eee' }">
                                         <i class="fa-solid fa-star" :style="{ color: colorConfig[1].value }"></i>
-                                        <h6 :style="{ fontFamily: fontConfig.primaryFamily || fontConfig.primaryFont || 'Patua One, serif' }">Calidad</h6>
-                                        <p :style="{ fontSize: fontConfig.paragraphSize + 'px', fontFamily: fontConfig.secondaryFamily || fontConfig.secondaryFont || 'Saira, Arial, sans-serif' }">Diseños pulidos y modernos.</p>
+                                        <h6 :style="{ fontFamily: fontConfig.secondaryFamily || fontConfig.secondaryFont || 'Patua One, serif' }">Calidad</h6>
+                                        <p :style="{ fontSize: fontConfig.paragraphSize + 'px', fontFamily: fontConfig.primaryFamily || fontConfig.primaryFont || 'Saira, Arial, sans-serif' }">Diseños pulidos y modernos.</p>
                                     </div>
                                 </div>
                             </div>
@@ -370,24 +370,30 @@
                                         <div class="palette-colors">
                                             <div class="color-preview" style="background:#fff; border:1px solid #dee2e6;" title="Tamaños">
                                                 <div class="typography-sample" style="padding:10px; color:#333;">
-                                                    <div class="sample-line" :style="{ fontSize: item.fonts.titleSize + 'px', fontFamily: (item.fonts.secondaryFamily || item.fonts.secondaryFont) || 'Patua One, serif' }">
+                                                    <div class="sample-line" :style="{ fontSize: item.fonts.titleSize + 'px', fontFamily: getFontFamilyName(item.fonts.secondaryFont, 'secondary') }">
                                                         A
                                                         <div class="sample-label"><strong>Título</strong> — {{ item.fonts.titleSize }}px</div>
                                                     </div>
-                                                    <div class="sample-line" :style="{ fontSize: item.fonts.subtitleSize + 'px', fontFamily: item.fonts.secondaryFont || 'Patua One, serif' }">
+                                                    <div class="sample-line" :style="{ fontSize: item.fonts.subtitleSize + 'px', fontFamily: getFontFamilyName(item.fonts.secondaryFont, 'secondary') }">
                                                         A
                                                         <div class="sample-label"><strong>Subtítulo</strong> — {{ item.fonts.subtitleSize }}px</div>
                                                     </div>
-                                                    <div class="sample-line" :style="{ fontSize: item.fonts.paragraphSize + 'px', fontFamily: (item.fonts.primaryFamily || item.fonts.primaryFont) || 'Saira, Arial, sans-serif' }">
+                                                    <div class="sample-line" :style="{ fontSize: item.fonts.paragraphSize + 'px', fontFamily: getFontFamilyName(item.fonts.primaryFont, 'primary') }">
                                                         A
                                                         <div class="sample-label"><strong>Párrafo</strong> — {{ item.fonts.paragraphSize }}px</div>
                                                     </div>
                                                 </div>
                                             </div>
                                             <!-- Mostrar nombres de las fuentes guardadas -->
-                                            <div style="display:flex;gap:12px;justify-content:center;margin-top:10px;color:#495057;font-size:0.95rem;">
-                                                <div><strong>Fuente 1:</strong> {{ fileBasename(item.fonts.primaryFont) || (item.fonts.primaryFont ? item.fonts.primaryFont : '—') }}</div>
-                                                <div><strong>Fuente 2:</strong> {{ fileBasename(item.fonts.secondaryFont) || (item.fonts.secondaryFont ? item.fonts.secondaryFont : '—') }}</div>
+                                            <div class="font-info-section">
+                                                <div class="font-item">
+                                                    <div class="font-label">Fuente Principal</div>
+                                                    <div class="font-name">{{ getCleanFontName(item.fonts.primaryFont) }}</div>
+                                                </div>
+                                                <div class="font-item">
+                                                    <div class="font-label">Fuente Secundaria</div>
+                                                    <div class="font-name">{{ getCleanFontName(item.fonts.secondaryFont) }}</div>
+                                                </div>
                                             </div>
                                         </div>
                                         
@@ -1277,7 +1283,7 @@ const editTypography = async (item) => {
 
 
 
-const loadTypography = (item) => {
+const loadTypography = async (item) => {
     if (!item || !item.fonts) return
     fontConfig.value.titleSize = item.fonts.titleSize
     fontConfig.value.subtitleSize = item.fonts.subtitleSize
@@ -1305,6 +1311,21 @@ const loadTypography = (item) => {
         }
     }
 
+    // activar la tipografia en el backend
+
+    const response = await fetch(`http://localhost:3000/api/tipografias/${item.id}/activate`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'  // ✅ Indica que envías JSON
+        },
+        body: JSON.stringify({active: true})  // ✅ Convierte el objeto a string JSON
+        });
+    if (!response.ok) {
+        const t = await response.text().catch(()=>'')
+        console.error(`Error activating typography on server: ${response.status} ${t}`)
+    }
+
+
     // kick off loads but don't block UI
     tryLoadUrlAsFamily(fontConfig.value.primaryFont, 'primary')
     tryLoadUrlAsFamily(fontConfig.value.secondaryFont, 'secondary')
@@ -1314,7 +1335,17 @@ const loadTypography = (item) => {
     Swal.fire({
         icon: 'success',
         title: 'Tipografía cargada',
-        text: `La tipografía "${item.name}" ha sido cargada exitosamente!`
+        text: `La tipografía "${item.name}" ha sido cargada exitosamente! Deseas ir al home para verla en acción?`,
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ir al Home',
+        cancelButtonText: 'Quedarme aquí',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // redirigir al home
+            window.location.href = '/'
+        }
     })
 }
 
@@ -1834,6 +1865,60 @@ const fileBasename = (pathOrUrl) => {
         const parts = String(pathOrUrl).split(/[/\\\\]/)
         return parts[parts.length - 1]
     }
+}
+
+// helper: extrae el nombre limpio de la fuente sin números ni timestamps
+const getCleanFontName = (pathOrUrl) => {
+    if (!pathOrUrl) return 'Sin fuente'
+    
+    const filename = fileBasename(pathOrUrl)
+    if (!filename) return 'Sin fuente'
+    
+    // Eliminar extensión
+    const nameWithoutExt = filename.replace(/\.(ttf|otf|woff2?)$/i, '')
+    
+    // Eliminar timestamps y números al inicio (formato: números-números-nombre)
+    const cleanName = nameWithoutExt.replace(/^\d+-\d+-/, '')
+    
+    // Eliminar números al final y convertir guiones a espacios
+    const fontName = cleanName
+        .replace(/-\d+$/, '') // eliminar números al final
+        .split('-')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // capitalizar cada palabra
+        .join(' ') // unir con espacios
+    
+    return fontName || 'Fuente personalizada'
+}
+
+// helper: obtiene el nombre de familia CSS para usar en font-family
+const getFontFamilyName = (pathOrUrl, type = 'primary') => {
+    if (!pathOrUrl) return type === 'primary' ? 'Saira, Arial, sans-serif' : 'Patua One, serif'
+    
+    const filename = fileBasename(pathOrUrl)
+    if (!filename) return type === 'primary' ? 'Saira, Arial, sans-serif' : 'Patua One, serif'
+    
+    // Eliminar extensión
+    const nameWithoutExt = filename.replace(/\.(ttf|otf|woff2?)$/i, '')
+    
+    // Eliminar timestamps y números al inicio
+    const cleanName = nameWithoutExt.replace(/^\d+-\d+-/, '')
+    
+    // Eliminar números al final y convertir guiones a espacios
+    const fontName = cleanName
+        .replace(/-\d+$/, '')
+        .split('-')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+    
+    // Crear un nombre de familia CSS válido
+    const cssFamilyName = `"${fontName || 'Custom Font'}", ${type === 'primary' ? 'sans-serif' : 'serif'}`
+    
+    // Cargar la fuente automáticamente si es una URL local
+    if (pathOrUrl.startsWith('/uploads/')) {
+        loadFontFromUrl(pathOrUrl, fontName || 'Custom Font')
+    }
+    
+    return cssFamilyName
 }
 
 // Cargar paletas al inicializar el componente
@@ -2850,21 +2935,22 @@ const getColorError = (colorId) => {
     /* Estilos específicos para la vista de tipografías (lista horizontal por item) */
     .typographies-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 1.5rem;
     }
 
     .typographies-grid .palette-card {
         display: flex;
-        align-items: center;
+        flex-direction: column;
         gap: 1rem;
-        padding: 1rem;
+        padding: 1.25rem;
         overflow: hidden;
         box-sizing: border-box;
+        min-height: 200px;
     }
 
     .typographies-grid .palette-header {
-        flex: 0 0 220px;
+        flex: 0 0 auto;
         min-width: 180px;
         max-width: 260px;
         overflow: hidden;
@@ -2972,5 +3058,39 @@ const getColorError = (colorId) => {
     font-size: 0.85rem;
     color: #6c757d;
     margin-left: 0.5rem;
+}
+
+/* Estilos para la sección de información de fuentes */
+.font-info-section {
+    margin-top: 12px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.font-item {
+    margin-bottom: 8px;
+}
+
+.font-item:last-child {
+    margin-bottom: 0;
+}
+
+.font-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.font-name {
+    font-size: 0.85rem;
+    color: #212529;
+    font-weight: 500;
+    word-break: break-word;
+    line-height: 1.3;
 }
 </style>

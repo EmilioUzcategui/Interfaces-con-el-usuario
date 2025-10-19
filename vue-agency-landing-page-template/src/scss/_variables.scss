@@ -1,36 +1,85 @@
 /** Font Awesome webfonts path **/
-$fa-font-path:"@fortawesome/fontawesome-free/webfonts";
+$fa-font-path: "@fortawesome/fontawesome-free/webfonts";
 
-/** Overriding Bootstrap's contrast ratio. **/
+/** Overriding Bootstrap's contrast ratio **/
 $min-contrast-ratio: 1.5 !default;
 
-/** Typography **/
-$font-family-base: "Saira", sans-serif;
-$headings-font-family: "Patua One", sans-serif;
+/*─────────────────────────────────────────────
+  🎨 BASE DE COLORES (SASS + CSS VARIABLES)
+─────────────────────────────────────────────*/
 
-/** Bootstrap Colors **/
-$primary: #ff5900;
-$dark: #212529;
-$success: #038600;
-$light: #fcfcfc;
-$white: white;
+// Valores por defecto (Sass)
+$primary-default: #ff5900;
+$dark-default: #212529;
+$success-default: #038600;
+$light-default: #fcfcfc;
+$white-default: #ffffff;
 
-/** General **/
+// Variables Sass (usadas por Bootstrap y mixins)
+$primary: $primary-default;
+$dark: $dark-default;
+$success: $success-default;
+$light: $light-default;
+$white: $white-default;
+
+// Variables CSS dinámicas (se pueden modificar desde JS)
+:root {
+    --primary-color: #{$primary-default};
+    --dark-color: #{$dark-default};
+    --success-color: #{$success-default};
+    --light-color: #{$light-default};
+    --white-color: #{$white-default};
+
+    --background-color: #fefefe;
+    --nav-background-color: #{$dark-default};
+    --footer-bg-color: #{$dark-default};
+    --footer-bg-highlight-color: #{darken($dark-default, 1%)};
+
+    --headings-color: #{$dark-default};
+    --text-normal: black;
+    --text-normal-contrast: white;
+    --text-muted: #757575;
+
+    /* Tipografía base — se puede cambiar dinámicamente */
+    --font-base: "Saira", sans-serif;
+    --font-headings: "Patua One", sans-serif;
+}
+
+/*─────────────────────────────────────────────
+  ✏️ TIPOGRAFÍA BASE
+─────────────────────────────────────────────*/
+
+$font-family-base: var(--font-base);
+$headings-font-family: var(--font-headings);
+
+/*─────────────────────────────────────────────
+  ⚙️ GENERAL
+─────────────────────────────────────────────*/
+
 $background-color: #fefefe;
 $nav-background-color: $dark;
 $footer-bg-color: $dark;
 $footer-bg-highlight-color: darken($dark, 1%);
 
-/** Dimensions **/
+/*─────────────────────────────────────────────
+  📏 DIMENSIONES
+─────────────────────────────────────────────*/
+
 $navbar-height: 71px;
 
-/** Texts **/
+/*─────────────────────────────────────────────
+  📝 TEXTOS
+─────────────────────────────────────────────*/
+
 $headings-color: $dark;
 $text-normal: black;
 $text-normal-contrast: white;
 $text-muted: #757575;
 
-/** Light Shades **/
+/*─────────────────────────────────────────────
+  💡 LIGHT SHADES
+─────────────────────────────────────────────*/
+
 $light-1: #f8f9fa;
 $light-2: #e9ecef;
 $light-3: #dee2e6;
@@ -46,10 +95,13 @@ $light-shades-palette: (
     $light-4,
     $light-5,
     $light-6,
-    $light-7,
+    $light-7
 );
 
-/** Typography - Texts Breakpoints **/
+/*─────────────────────────────────────────────
+  🔠 TIPOGRAFÍA RESPONSIVA
+─────────────────────────────────────────────*/
+
 $texts-breakpoint-multipliers: (
     xxxl: 1,
     xxl: 0.95,
@@ -59,7 +111,6 @@ $texts-breakpoint-multipliers: (
     sm: 0.85
 );
 
-/** Typography - Headings Breakpoints **/
 $headings-breakpoint-multipliers: (
     xxxl: 1,
     xxl: 0.95,
@@ -69,7 +120,10 @@ $headings-breakpoint-multipliers: (
     sm: 0.8
 );
 
-/** Typography - Headings Base Sizes **/
+/*─────────────────────────────────────────────
+  🧱 TAMAÑOS DE ENCABEZADOS BASE
+─────────────────────────────────────────────*/
+
 $headings-base-sizes: (
     h1: (font-size: 3rem),
     h2: (font-size: 2.5rem),

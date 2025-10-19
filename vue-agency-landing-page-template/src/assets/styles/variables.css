@@ -1,0 +1,19 @@
+:root {
+    --primary-font: "Saira", sans-serif;
+    --secondary-font: "Patua One", sans-serif;
+
+    --primary-color: #ff5900;
+    --dark-color: #212529;
+    --success-color: #038600;
+    --light-color: #fcfcfc;
+
+    --background-color: #fefefe;
+    --nav-background-color: #212529;
+    --footer-bg-color: #212529;
+    --footer-bg-highlight-color: #1d1f22;
+
+    --headings-color: #212529;
+    --text-normal: black;
+    --text-normal-contrast: white;
+    --text-muted: #757575;
+}

@@ -1,6 +1,6 @@
 import "./scss/style.scss"
-import {createApp} from "vue"
-import {createRouter, createWebHistory} from "vue-router"
+import { createApp } from "vue"
+import { createRouter, createWebHistory } from "vue-router"
 import App from "/src/vue/stack/App.vue"
 import HomePage from "/src/vue/content/pages/HomePage.vue"
 import LoginPage from "/src/vue/content/pages/LoginPage.vue"
@@ -8,6 +8,7 @@ import RegisterPage from "/src/vue/content/pages/RegisterPage.vue"
 import DashboardPage from "/src/vue/content/pages/DashboardPage.vue"
 import LicensePage from "/src/vue/content/pages/LicensePage.vue"
 import PolicyPage from "/src/vue/content/pages/PolicyPage.vue"
+import { loadTypography } from './utils/loadTypography.js'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -100,5 +101,5 @@ const router = createRouter({
         }
     ]
 })
-
+await loadTypography() // Carga fuentes antes de renderizar la app
 createApp(App).use(router).mount("#app")

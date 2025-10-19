@@ -66,11 +66,11 @@ const parsedSubtitle = computed(() => {
 header.foxy-header {
     --height: clamp(650px, 100vh, 1050px);
     --content-margin-top: 80px;
-    --max-logo-proportion:45vw;
-    --max-logo-height:50vh;
-    @include media-breakpoint-down(xl) {--max-logo-height: 35vh;}
-    @include media-breakpoint-down(lg) {--max-logo-height: 30vh; }
-    @include media-breakpoint-down(md) {--content-margin-top: 65px;}
+    --max-logo-proportion: 45vw;
+    --max-logo-height: 50vh;
+    @include media-breakpoint-down(xl) { --max-logo-height: 35vh; }
+    @include media-breakpoint-down(lg) { --max-logo-height: 30vh; }
+    @include media-breakpoint-down(md) { --content-margin-top: 65px; }
 
     --content-height: calc(var(--height) - var(--content-margin-top));
     --logo-proportion: clamp(190px, 45vw, min(37.5vh, 35vw, 350px));
@@ -82,7 +82,6 @@ header.foxy-header {
         display: flex;
         align-items: center;
         justify-content: center;
-
         height: var(--height);
         padding-left: 1rem;
         padding-right: 1rem;
@@ -94,7 +93,7 @@ header.foxy-header {
         align-items: center;
         justify-content: center;
         flex-direction: column;
-        padding-top:var(--content-margin-top);
+        padding-top: var(--content-margin-top);
     }
 
     div.foxy-hero-header-logo {
@@ -102,21 +101,27 @@ header.foxy-header {
         width: var(--logo-proportion);
     }
 
+    /* 🔠 TÍTULO PRINCIPAL */
     h1.heading {
-        color:$white;
+        color: $white;
         text-transform: uppercase;
         text-align: center;
         font-weight: 700;
-        font-size: calc(var(--logo-proportion)/6);
-        padding: calc(var(--logo-proportion)/8) 0 calc(var(--logo-proportion)/180);
+
+        /* ⚡️ APLICAMOS VARIABLES DINÁMICAS */
+        font-family: var(--font-secondary, 'Patua One', sans-serif);
+        font-size: var(--size-title, calc(var(--logo-proportion) / 6));
+
+        padding: calc(var(--logo-proportion) / 8) 0 calc(var(--logo-proportion) / 180);
     }
 
+    /* 📝 SUBTÍTULO */
     h4.subheading {
-        font-family: $font-family-base;
+        font-family: var(--font-primary, 'Saira', sans-serif);
         color: $light-5;
 
-        font-size: clamp(16px, calc(var(--logo-proportion)/14), 100px);
-        padding: calc(var(--logo-proportion)/20) 0;
+        font-size: var(--size-subtitle, clamp(16px, calc(var(--logo-proportion) / 14), 100px));
+        padding: calc(var(--logo-proportion) / 20) 0;
         line-height: 24px;
         text-align: center;
     }

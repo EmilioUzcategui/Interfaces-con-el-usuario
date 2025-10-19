@@ -14,7 +14,8 @@ create table colors (
     color3 varchar(7) not null,
     color4 varchar(7) not null,
     color5 varchar(7) not null,
-    created_at timestamp default current_timestamp
+    created_at timestamp default current_timestamp,
+    active boolean default false
 );
 
 create table tipografia (
@@ -25,7 +26,12 @@ create table tipografia (
     tamanio_parrafo int not null,
     font1 varchar(100) not null,
     font2 varchar(100) not null,
-    created_at timestamp default current_timestamp
+    created_at timestamp default current_timestamp,
+    active boolean default false
 );
+
+-- establecer el active en true
+
+update tipografia set active = true where id_tipografia = 1;
 
 

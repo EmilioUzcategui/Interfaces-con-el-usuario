@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import {onMounted, watch, ref} from "vue"
+import {onMounted, watch, ref, onUnmounted} from "vue"
 import {useUtils} from "/src/composables/utils.js"
 import {useLayout} from "/src/composables/layout.js"
 import {useScheduler} from "/src/composables/scheduler.js"
@@ -70,10 +70,16 @@ const didEmitReady = ref(false)
 const currentStep = ref(Steps.NONE)
 const percentage = ref(0)
 const loadingTime = ref(0)
+let bodyScrollLocked = false
 
 onMounted(() => {
     scheduler.clearAllWithTag(schedulerTag)
     _performTransition()
+})
+
+onUnmounted(() => {
+    // Asegurar que el scroll del body se restaure si el loader se desmonta
+    try { layout.setBodyScrollEnabled(true) } catch (e) { /* ignore */ }
 })
 
 watch(() => props.visible, () => {
@@ -120,7 +126,13 @@ const _executeEnteringStep = () => {
 const _executeAnimatingLogoStep = () => {
     emit('rendered')
     currentStep.value = Steps.LOADING_LOGO
-    layout.setBodyScrollEnabled(false)
+    // Evitar bloquear el scroll repetidamente si ya está bloqueado
+    try {
+        if (!bodyScrollLocked) {
+            layout.setBodyScrollEnabled(false)
+            bodyScrollLocked = true
+        }
+    } catch (e) {}
 
     if(!didLoadLogo.value) {
         scheduler.schedule(() => {
@@ -213,7 +225,10 @@ const _onLoadingComplete = () => {
 }
 
 const _executeLeavingStep = () => {
-    layout.setBodyScrollEnabled(true)
+    try {
+        layout.setBodyScrollEnabled(true)
+        bodyScrollLocked = false
+    } catch (e) {}
     emit('leaving')
 
     if(window.location.hash) {

@@ -25,24 +25,20 @@ const projectModalTarget = inject("projectModalTarget")
 const LoaderAnimationStatus = inject("LoaderAnimationStatus")
 const loaderAnimationStatus = inject("loaderAnimationStatus")
 
-const excludedNames = new Set(["dashboard", "login", "register"]) 
+const excludedNames = new Set(["dashboard", "login", "register"])
 const isExcludedRoute = computed(() => excludedNames.has(route.name))
 
 const shouldSlot = computed(() => {
-    if(!loaderEnabled)
+    if(isExcludedRoute.value) {
         return true
-    if(isExcludedRoute.value)
-        return true
-    return loaderAnimationStatus.value === LoaderAnimationStatus.TRACKING_PROGRESS ||
+    }
+    
+    return !loaderEnabled ||
+        loaderAnimationStatus.value === LoaderAnimationStatus.TRACKING_PROGRESS ||
         loaderAnimationStatus.value === LoaderAnimationStatus.LEAVING
 })
 
-/**
- * @description This hook can be used to report a visit to an external analytics service.
- * Here, you can integrate Google Analytics, Mixpanel, or your own custom analytics implementation.
- */
 onMounted(() => {
-    // replace the implementation below with your own analytics service...
     fetch("https://ryanbalieiro.com/api/analytics/mock", {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -72,17 +68,11 @@ watch(() => loaderAnimationStatus.value, () => {
 })
 
 router.beforeEach((to, from, next) => {
-    if(from.name === to.name || !loaderEnabled) {
+    console.log("[v0] router.beforeEach - from.name:", from.name, "to.name:", to.name, "from.path:", from.path, "to.path:", to.path)
+    
+    if(!from.name || from.name === to.name || !loaderEnabled) {
+        console.log("[v0] Skipping loader - calling next() immediately")
         next()
-        return
-    }
-
-    // Saltar preloader una sola vez (por ejemplo, al redirigir tras login)
-    const skipOnce = localStorage.getItem('skipPreloaderOnce') === '1'
-    if (skipOnce) {
-        localStorage.removeItem('skipPreloaderOnce')
-        next()
-        window.scrollTo({top: 0, behavior: "instant"})
         return
     }
 
@@ -90,12 +80,16 @@ router.beforeEach((to, from, next) => {
         !to.matched[0].props.default['shouldAlwaysPreload'] :
         false
 
+    console.log("[v0] shouldIgnorePreloader:", shouldIgnorePreloader, "for route:", to.name)
+
     if(shouldIgnorePreloader) {
+        console.log("[v0] Ignoring preloader - calling next()")
         next()
         window.scrollTo({top: 0, behavior: "instant"})
         return
     }
 
+    console.log("[v0] Activating loader - loaderActive = true")
     loaderActive.value = true
     const isDifferentRoute = from && to && from.path !== to.path
     const isDifferentRouteName = from && to && from.name !== to.name
@@ -112,10 +106,15 @@ router.beforeEach((to, from, next) => {
 })
 
 router.afterEach((to, from) => {
+    console.log("[v0] router.afterEach - from.path:", from.path, "to.path:", to.path)
+    
     const isDifferentRoute = from && to && from.path !== to.path
-    if(!isDifferentRoute)
+    if(!isDifferentRoute) {
+        console.log("[v0] Same route, not scrolling")
         return
+    }
 
+    console.log("[v0] Different route, scrolling to top")
     window.scrollTo({top: 0, behavior: "smooth"})
 })
 

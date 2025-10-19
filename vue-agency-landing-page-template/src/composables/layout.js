@@ -2,32 +2,33 @@
  * Created by Ryan Balieiro on 08.26.2023
  * This composable will implement helper methods that manipulate DOM elements.
  */
-import {useUtils} from "/src/composables/utils.js"
-
-const utils = useUtils()
+import { useUtils } from "/src/composables/utils.js"
 
 export function useLayout() {
+    const utils = useUtils()
+
     /**
      * @param {Boolean} enabled
      */
     const setBodyScrollEnabled = (enabled) => {
+        console.log("[v0] setBodyScrollEnabled called with:", enabled)
+        console.trace("[v0] Call stack:")
+
         const body = document.body
 
-        if(!enabled) {
+        if (!enabled) {
             window.savedScrollY = window.scrollY
             body.classList.add(`body-no-scroll`)
-            if(utils.isIOS()) {
+            if (utils.isIOS()) {
                 body.classList.add(`position-fixed`)
             }
-        }
-        else {
+        } else {
             body.classList.remove(`body-no-scroll`)
             body.classList.remove(`position-fixed`)
-
-            if(window.savedScrollY) {
+            if (window.savedScrollY) {
                 window.scrollTo({
                     top: window.savedScrollY,
-                    behavior: "instant"
+                    behavior: "instant",
                 })
                 window.savedScrollY = null
             }
@@ -41,12 +42,7 @@ export function useLayout() {
     const isElementOutsideBounds = (element) => {
         const rect = element.getBoundingClientRect()
 
-        return (
-            rect.bottom < 0 ||
-            rect.right < 0 ||
-            rect.left > window.innerWidth ||
-            rect.top > window.innerHeight
-        )
+        return rect.bottom < 0 || rect.right < 0 || rect.left > window.innerWidth || rect.top > window.innerHeight
     }
 
     /**
@@ -54,7 +50,7 @@ export function useLayout() {
      * @return {boolean}
      */
     const scrollIntoView = (element) => {
-        const elNavbar = document.querySelector('.foxy-navbar-compressed')
+        const elNavbar = document.querySelector(".foxy-navbar-compressed")
         const navOffset = elNavbar ? elNavbar.getBoundingClientRect().height - 2 : 70
 
         const elementPosition = element.getBoundingClientRect().top + window.scrollY
@@ -62,13 +58,13 @@ export function useLayout() {
 
         window.scrollTo({
             top: offsetPosition,
-            behavior: "smooth"
-        });
+            behavior: "smooth",
+        })
     }
 
     return {
         setBodyScrollEnabled,
         isElementOutsideBounds,
-        scrollIntoView
+        scrollIntoView,
     }
 }

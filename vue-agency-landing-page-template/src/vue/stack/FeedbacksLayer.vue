@@ -2,7 +2,7 @@
     <ActivitySpinner :visible="Boolean(spinnerActive)"
                      :message="String(spinnerMessage)"/>
 
-    <Loader v-if="loaderEnabled && !isExcludedRoute"
+    <Loader v-if="loaderEnabled"
             :visible="Boolean(loaderActive && !isExcludedRoute)"
             :refresh-count="Number(loaderPageRefreshCount)"
             :smooth-transition-enabled="Boolean(loaderSmoothTransitionEnabled)"
@@ -15,10 +15,13 @@
 </template>
 
 <script setup>
-import {inject, provide, ref, watch, computed} from "vue"
+import {inject, provide, ref, watch, computed, onMounted, nextTick} from "vue"
 import {useRoute} from "vue-router"
+import {useLayout} from "/src/composables/layout.js"
 import ActivitySpinner from "/src/vue/components/loaders/ActivitySpinner.vue"
 import Loader from "/src/vue/components/loaders/Loader.vue"
+
+const layout = useLayout()
 
 const loaderEnabled = inject("loaderEnabled")
 const LoaderAnimationStatus = inject("LoaderAnimationStatus")
@@ -42,12 +45,6 @@ const isReady = computed(() => {
            loaderAnimationStatus.value === LoaderAnimationStatus.LEAVING
 })
 
-watch(() => loaderEnabled.value, () => {
-    if(loaderEnabled.value) {
-        loaderAnimationStatus.value = LoaderAnimationStatus.INITIALIZED
-    }
-})
-
 const _onLoaderRendered = () => {
     loaderAnimationStatus.value = LoaderAnimationStatus.RENDERED
 }
@@ -63,6 +60,34 @@ const _onLoaderWillLeave = () => {
 const _onLoaderCompleted = () => {
     loaderActive.value = false
 }
+
+onMounted(() => {
+    console.log("[v0] FeedbacksLayer onMounted - route.name:", route.name, "isExcludedRoute:", isExcludedRoute.value)
+    nextTick(() => {
+        if(isExcludedRoute.value) {
+            console.log("[v0] FeedbacksLayer onMounted - enabling scroll for excluded route")
+            loaderActive.value = false
+            layout.setBodyScrollEnabled(true)
+        }
+    })
+})
+
+watch(isExcludedRoute, (newValue) => {
+    console.log("[v0] FeedbacksLayer watch isExcludedRoute:", newValue)
+    if(newValue) {
+        nextTick(() => {
+            console.log("[v0] FeedbacksLayer watch - enabling scroll for excluded route")
+            loaderActive.value = false
+            layout.setBodyScrollEnabled(true)
+        })
+    }
+}, { immediate: true })
+
+watch(() => loaderEnabled.value, (newValue) => {
+    if(newValue) {
+        loaderAnimationStatus.value = LoaderAnimationStatus.INITIALIZED
+    }
+})
 </script>
 
 <style lang="scss" scoped>

@@ -11,6 +11,6 @@
 @import "/src/scss/_theming.scss";
 
 .foxy-footer {
-    background-color: $footer-bg-color;
+    background-color: var(--primary-color, $footer-bg-color);
 }
 </style>

@@ -49,7 +49,7 @@ const props = defineProps(({
 @import "/src/scss/_theming.scss";
 
 p, span {
-    color: $light-5;
+    color: var(--success-color, $light-5);
 }
 
 div.foxy-footer-col {
@@ -62,7 +62,7 @@ div.foxy-footer-col {
         }
 
         &:not(:first-child) {
-            border-top: 1px solid lighten($dark, 3%);
+            border-top: 1px solid var(--primary-color, lighten($dark, 3%));
         }
 
         &:last-child {
@@ -73,7 +73,7 @@ div.foxy-footer-col {
 
 h5.foxy-footer-col-title {
     i, span {
-        color: $light-1;
+        color: var(--accent-color, $light-1);
         text-transform: uppercase;
     }
 }

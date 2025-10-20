@@ -1,0 +1,28 @@
+:root {
+    --primary-color: #212529;
+    --secondary-color: #ff5900;
+    --accent-color: #000000;
+    --success-color: #343a40;
+    --background-color: #fcfcfc;
+  }
+  
+  /* Aplicar colores al template */
+  .header-bg {
+    background-color: var(--primary-color) !important;
+  }
+  
+  .secondary-bg {
+    background-color: var(--secondary-color) !important;
+  }
+  
+  .accent-text {
+    color: var(--accent-color) !important;
+  }
+  
+  .success-text {
+    color: var(--success-color) !important;
+  }
+  
+  .background-bg {
+    background-color: var(--background-color) !important;
+  }

@@ -258,7 +258,7 @@ div.foxy-loader {
     justify-content: center;
     align-items: center;
 
-    background-color: $dark;
+    background-color: var(--primary-color, $dark);
     width: 100vw;
     height: 125vh;
     height: 125svh;

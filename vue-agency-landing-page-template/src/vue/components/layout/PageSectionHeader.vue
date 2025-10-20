@@ -43,11 +43,11 @@ div.foxy-section-header {
 
 h1 {
     text-transform: uppercase;
-    color: inherit;
+    color: var(--accent-color, inherit);
 }
 
 h5 {
     font-family: $font-family-base;
-    color: $text-muted;
+    color: var(--success-color, $text-muted);
 }
 </style>

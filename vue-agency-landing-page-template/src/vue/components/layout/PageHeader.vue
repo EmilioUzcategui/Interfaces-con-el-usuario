@@ -103,7 +103,7 @@ header.foxy-header {
 
     /* 🔠 TÍTULO PRINCIPAL */
     h1.heading {
-        color: $white;
+        color: var(--accent-color, $white);
         text-transform: uppercase;
         text-align: center;
         font-weight: 700;
@@ -118,7 +118,7 @@ header.foxy-header {
     /* 📝 SUBTÍTULO */
     h4.subheading {
         font-family: var(--font-primary, 'Saira', sans-serif);
-        color: $light-5;
+        color: var(--success-color, $light-5);
 
         font-size: var(--size-subtitle, clamp(16px, calc(var(--logo-proportion) / 14), 100px));
         padding: calc(var(--logo-proportion) / 20) 0;

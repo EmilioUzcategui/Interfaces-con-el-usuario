@@ -98,7 +98,7 @@ nav.foxy-navbar {
     width: 100vw;
     min-height: $navbar-height;
     z-index: 10;
-    background-color: $nav-background-color;
+    background-color: var(--primary-color, $nav-background-color);
     transition: 0.3s ease-in-out padding;
 
     @include media-breakpoint-down(lg) {

@@ -66,12 +66,12 @@ button.btn {
     &.active, &:hover {
         background-color: darken($light, 5%);
         border-color: $light;
-        color: $primary;
+        color: var(--secondary-color, $primary);
     }
 
     &.active {
-        background-color: $primary;
-        color: $text-normal-contrast;
+        background-color: var(--secondary-color, $primary);
+        color: var(--accent-color, $text-normal-contrast);
         opacity: 1;
     }
 }

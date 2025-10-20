@@ -51,7 +51,7 @@ div.foxy-navbar-brand {
     text-transform: uppercase;
     font-family: $headings-font-family;
     font-weight: $headings-font-weight;
-    color: $text-normal-contrast;
+    color: var(--accent-color, $text-normal-contrast);
     margin-top: 5px;
     transition: font-size 0.3s ease-in-out;
     padding: 5px 0 5px;

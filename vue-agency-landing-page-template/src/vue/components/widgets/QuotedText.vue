@@ -28,11 +28,11 @@ const lastPart = computed(() => {
 })
 
 const firstSpanContent = computed(() => {
-    return `<i class="fa-solid fa-quote-left text-primary me-1"></i> ${firstPart.value} ${middlePart.value}`
+    return `<i class="fa-solid fa-quote-left me-1" style="color: var(--secondary-color, #ff5900);"></i> ${firstPart.value} ${middlePart.value}`
 })
 
 const lastSpanContent = computed(() => {
-    return `${lastPart.value} <i class="fa-solid fa-quote-right text-primary ms-1"></i>`
+    return `${lastPart.value} <i class="fa-solid fa-quote-right ms-1" style="color: var(--secondary-color, #ff5900);"></i>`
 })
 </script>
 

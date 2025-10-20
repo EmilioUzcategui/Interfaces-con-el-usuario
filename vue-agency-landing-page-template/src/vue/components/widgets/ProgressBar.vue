@@ -42,7 +42,7 @@ div.progress {
 }
 
 div.progress-bar {
-    background-color: $primary;
+    background-color: var(--secondary-color, $primary);
     -webkit-transition: none;
     -moz-transition: none;
     -ms-transition: none;

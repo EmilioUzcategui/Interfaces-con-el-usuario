@@ -14,10 +14,10 @@ const props = defineProps({
 
 hr.solid-divider {
     width: 60px;
-    color: black;
+    color: var(--accent-color, black);
     opacity: 1;
-    border: 2px solid black;
+    border: 2px solid var(--accent-color, black);
     margin: 0 auto;
-    background-color: black;
+    background-color: var(--accent-color, black);
 }
 </style>

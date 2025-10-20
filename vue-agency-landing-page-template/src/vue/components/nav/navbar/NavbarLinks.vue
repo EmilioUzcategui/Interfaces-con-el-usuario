@@ -98,7 +98,7 @@ button.foxy-nav-link {
     padding: 0 0 0 1.2rem;
 
     font-family: $font-family-base;
-    color: $light-3;
+    color: var(--success-color, $light-3);
     text-transform: uppercase;
 
     @include media-breakpoint-down(xl) {

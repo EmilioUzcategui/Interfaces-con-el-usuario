@@ -46,7 +46,7 @@ img.foxy-spinner {
 }
 
 h5 {
-    color: $light-5;
+    color: var(--success-color, $light-5);
     text-transform: uppercase;
 }
 </style>

@@ -33,15 +33,15 @@ button.foxy-navbar-toggle {
 
     width: $button-size;
     height: $button-size;
-    background-color: $nav-background-color;
+    background-color: var(--primary-color, $nav-background-color);
 
     font-size: 0.75rem;
     font-family: $headings-font-family;
     font-weight: $font-weight-bold;
 
-    border: 2px solid lighten($nav-background-color, 5%);
+    border: 2px solid var(--primary-color, lighten($nav-background-color, 5%));
     border-radius: 10px;
-    color: $light-4;
+    color: var(--success-color, $light-4);
 
     display: flex;
     align-items: center;

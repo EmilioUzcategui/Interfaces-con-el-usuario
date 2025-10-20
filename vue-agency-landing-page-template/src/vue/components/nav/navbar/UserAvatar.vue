@@ -106,7 +106,7 @@ onUnmounted(() => {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, $primary 0%, darken($primary, 15%) 100%);
+    background: linear-gradient(135deg, var(--secondary-color, $primary) 0%, var(--primary-color, darken($primary, 15%)) 100%);
     color: white;
     display: flex;
     align-items: center;
@@ -117,7 +117,7 @@ onUnmounted(() => {
     transition: all 0.3s ease;
     
     &:hover {
-        box-shadow: 0 4px 12px rgba($primary, 0.3);
+        box-shadow: 0 4px 12px rgba(var(--secondary-color, $primary), 0.3);
     }
 }
 

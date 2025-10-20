@@ -96,10 +96,15 @@ a.social-link {
     color: $white;
 
     @include create-btn-social-size(1rem, 0.85rem);
-    @include create-btn-social-color(
-        $white, lighten($primary, 10%), lighten($primary, 25%),
-        $white, lighten($dark, 15%), lighten($dark, 25%),
-    )
+    
+    /* Usar variables CSS dinámicas */
+    background-color: var(--secondary-color, lighten($primary, 10%));
+    border-color: var(--secondary-color, lighten($primary, 25%));
+    
+    &:hover {
+        background-color: var(--primary-color, lighten($dark, 15%));
+        border-color: var(--primary-color, lighten($dark, 25%));
+    }
 }
 
 a.social-link-size-2 {

@@ -106,6 +106,6 @@ div.image-not-found-fallback {
     align-items: center;
     justify-content: center;
     font-size: 30px;
-    color: $light-2;
+    color: var(--accent-color, $light-2);
 }
 </style>

@@ -9,6 +9,7 @@ import DashboardPage from "/src/vue/content/pages/DashboardPage.vue"
 import LicensePage from "/src/vue/content/pages/LicensePage.vue"
 import PolicyPage from "/src/vue/content/pages/PolicyPage.vue"
 import { loadTypography } from './utils/loadTypography.js'
+import "./assets/styles/dynamic-colors.css"
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),

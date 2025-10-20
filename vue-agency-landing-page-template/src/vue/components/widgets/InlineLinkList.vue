@@ -62,7 +62,7 @@ ul.inline-link-list {
     list-style: none;
     padding: 0;
     margin: 0;
-    color: $light-5;
+    color: var(--success-color, $light-5);
 }
 
 li.inline-link-list-item {
@@ -73,7 +73,7 @@ li.inline-link-list-item {
 
     &:not(:last-child)::after {
         content: "·";
-        color: $light-5;
+        color: var(--success-color, $light-5);
         margin-left: 0.6rem;
     }
 
@@ -89,7 +89,7 @@ li.inline-link-list-item {
 li.inline-link-list-header {
     margin-top: 0.2rem;
     margin-bottom: 0.2rem;
-    color: $light-5;
+    color: var(--success-color, $light-5);
     font-size: 0.5rem;
     @include media-breakpoint-up(sm) {
         display: none;
@@ -98,11 +98,11 @@ li.inline-link-list-header {
 
 .inline-link-list-link {
     text-decoration: none;
-    color: $light-6;
+    color: var(--success-color, $light-6);
 
     i.inline-link-list-icon {
         min-width: 22px;
-        color: $light-5;
+        color: var(--success-color, $light-5);
         @include media-breakpoint-down(md) {
             min-width: 20px;
         }
@@ -110,13 +110,13 @@ li.inline-link-list-header {
 }
 
 .inline-link-list-link:hover {
-    color: lighten($primary, 15%);
+    color: var(--secondary-color, lighten($primary, 15%));
     i.inline-link-list-icon {
-        color: $light-2;
+        color: var(--accent-color, $light-2);
     }
 }
 
 .inline-link-list-link-active {
-    color: lighten($primary, 20%);
+    color: var(--secondary-color, lighten($primary, 20%));
 }
 </style>

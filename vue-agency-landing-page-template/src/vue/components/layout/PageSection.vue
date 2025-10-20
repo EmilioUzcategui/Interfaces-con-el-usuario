@@ -44,7 +44,7 @@ section.foxy-section {
         sm:   (padding: 2rem 0rem 3rem),
     ));
 
-    background-color: $background-color;
+    background-color: var(--background-color, $background-color);
     position: relative;
 
     .foxy-promo-background {
@@ -54,15 +54,15 @@ section.foxy-section {
 }
 
 section.foxy-section-primary {
-    background-color: lighten($primary, 42%);
+    background-color: var(--primary-color, lighten($primary, 42%));
 }
 
 section.foxy-section-dark {
-    background-color: lighten($dark, 10%);
-    color: $text-normal-contrast;
+    background-color: var(--primary-color, lighten($dark, 10%));
+    color: var(--accent-color, $text-normal-contrast);
 
     h5.foxy-section-header-subtitle {
-        color: $light-5;
+        color: var(--success-color, $light-5);
     }
 }
 

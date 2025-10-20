@@ -70,10 +70,10 @@ ul.breadcrumbs-link-list {
 li.breadcrumb-link-item {
     margin-right: 0.3rem;
 
-    color: $light-6;
+    color: var(--success-color, $light-6);
     &:not(:last-child)::after {
         content: "›";
-        color: $light-6;
+        color: var(--success-color, $light-6);
         margin-left: 0.2rem;
     }
 }

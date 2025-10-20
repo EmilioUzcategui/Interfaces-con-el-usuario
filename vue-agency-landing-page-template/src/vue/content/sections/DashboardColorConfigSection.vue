@@ -255,7 +255,7 @@
                             
 
                             <!-- Vista Previa Combinada (Colores + Tipografía) -->
-                       <div class="combined-preview"
+                            <div class="combined-preview"
                            :style="{ fontFamily: fontConfig.secondaryFamily || fontConfig.secondaryFont || 'Saira, Arial, sans-serif' }">
                                 <div class="combined-header"
                                      :style="{ backgroundColor: colorConfig[0].value, color: '#ffffff' }">
@@ -305,7 +305,7 @@
                             </div>
 
                             
-                        </div>
+                                        </div>
                     </div>
                 </div>
                 
@@ -373,23 +373,23 @@
                                                     <div class="sample-line" :style="{ fontSize: item.fonts.titleSize + 'px', fontFamily: getFontFamilyName(item.fonts.secondaryFont, 'secondary') }">
                                                         A
                                                         <div class="sample-label"><strong>Título</strong> — {{ item.fonts.titleSize }}px</div>
-                                                    </div>
+                                                </div>
                                                     <div class="sample-line" :style="{ fontSize: item.fonts.subtitleSize + 'px', fontFamily: getFontFamilyName(item.fonts.secondaryFont, 'secondary') }">
                                                         A
                                                         <div class="sample-label"><strong>Subtítulo</strong> — {{ item.fonts.subtitleSize }}px</div>
-                                                    </div>
+                                            </div>
                                                     <div class="sample-line" :style="{ fontSize: item.fonts.paragraphSize + 'px', fontFamily: getFontFamilyName(item.fonts.primaryFont, 'primary') }">
                                                         A
                                                         <div class="sample-label"><strong>Párrafo</strong> — {{ item.fonts.paragraphSize }}px</div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
                                             <!-- Mostrar nombres de las fuentes guardadas -->
                                             <div class="font-info-section">
                                                 <div class="font-item">
                                                     <div class="font-label">Fuente Principal</div>
                                                     <div class="font-name">{{ getCleanFontName(item.fonts.primaryFont) }}</div>
-                                                </div>
+                                </div>
                                                 <div class="font-item">
                                                     <div class="font-label">Fuente Secundaria</div>
                                                     <div class="font-name">{{ getCleanFontName(item.fonts.secondaryFont) }}</div>
@@ -673,13 +673,13 @@ const resetChanges = () => {
         })
     } else {
         // Resetear solo colores
-        colorConfig.value = [
-            { id: 'primary-color', label: 'Color Primario', value: '#667eea' },
-            { id: 'secondary-color', label: 'Color Secundario', value: '#764ba2' },
-            { id: 'accent-color', label: 'Color de Acento', value: '#f093fb' },
-            { id: 'success-color', label: 'Color de Éxito', value: '#4facfe' },
-            { id: 'background-color', label: 'Color de Fondo', value: '#f8f9fa' }
-        ]
+    colorConfig.value = [
+        { id: 'primary-color', label: 'Color Primario', value: '#667eea' },
+        { id: 'secondary-color', label: 'Color Secundario', value: '#764ba2' },
+        { id: 'accent-color', label: 'Color de Acento', value: '#f093fb' },
+        { id: 'success-color', label: 'Color de Éxito', value: '#4facfe' },
+        { id: 'background-color', label: 'Color de Fondo', value: '#f8f9fa' }
+    ]
         Swal.fire({
             icon: 'success',
             title: 'Reseteado',
@@ -687,7 +687,19 @@ const resetChanges = () => {
         })
     }
 }
-
+// Función para aplicar colores al template real
+const applyColorsToTemplate = (colors) => {
+    const root = document.documentElement;
+    
+    root.style.setProperty('--primary-color', colors[0].value);
+    root.style.setProperty('--secondary-color', colors[1].value);
+    root.style.setProperty('--accent-color', colors[2].value);
+    root.style.setProperty('--success-color', colors[3].value);
+    root.style.setProperty('--background-color', colors[4].value);
+    
+    // Guardar en localStorage para persistencia
+    localStorage.setItem('activeColorPalette', JSON.stringify(colors));
+}
 // Funciones para gestión de paletas
 const saveCurrentPalette = async () => {
     if (!newPaletteName.value.trim()) {
@@ -696,6 +708,8 @@ const saveCurrentPalette = async () => {
             title: 'Error',
             text: 'Por favor ingresa un nombre para la paleta'
         })
+        // Al final de saveCurrentPalette, después de guardar en localStorage
+        applyColorsToTemplate(colorConfig.value);
         return
     }
     
@@ -777,8 +791,8 @@ const saveCurrentPalette = async () => {
 
         // Limpiar input
         newPaletteName.value = ''
-        return
-    }
+            return
+        }
 
     // Si no existe, intentar crear (POST)
     try {
@@ -798,7 +812,7 @@ const saveCurrentPalette = async () => {
     const newId = created && (created.id_color || created.id) ? String(created.id_color || created.id) : ('local-' + Date.now().toString())
         const createdAt = created && (created.created_at || created.createdAt) ? (created.created_at || created.createdAt) : localPaletteBase.createdAt
 
-        const newPalette = {
+    const newPalette = {
             id: newId,
             name: localPaletteBase.name,
             colors: [...localPaletteBase.colors],
@@ -985,11 +999,11 @@ const saveCurrentTypography = () => {
             if (payload.font2) {
                 const fam2 = 'SavedSecondary_' + Date.now().toString()
                 loadFontFromUrl(payload.font2, fam2).then(() => { newItem.fonts.secondaryFamily = fam2; fontConfig.value.secondaryFamily = fam2 })
-            }
+    }
 
-            savedTypography.value.unshift(newItem)
-            saveTypographiesToStorage()
-            newTypographyName.value = ''
+    savedTypography.value.unshift(newItem)
+    saveTypographiesToStorage()
+    newTypographyName.value = ''
             // limpiar files
             primaryFontFile.value = null
             secondaryFontFile.value = null
@@ -1377,8 +1391,8 @@ const deleteTypography = (id) => {
                 }
             }
 
-            savedTypography.value = savedTypography.value.filter(p => p.id !== id)
-            saveTypographiesToStorage()
+        savedTypography.value = savedTypography.value.filter(p => p.id !== id)
+        saveTypographiesToStorage()
 
             Swal.fire({ title: 'Eliminado!', text: 'Tu tipografía ha sido eliminada.', icon: 'success' })
         } catch (err) {
@@ -1696,26 +1710,14 @@ const loadTypographiesFromStorage = () => {
 }
 
 const loadPalette = (palette) => {
-    Swal.fire({
-        title: "Cargar Paleta",
-        text: `¿Estás seguro de cargar la paleta "${palette.name}"? Esto sobrescribirá los colores actuales.`,
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Sí, cargar",
-        cancelButtonText: "Cancelar"
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Cargar los colores de la paleta
-            colorConfig.value = palette.colors.map(c => ({ ...c })) // Copia profunda
-            Swal.fire({
-                icon: 'success',
-                title: 'Paleta cargada',
-                text: `La paleta "${palette.name}" ha sido cargada exitosamente!`
-            })
-        }
-    })
+    if (palette && palette.colors) {
+        colorConfig.value = palette.colors.map(color => ({ ...color }))
+        
+        // Aplicar colores al template real
+        applyColorsToTemplate(palette.colors);
+        
+        alert('Paleta cargada exitosamente!')
+    }
 }
 
 const deletePalette = async (paletteId) => {
@@ -1725,10 +1727,10 @@ const deletePalette = async (paletteId) => {
     const result = await Swal.fire({
         title: "¿Estás seguro?",
         text: "Esta acción no se puede revertir!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
         confirmButtonText: "Sí, eliminar!",
         cancelButtonText: "Cancelar"
     })
@@ -1756,7 +1758,7 @@ const deletePalette = async (paletteId) => {
         await Swal.fire({
             title: "Eliminado!",
             text: "Tu paleta ha sido eliminada.",
-            icon: "success"
+        icon: "success"
         })
     } catch (error) {
         console.error('Error eliminando paleta:', error)

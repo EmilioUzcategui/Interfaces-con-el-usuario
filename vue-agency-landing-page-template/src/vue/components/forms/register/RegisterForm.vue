@@ -248,7 +248,7 @@ const handleSubmit = async () => {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, $primary 0%, $primary 100%);
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-color) 100%);
     border: none;
     padding: 12px;
     font-weight: 600;
@@ -257,14 +257,13 @@ const handleSubmit = async () => {
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #d35309 0%, #d35309 100%);
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-color) 100%);
+    opacity: 0.9;
     transform: translateY(-1px);
-    
-;
 }
 
 .form-control:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem $primary
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 0.2rem var(--secondary-color);
 }
 </style>

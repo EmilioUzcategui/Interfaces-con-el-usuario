@@ -144,14 +144,14 @@ button.foxy-nav-link.hidden {
 }
 
 button.foxy-nav-link:hover, button.foxy-nav-link.active {
-    color: lighten($primary, 5%);
+    color: var(--secondary-color);
     i.foxy-nav-link-icon {
-        color: lighten($primary, 25%);
+        color: var(--secondary-color);
     }
 }
 
 button.foxy-nav-link-auth {
-    background: linear-gradient(135deg, $primary 0%, darken($primary, 10%) 100%);
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-color) 100%);
     color: white !important;
     border-radius: 20px;
     padding: 8px 16px !important;
@@ -167,14 +167,16 @@ button.foxy-nav-link-auth {
     }
 
     &:hover {
-        background: linear-gradient(135deg, lighten($primary, 5%) 0%, $primary 100%);
+        background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-color) 100%);
+        opacity: 0.9;
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba($primary, 0.3);
+        box-shadow: 0 4px 12px rgba(255, 89, 0, 0.3);
         color: white !important;
     }
 
     &.active {
-        background: linear-gradient(135deg, darken($primary, 5%) 0%, darken($primary, 15%) 100%);
+        background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-color) 100%);
+        opacity: 0.8;
         color: white !important;
     }
 

@@ -414,6 +414,9 @@ import PageSectionHeader from "/src/vue/components/layout/PageSectionHeader.vue"
 import PageSectionContent from "/src/vue/components/layout/PageSectionContent.vue"
 import {ref, onMounted, onUnmounted} from "vue"
 import Swal from 'sweetalert2'
+import * as themeManager from '/src/utils/themeManager.js'
+
+
 
 const colorConfig = ref([
     {
@@ -1670,6 +1673,7 @@ const _onEscape = (e) => {
     if (e.key === 'Escape') closeContextMenu()
 }
 
+
 onMounted(() => {
     document.addEventListener('click', _onDocumentClick)
     document.addEventListener('keydown', _onEscape)
@@ -1677,6 +1681,12 @@ onMounted(() => {
     // Cargar tipografías desde servidor y storage (fallback)
     fetchTypographiesFromAPI()
     loadTypographiesFromStorage()
+
+    // Cargar la última paleta guardada en localStorage (persistencia)
+    const savedPalette = themeManager.loadPalette()
+    if (savedPalette) {
+        themeManager.applyPalette(savedPalette)
+    }
 })
 
 onUnmounted(() => {
@@ -1709,16 +1719,56 @@ const loadTypographiesFromStorage = () => {
     }
 }
 
-const loadPalette = (palette) => {
-    if (palette && palette.colors) {
+const loadPalette = async (palette) => {
+    if (!palette || !palette.colors) return
+
+    // Primera validación: confirmar si quiere cargar la paleta
+    const result = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: `¿Quieres cargar la paleta "${palette.name}"?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, cargar',
+        cancelButtonText: 'Cancelar',
+        customClass: {
+            popup: 'swal2-popup-custom',
+            title: 'swal2-title-custom',
+            content: 'swal2-content-custom',
+            confirmButton: 'swal2-confirm-custom',
+            cancelButton: 'swal2-cancel-custom'
+        }
+    })
+
+    // Si confirma, proceder con la carga
+    if (result.isConfirmed) {
         colorConfig.value = palette.colors.map(color => ({ ...color }))
         
         // Aplicar colores al template real
-        applyColorsToTemplate(palette.colors);
+        applyColorsToTemplate(palette.colors)
         
-        alert('Paleta cargada exitosamente!')
+        // Guardar y aplicar paleta de forma persistente
+        themeManager.savePalette(palette)
+        themeManager.applyPalette(palette)
+        
+        // Segunda validación: mostrar éxito
+        await Swal.fire({
+            icon: 'success',
+            title: '¡Paleta cargada exitosamente!',
+            text: `La paleta "${palette.name}" ha sido aplicada correctamente.`,
+            confirmButtonColor: '#28a745',
+            confirmButtonText: 'Aceptar',
+            customClass: {
+                popup: 'swal2-popup-custom',
+                title: 'swal2-title-custom',
+                content: 'swal2-content-custom',
+                confirmButton: 'swal2-confirm-custom'
+            }
+        })
     }
 }
+
 
 const deletePalette = async (paletteId) => {
     const palette = savedPalettes.value.find(p => p.id === paletteId)

@@ -10,6 +10,7 @@ import LicensePage from "/src/vue/content/pages/LicensePage.vue"
 import PolicyPage from "/src/vue/content/pages/PolicyPage.vue"
 import { loadTypography } from './utils/loadTypography.js'
 import "./assets/styles/dynamic-colors.css"
+import { loadPalette, loadPaletteWhenReady, debugPaletteState } from './utils/themeManager.js' // 👈 Importa las funciones
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -103,4 +104,32 @@ const router = createRouter({
     ]
 })
 await loadTypography() // Carga fuentes antes de renderizar la app
-createApp(App).use(router).mount("#app")
+
+// 🔥 Crea y monta la app
+const app = createApp(App).use(router)
+app.mount("#app")
+
+// 🔥 Aplica la paleta guardada después de que la app esté montada
+// Múltiples estrategias para asegurar que se cargue
+loadPaletteWhenReady()
+
+setTimeout(() => {
+  console.log("🔄 Intentando cargar paleta (intento 1)...")
+  loadPalette()
+}, 50)
+
+setTimeout(() => {
+  console.log("🔄 Intentando cargar paleta (intento 2)...")
+  loadPalette()
+}, 200)
+
+setTimeout(() => {
+  console.log("🔄 Intentando cargar paleta (intento 3)...")
+  loadPalette()
+}, 500)
+
+// Debug final después de todos los intentos
+setTimeout(() => {
+  console.log("🔍 Debug final del estado de la paleta:")
+  debugPaletteState()
+}, 1000)

@@ -63,19 +63,38 @@ const linkList = computed(() => {
         }
     }).filter(section => section.label && section.path) : []
 
-    // Agregar enlace de login al final solo si NO está logueado
-    if (!isLoggedIn.value) {
-        const loginLink = {
-            path: '/login',
-            label: 'Login',
-            faIcon: 'fa-solid fa-user',
-            isActive: route.path === '/login'
+    // Si está logueado, verificar si es administrador
+    if (isLoggedIn.value) {
+        const userData = localStorage.getItem('currentUser')
+        if (userData) {
+            try {
+                const user = JSON.parse(userData)
+                // Si es administrador (id_user === 1), agregar enlace al dashboard
+                if (user.id_user === 1) {
+                    const dashboardLink = {
+                        path: '/dashboard',
+                        label: 'Dashboard',
+                        faIcon: 'fa-solid fa-tachometer-alt',
+                        isActive: route.path === '/dashboard'
+                    }
+                    return [...sectionLinks, dashboardLink]
+                }
+            } catch (error) {
+                console.error('Error parsing user data:', error)
+            }
         }
-
-        return [...sectionLinks, loginLink]
+        return sectionLinks
     }
 
-    return sectionLinks
+    // Agregar enlace de login al final solo si NO está logueado
+    const loginLink = {
+        path: '/login',
+        label: 'Login',
+        faIcon: 'fa-solid fa-user',
+        isActive: route.path === '/login'
+    }
+
+    return [...sectionLinks, loginLink]
 })
 
 onMounted(() => {

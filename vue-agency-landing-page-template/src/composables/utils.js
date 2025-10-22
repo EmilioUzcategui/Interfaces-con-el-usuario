@@ -78,7 +78,7 @@ export function useUtils() {
             "text-primary-light" :
             "text-primary"
 
-        return title.replace(/\*(.*?)\*/g, `<span class="${titleClass}">$1</span>`)
+        return title.replace(/\*(.*?)\*/g, `<span class="${titleClass}" style="color: var(--secondary-color, var(--accent-color));">$1</span>`)
     }
 
     /**

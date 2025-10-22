@@ -4,6 +4,10 @@
     --accent-color: #000000;
     --success-color: #343a40;
     --background-color: #fcfcfc;
+    
+    /* Variables de texto que se actualizan dinámicamente */
+    --text-normal: var(--accent-color);
+    --headings-color: var(--accent-color);
   }
   
   /* Aplicar colores al template */
@@ -25,4 +29,63 @@
   
   .background-bg {
     background-color: var(--background-color) !important;
+  }
+  
+  /* Estilos para textos que se actualizan dinámicamente */
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--secondary-color, var(--accent-color)) !important;
+  }
+  
+  p, .text-normal {
+    color: var(--accent-color) !important;
+  }
+  
+  .foxy-section-header-title {
+    color: var(--secondary-color, var(--accent-color)) !important;
+  }
+  
+  .foxy-section-header-subtitle {
+    color: var(--accent-color, var(--success-color)) !important;
+  }
+  
+  /* Sobrescribir clases de Bootstrap y otros estilos hardcodeados */
+  .text-primary {
+    color: var(--secondary-color, var(--accent-color)) !important;
+  }
+  
+  .text-primary-light {
+    color: var(--secondary-color, var(--accent-color)) !important;
+  }
+  
+  /* Estilos específicos para testimonios */
+  .foxy-testimonial-author {
+    color: var(--accent-color) !important;
+  }
+  
+  .foxy-testimonial-author span {
+    color: var(--secondary-color, var(--accent-color)) !important;
+  }
+  
+  /* Estilos para FAQ */
+  .question-icon {
+    color: var(--secondary-color, var(--accent-color)) !important;
+  }
+  
+  /* Estilos para elementos con asteriscos */
+  span[class*="text-primary"] {
+    color: var(--secondary-color, var(--accent-color)) !important;
+  }
+  
+  /* Estilos adicionales para asegurar cobertura completa */
+  .card-footer p {
+    color: var(--accent-color) !important;
+  }
+  
+  .card-footer span {
+    color: var(--secondary-color, var(--accent-color)) !important;
+  }
+  
+  /* Forzar actualización de todos los elementos de texto */
+  * {
+    transition: color 0.3s ease;
   }

@@ -50,8 +50,6 @@ onUnmounted(() => {
 })
 
 const linkList = computed(() => {
-    console.log('Computing linkList, isLoggedIn:', isLoggedIn.value)
-    
     // Enlaces fijos consistentes con la página principal
     const staticLinks = [
         {
@@ -98,8 +96,28 @@ const linkList = computed(() => {
         }
     ]
 
-    // Solo agregar enlaces de autenticación si no está logueado
+    // Si está logueado, verificar si es administrador
     if (isLoggedIn.value) {
+        const userData = localStorage.getItem('currentUser')
+        if (userData) {
+            try {
+                const user = JSON.parse(userData)
+                // Si es administrador (id_user === 1), agregar enlace al dashboard
+                if (user.id_user === 1) {
+                    return [
+                        ...staticLinks,
+                        {
+                            path: '/dashboard',
+                            label: 'Dashboard',
+                            faIcon: 'fa-solid fa-tachometer-alt',
+                            isActive: route.path === '/dashboard'
+                        }
+                    ]
+                }
+            } catch (error) {
+                console.error('Error parsing user data:', error)
+            }
+        }
         return staticLinks
     }
     

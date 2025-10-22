@@ -35,8 +35,8 @@ $white: $white-default;
     --footer-bg-color: #{$dark-default};
     --footer-bg-highlight-color: #{darken($dark-default, 1%)};
 
-    --headings-color: #{$dark-default};
-    --text-normal: black;
+    --headings-color: var(--accent-color, #{$dark-default});
+    --text-normal: var(--accent-color, black);
     --text-normal-contrast: white;
     --text-muted: #757575;
 
@@ -71,8 +71,8 @@ $navbar-height: 71px;
   📝 TEXTOS
 ─────────────────────────────────────────────*/
 
-$headings-color: $dark;
-$text-normal: black;
+$headings-color: var(--accent-color, $dark);
+$text-normal: var(--accent-color, black);
 $text-normal-contrast: white;
 $text-muted: #757575;
 

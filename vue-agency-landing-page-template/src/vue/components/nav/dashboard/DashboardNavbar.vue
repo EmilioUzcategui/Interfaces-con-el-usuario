@@ -103,6 +103,12 @@ const dashboardLinks = ref([
         icon: 'fa-solid fa-home'
     },
     {
+        id: 'main-site',
+        label: 'Sitio Principal',
+        url: '/',
+        icon: 'fa-solid fa-globe'
+    },
+    {
         id: 'stats',
         label: 'Estadísticas',
         url: '#dashboard-stats',

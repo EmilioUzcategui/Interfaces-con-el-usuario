@@ -2,7 +2,7 @@
     <div class="foxy-item-faq-question">
         <!-- Question Icon -->
         <div class="flex-shrink-0">
-            <i class="fa fa-question-circle text-primary question-icon eq-h4"/>
+            <i class="fa fa-question-circle question-icon eq-h4" style="color: var(--secondary-color, var(--accent-color));"/>
         </div>
 
         <!-- Question Content -->

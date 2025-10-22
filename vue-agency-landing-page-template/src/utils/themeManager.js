@@ -29,6 +29,18 @@ export function applyPalette(palette) {
       document.documentElement.style.setProperty(varName, value)
       console.log(`  ${varName}: ${value}`)
     })
+    
+    // También actualizar variables relacionadas con textos
+    if (palette.colors.length >= 2) {
+      document.documentElement.style.setProperty('--text-normal', palette.colors[2]?.value || "#000000")
+      document.documentElement.style.setProperty('--headings-color', palette.colors[2]?.value || "#000000")
+    }
+    
+    // Actualizar clases CSS personalizadas para Bootstrap
+    updateBootstrapClasses(palette.colors)
+    
+    // Forzar actualización de estilos
+    forceStyleUpdate()
     console.log("✅ Paleta aplicada exitosamente (formato objeto con colors)")
     return
   }
@@ -50,6 +62,18 @@ export function applyPalette(palette) {
       document.documentElement.style.setProperty(varName, value)
       console.log(`  ${varName}: ${value}`)
     })
+    
+    // También actualizar variables relacionadas con textos
+    if (palette.length >= 3) {
+      document.documentElement.style.setProperty('--text-normal', palette[2]?.value || "#000000")
+      document.documentElement.style.setProperty('--headings-color', palette[2]?.value || "#000000")
+    }
+    
+    // Actualizar clases CSS personalizadas para Bootstrap
+    updateBootstrapClasses(palette)
+    
+    // Forzar actualización de estilos
+    forceStyleUpdate()
     console.log("✅ Paleta aplicada exitosamente (formato array)")
     return
   }
@@ -138,6 +162,56 @@ export function debugPaletteState() {
     console.log(`  ${varName}: ${value}`)
   })
   console.log("=== END DEBUG ===")
+}
+
+/**
+ * 🎨 Actualiza las clases CSS personalizadas para Bootstrap
+ */
+function updateBootstrapClasses(colors) {
+  if (!colors || colors.length < 2) return
+  
+  const secondaryColor = colors[1]?.value || colors[1] || "#ff5900"
+  const accentColor = colors[2]?.value || colors[2] || "#000000"
+  
+  // Crear o actualizar estilos CSS personalizados
+  let customStyles = document.getElementById('dynamic-bootstrap-overrides')
+  if (!customStyles) {
+    customStyles = document.createElement('style')
+    customStyles.id = 'dynamic-bootstrap-overrides'
+    document.head.appendChild(customStyles)
+  }
+  
+  customStyles.textContent = `
+    .text-primary {
+      color: ${secondaryColor} !important;
+    }
+    .text-primary-light {
+      color: ${secondaryColor} !important;
+    }
+    .foxy-testimonial-author {
+      color: ${accentColor} !important;
+    }
+    .foxy-testimonial-author span {
+      color: ${secondaryColor} !important;
+    }
+    .question-icon {
+      color: ${secondaryColor} !important;
+    }
+    span[class*="text-primary"] {
+      color: ${secondaryColor} !important;
+    }
+  `
+}
+
+/**
+ * 🔄 Fuerza la actualización de estilos para asegurar que los cambios se apliquen
+ */
+function forceStyleUpdate() {
+  // Forzar reflow para que los estilos se recalculen
+  document.documentElement.offsetHeight
+  
+  // Disparar evento personalizado para notificar cambios de color
+  window.dispatchEvent(new CustomEvent('colorPaletteUpdated'))
 }
 
 export const themeManager = {

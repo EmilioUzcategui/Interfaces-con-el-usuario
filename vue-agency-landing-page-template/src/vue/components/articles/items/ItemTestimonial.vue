@@ -16,7 +16,7 @@
 
         <div class="card-footer">
             <p class="foxy-testimonial-author text-3">
-                <span class="text-primary me-2">—</span>
+                <span class="me-2" style="color: var(--secondary-color, var(--accent-color));">—</span>
 
                 <span v-html="parsedAuthor"/>
 

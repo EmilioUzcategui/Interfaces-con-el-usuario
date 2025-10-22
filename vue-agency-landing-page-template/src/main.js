@@ -114,22 +114,22 @@ app.mount("#app")
 loadPaletteWhenReady()
 
 setTimeout(() => {
-  console.log("🔄 Intentando cargar paleta (intento 1)...")
-  loadPalette()
+    console.log("🔄 Intentando cargar paleta (intento 1)...")
+    loadPalette()
 }, 50)
 
 setTimeout(() => {
-  console.log("🔄 Intentando cargar paleta (intento 2)...")
-  loadPalette()
+    console.log("🔄 Intentando cargar paleta (intento 2)...")
+    loadPalette()
 }, 200)
 
 setTimeout(() => {
-  console.log("🔄 Intentando cargar paleta (intento 3)...")
-  loadPalette()
+    console.log("🔄 Intentando cargar paleta (intento 3)...")
+    loadPalette()
 }, 500)
 
 // Debug final después de todos los intentos
 setTimeout(() => {
-  console.log("🔍 Debug final del estado de la paleta:")
-  debugPaletteState()
+    console.log("🔍 Debug final del estado de la paleta:")
+    debugPaletteState()
 }, 1000)

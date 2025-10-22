@@ -61,5 +61,5 @@ a {
 }
 
 p {
-    color: $text-normal;
+    color: var(--accent-color, $text-normal);
 }

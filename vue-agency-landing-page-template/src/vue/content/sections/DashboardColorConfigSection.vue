@@ -1328,7 +1328,23 @@ const loadTypography = async (item) => {
         }
     }
 
+    // preguntar si desea la tipografía
+
+
+
     // activar la tipografia en el backend
+
+    const result = await Swal.fire({
+        title: "Cargar Tipografía",
+        text: `¿Deseas activar la tipografía "${item.name}" para previsualización?`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí, activar",
+        cancelButtonText: "Cancelar"
+    })
+    if (!result.isConfirmed) return
 
     const response = await fetch(`http://localhost:3000/api/tipografias/${item.id}/activate`, {
         method: 'POST',
@@ -1349,6 +1365,7 @@ const loadTypography = async (item) => {
     // Clear font errors when loading typography
     fontErrors.value.primaryFont = null
     fontErrors.value.secondaryFont = null
+
     Swal.fire({
         icon: 'success',
         title: 'Tipografía cargada',
@@ -1752,20 +1769,21 @@ const loadPalette = async (palette) => {
         themeManager.savePalette(palette)
         themeManager.applyPalette(palette)
         
-        // Segunda validación: mostrar éxito
-        await Swal.fire({
+        // Segunda validación: mostrar éxito y preguntar si quiere ir al home
+        const goHomeResult = await Swal.fire({
             icon: 'success',
-            title: '¡Paleta cargada exitosamente!',
-            text: `La paleta "${palette.name}" ha sido aplicada correctamente.`,
-            confirmButtonColor: '#28a745',
-            confirmButtonText: 'Aceptar',
-            customClass: {
-                popup: 'swal2-popup-custom',
-                title: 'swal2-title-custom',
-                content: 'swal2-content-custom',
-                confirmButton: 'swal2-confirm-custom'
-            }
+            title: 'Paleta cargada',
+            text: `La paleta "${palette.name}" ha sido cargada exitosamente! Deseas ir al home para verla en acción?`,
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ir al Home',
+            cancelButtonText: 'Quedarme aquí',
         })
+        if (goHomeResult.isConfirmed) {
+            // redirigir al home
+            window.location.href = '/'
+        }
     }
 }
 

@@ -47,6 +47,8 @@ export async function loadTypography() {
 
     // Crear elemento <style> para @font-face y variables CSS
     const style = document.createElement("style")
+    // marcar el style para poder eliminarlo más tarde
+    style.id = 'injected-typography'
     let cssContent = ""
 
     if (font1IsLocal || font2IsLocal) {
@@ -160,4 +162,28 @@ export async function loadTypography() {
   } catch (error) {
     console.error("❌ Error cargando tipografía:", error)
   }
+}
+
+export function unloadTypography() {
+  try {
+    // eliminar el style inyectado por loadTypography
+    const injected = document.getElementById('injected-typography')
+    if (injected && injected.parentNode) injected.parentNode.removeChild(injected)
+  } catch (e) {
+    console.warn('Error removiendo injected-typography style:', e)
+  }
+
+  // remover variables CSS relacionadas con tipografías y tamaños
+  const vars = [
+    '--font-base', '--font-headings', '--font-primary', '--font-secondary',
+    '--size-title', '--size-subtitle', '--size-paragraph',
+    '--paragraph-size', '--title-size', '--subtitle-size'
+  ]
+  try {
+    vars.forEach(v => document.documentElement.style.removeProperty(v))
+  } catch (e) {
+    console.warn('Error removiendo variables de tipografía:', e)
+  }
+
+  console.log('✅ Tipografías descargadas / variables limpiadas')
 }

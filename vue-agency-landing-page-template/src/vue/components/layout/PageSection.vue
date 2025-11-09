@@ -20,15 +20,13 @@ import BackgroundPromo from "/src/vue/components/layout/BackgroundPromo.vue"
 
 const props = defineProps({
     id: String,
-    variant: String, // default, primary, dark or promo.
+    variant: String, // default, primary, dark, promo, or success.
     name: String,
     faIcon: String
 })
 
 const classList = computed(() => {
-    return props.variant ?
-        `foxy-section-${props.variant}` :
-        ``
+    return props.variant ? `foxy-section-${props.variant}` : ''
 })
 </script>
 
@@ -36,13 +34,7 @@ const classList = computed(() => {
 @import "/src/scss/_theming.scss";
 
 section.foxy-section {
-    @include generate-dynamic-styles-with-hash((
-        xxxl: (padding: 4rem 0em 5rem),
-        xxl:  (padding: 3rem 0rem 3.5rem),
-        lg:   (padding: 2.5rem 0rem 3.5rem),
-        md:   (padding: 2.25rem 0rem 3.25rem),
-        sm:   (padding: 2rem 0rem 3rem),
-    ));
+    @include generate-dynamic-styles-with-hash((xxxl: (padding: 4rem 0em 5rem), xxl: (padding: 3rem 0rem 3.5rem), lg: (padding: 2.5rem 0rem 3.5rem), md: (padding: 2.25rem 0rem 3.25rem), sm: (padding: 2rem 0rem 3rem)));
 
     background-color: var(--background-color, $background-color);
     position: relative;
@@ -64,6 +56,11 @@ section.foxy-section-dark {
     h5.foxy-section-header-subtitle {
         color: var(--success-color, $light-5);
     }
+}
+
+section.foxy-section-success {
+    background-color: var(--success-color, lighten($primary, 45%));
+    color: var(--accent-color, $text-normal);
 }
 
 section.foxy-section-promo {

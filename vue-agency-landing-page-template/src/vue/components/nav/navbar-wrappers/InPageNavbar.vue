@@ -71,19 +71,32 @@ const linkList = computed(() => {
                 const user = JSON.parse(userData)
                 // Si es administrador (id_user === 1), agregar enlace al dashboard
                 if (user.id_user === 1) {
+                    const cvLink = {
+                        path: '/cv',
+                        label: 'Crear CV',
+                        faIcon: 'fa-solid fa-file-alt',
+                        isActive: route.path === '/cv'
+                    }
                     const dashboardLink = {
                         path: '/dashboard',
                         label: 'Dashboard',
                         faIcon: 'fa-solid fa-tachometer-alt',
                         isActive: route.path === '/dashboard'
                     }
-                    return [...sectionLinks, dashboardLink]
+                    return [...sectionLinks, cvLink, dashboardLink]
                 }
             } catch (error) {
                 console.error('Error parsing user data:', error)
             }
         }
-        return sectionLinks
+        // Si está logueado pero no es admin, agregar enlace de CV
+        const cvLink = {
+            path: '/cv',
+            label: 'Crear CV',
+            faIcon: 'fa-solid fa-file-alt',
+            isActive: route.path === '/cv'
+        }
+        return [...sectionLinks, cvLink]
     }
 
     // Agregar enlace de login al final solo si NO está logueado

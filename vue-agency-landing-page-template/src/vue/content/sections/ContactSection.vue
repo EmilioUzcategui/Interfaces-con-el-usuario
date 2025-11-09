@@ -1,6 +1,6 @@
 <template>
     <!-- About Section -->
-    <PageSection variant="dark"
+    <PageSection variant="success"
                  :id="props.id">
         <!-- Title -->
         <PageSectionHeader title="*Contact* Us"

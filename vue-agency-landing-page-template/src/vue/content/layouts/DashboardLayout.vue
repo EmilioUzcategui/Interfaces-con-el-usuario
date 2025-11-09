@@ -16,6 +16,19 @@
 <script setup>
 import DashboardNavbar from "/src/vue/components/nav/dashboard/DashboardNavbar.vue"
 import DashboardFooter from "/src/vue/components/footer/dashboard/DashboardFooter.vue"
+import { onMounted } from 'vue'
+import { unloadTypography } from '/src/utils/loadTypography.js'
+
+// Al montar el layout del dashboard limpiamos cualquier tipografía inyectada
+// para que el dashboard no muestre la tipografía activa del sitio sin refrescar.
+onMounted(() => {
+    try {
+        // Si hay estilos/variables inyectadas por la vista de tipografías, removerlos
+        unloadTypography()
+    } catch (e) {
+        console.warn('Error llamando a unloadTypography en DashboardLayout:', e)
+    }
+})
 </script>
 
 <style lang="scss" scoped>

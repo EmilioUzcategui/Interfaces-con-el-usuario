@@ -1,17 +1,16 @@
 <template>
     <div class="foxy-quote-item px-0 px-lg-3 px-xl-4 mx-auto">
         <!-- Quote Balloon -->
-        <div v-if="quote"
-             class="foxy-quote-balloon">
+        <div class="foxy-quote-balloon">
             <div class="triangle"/>
-
-            <QuotedText class="text-muted text-3 mx-3"
+            
+            <QuotedText class="text-muted text-4 mx-3"
                         :text="parsedQuote"/>
         </div>
 
         <!-- Avatar -->
-        <ImageView :src="props.image"
-                   :alt="props.title"
+        <ImageView :src="image"
+                   :alt="title"
                    class="foxy-quote-avatar"/>
 
         <!-- Texts And Links -->
@@ -22,8 +21,8 @@
             <p class="text-muted text-4 mb-2 pb-1"
                v-html="role"/>
 
-            <SocialLinks v-if="props.links"
-                         :items="props.links"
+            <SocialLinks v-if="links"
+                         :items="links"
                          size="2"
                          variant="black"/>
         </div>
@@ -59,6 +58,7 @@ const parsedQuote = computed(() => {
 <style lang="scss" scoped>
 @import "/src/scss/_theming.scss";
 
+// valor por defecto en SASS para fallback
 $balloon-color: lighten($primary, 46%);
 
 div.foxy-quote-item {
@@ -83,25 +83,26 @@ div.foxy-quote-avatar {
     aspect-ratio: 1/1;
     overflow: hidden;
     border-radius: 100%;
-    border: 6px $balloon-color solid;
+    /* usar color 5 de la paleta (var(--background-color)) para el borde del avatar */
+    border: 6px solid var(--background-color, $balloon-color);
 }
 
 div.foxy-quote-balloon {
-    --height: 180px;
+    --min-height: 180px;
     --padding: 0 12px;
 
     @include media-breakpoint-down(xxl) {
-        --height: 170px;
+        --min-height: 170px;
         --padding: 0 10px;
     }
 
     @include media-breakpoint-down(lg) {
-        --height: 170px;
+        --min-height: 170px;
         --padding: 0 10px;
     }
 
     @include media-breakpoint-down(sm) {
-        --height: 140px;
+        --min-height: 140px;
         --padding: 0.25rem;
     }
 
@@ -109,23 +110,24 @@ div.foxy-quote-balloon {
     justify-content: center;
     align-items: center;
 
-    height: var(--height);
+    min-height: var(--min-height);
     overflow: hidden;
     padding: var(--padding);
     margin-bottom: 1.5rem;
 
-    background-color: $balloon-color;
+    /* usar color 5 de la paleta (mappeado a --background-color) para el fondo del balloon */
+    background-color: var(--background-color, $balloon-color);
     border-radius: 20px;
 
     .triangle {
         position: absolute;
-        margin-top: calc(var(--height) + 10px);
+        margin-top: calc(var(--min-height) + 10px);
         width: 0;
         height: 0;
 
         border-left: 10px solid transparent;
         border-right: 10px solid transparent;
-        border-top: 10px solid $balloon-color;
+        border-top: 10px solid var(--background-color, $balloon-color);
     }
 }
 </style>

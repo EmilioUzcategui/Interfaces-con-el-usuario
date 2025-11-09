@@ -34,7 +34,7 @@ $texts-base-sizes: (
 
 .text {
     &-muted {
-        color: $text-muted!important;
+        color: var(--accent-color, $text-muted)!important;
     }
 
     &-normal {

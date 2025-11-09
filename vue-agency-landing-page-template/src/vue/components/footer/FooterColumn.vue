@@ -52,6 +52,16 @@ p, span {
     color: var(--success-color, $light-5);
 }
 
+/* Forzar que los textos destacados dentro de la descripción del footer
+   (p.ej. <strong>, <em> o enlaces) usen el color 2 de la paleta. Esto
+   cubre casos como "Vue", "Bootstrap" o "Ryan Balieiro" cuando están
+   marcados como <strong> o como enlaces dentro del footer. */
+::v-deep .foxy-footer-col-description .text-2 strong,
+::v-deep .foxy-footer-col-description .text-2 em,
+::v-deep .foxy-footer-col-description .text-2 a {
+    color: var(--secondary-color) !important;
+}
+
 div.foxy-footer-col {
     @include media-breakpoint-down(lg) {
         padding-top: 1.5rem;

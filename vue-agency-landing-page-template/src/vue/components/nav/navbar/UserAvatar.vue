@@ -15,6 +15,10 @@
             </div>
             <div class="dropdown-divider"></div>
             <div class="dropdown-actions">
+                <button class="dropdown-item daltonic-toggle" @click="toggleDaltonicMode" :class="{ active: isDaltonicMode }">
+                    <i class="fa-solid fa-eye"></i>
+                    <span>{{ isDaltonicMode ? 'Modo Normal' : 'Modo Daltónico' }}</span>
+                </button>
                 <button class="dropdown-item logout-btn" @click="handleLogout">
                     <i class="fa-solid fa-sign-out-alt"></i>
                     <span>Cerrar Sesión</span>
@@ -26,12 +30,14 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, inject } from 'vue'
+import * as themeManager from '/src/utils/themeManager.js'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const showDropdown = ref(false)
 const avatarContainer = ref(null)
 const currentUser = ref(null)
+const isDaltonicMode = ref(false)
 const setSpinnerEnabled = inject("setSpinnerEnabled")
 
 const userInitials = computed(() => {
@@ -51,12 +57,130 @@ const handleLogout = async () => {
     setSpinnerEnabled && setSpinnerEnabled(true, 'Cerrando sesión...')
     await new Promise(resolve => setTimeout(resolve, 1000))
     setSpinnerEnabled && setSpinnerEnabled(false)
+    
+    // Limpiar estilos específicos del usuario
+    if (currentUser.value) {
+        const userClass = `user-${currentUser.value.id_user}-palette`
+        document.body.classList.remove(userClass)
+        
+        // Remover estilos CSS específicos del usuario
+        const userStyle = document.getElementById(`user-${currentUser.value.id_user}-style`)
+        if (userStyle) {
+            userStyle.remove()
+        }
+    }
+    
     localStorage.removeItem('currentUser')
     currentUser.value = null
+    isDaltonicMode.value = false
     showDropdown.value = false
+    
     // Disparar evento personalizado para actualizar navbar
     window.dispatchEvent(new CustomEvent('userLogout'))
     router.push('/')
+}
+
+const toggleDaltonicMode = async () => {
+    try {
+        setSpinnerEnabled && setSpinnerEnabled(true, isDaltonicMode.value ? 'Aplicando modo normal...' : 'Aplicando modo daltónico...')
+        
+        // Alternar el estado
+        isDaltonicMode.value = !isDaltonicMode.value
+        
+        // Guardar el estado específico del usuario en localStorage
+        const userKey = `daltonicMode_${currentUser.value.id_user}`
+        localStorage.setItem(userKey, isDaltonicMode.value.toString())
+        
+        // Obtener la paleta correspondiente del backend
+        const paletteName = isDaltonicMode.value ? 'daltonicos' : 'original'
+        const response = await fetch(`http://localhost:3000/api/colors/by-name/${paletteName}`)
+        
+        if (response.ok) {
+            const palette = await response.json()
+            
+            // Convertir la paleta del backend al formato esperado por themeManager
+            const formattedPalette = {
+                colors: [
+                    { label: 'Primary', value: palette.color1 },
+                    { label: 'Secondary', value: palette.color2 },
+                    { label: 'Accent', value: palette.color3 },
+                    { label: 'Success', value: palette.color4 },
+                    { label: 'Background', value: palette.color5 }
+                ]
+            }
+            
+            // Aplicar la paleta globalmente (como lo hace el dashboard)
+            try {
+                themeManager.applyPalette(formattedPalette)
+            } catch (e) {
+                console.warn('themeManager.applyPalette falló desde UserAvatar:', e)
+            }
+
+            // También aplicar ajustes/overrides específicos por usuario si es necesario
+            await applyUserSpecificPalette(formattedPalette, currentUser.value.id_user)
+            
+            console.log(`Modo daltónico ${isDaltonicMode.value ? 'activado' : 'desactivado'} para usuario ${currentUser.value.id_user}`)
+        } else {
+            console.error('Error al obtener la paleta:', response.statusText)
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 500))
+        setSpinnerEnabled && setSpinnerEnabled(false)
+        
+    } catch (error) {
+        console.error('Error al cambiar modo daltónico:', error)
+        setSpinnerEnabled && setSpinnerEnabled(false)
+    }
+}
+
+// Función para aplicar paleta específica por usuario
+const applyUserSpecificPalette = async (palette, userId) => {
+    // Crear un ID único para este usuario
+    const userClass = `user-${userId}-palette`
+    
+    // Remover estilos anteriores del usuario
+    const existingStyle = document.getElementById(`user-${userId}-style`)
+    if (existingStyle) {
+        existingStyle.remove()
+    }
+    
+    // Crear estilos específicos para este usuario
+    const style = document.createElement('style')
+    style.id = `user-${userId}-style`
+    
+    // Aplicar la paleta globalmente usando el themeManager para forzar
+    // la asignación de variables en :root y disparar las actualizaciones dom.
+    try {
+        if (palette && (palette.colors || Array.isArray(palette))) {
+            // themeManager acepta { colors: [...] } o array
+            themeManager.applyPalette(palette)
+        }
+    } catch (e) {
+        console.warn('Error aplicando paleta globalmente desde applyUserSpecificPalette:', e)
+    }
+
+    // Construir overrides específicos para el usuario (no sobreescribimos :root aquí)
+    const cssVars = ["--primary-color", "--secondary-color", "--accent-color", "--success-color", "--background-color"]
+    let cssContent = ''
+
+    // Solo crear reglas puntuales de componentes que necesiten !important
+    cssContent += `
+        .user-${userId}-palette .foxy-dynamic-button {
+            background-color: ${palette.colors[1]?.value || '#ff5900'} !important;
+            border-color: ${palette.colors[1]?.value || '#ff5900'} !important;
+        }
+        .user-${userId}-palette .text-primary {
+            color: ${palette.colors[1]?.value || '#ff5900'} !important;
+        }
+    `
+
+    style.textContent = cssContent
+    document.head.appendChild(style)
+
+    // Agregar clase al body para activar los estilos del usuario
+    document.body.classList.add(userClass)
+
+    console.log(`Paleta aplicada para usuario ${userId}`)
 }
 
 const closeDropdown = (event) => {
@@ -65,11 +189,60 @@ const closeDropdown = (event) => {
     }
 }
 
-onMounted(() => {
+// Función para limpiar estilos de otros usuarios
+const clearOtherUserStyles = (currentUserId) => {
+    // Remover todas las clases de usuario del body
+    const bodyClasses = Array.from(document.body.classList)
+    bodyClasses.forEach(className => {
+        if (className.startsWith('user-') && !className.includes(`user-${currentUserId}-palette`)) {
+            document.body.classList.remove(className)
+        }
+    })
+    
+    // Remover todos los estilos de usuario excepto el actual
+    const userStyles = document.querySelectorAll('style[id^="user-"]')
+    userStyles.forEach(style => {
+        if (!style.id.includes(`user-${currentUserId}-style`)) {
+            style.remove()
+        }
+    })
+}
+
+onMounted(async () => {
     // Cargar usuario del localStorage
     const userData = localStorage.getItem('currentUser')
     if (userData) {
         currentUser.value = JSON.parse(userData)
+        
+        // Limpiar estilos de otros usuarios
+        clearOtherUserStyles(currentUser.value.id_user)
+        
+        // Cargar estado del modo daltónico específico del usuario
+        const userKey = `daltonicMode_${currentUser.value.id_user}`
+        const daltonicMode = localStorage.getItem(userKey)
+        isDaltonicMode.value = daltonicMode === 'true'
+        
+        // Si el usuario tiene modo daltónico activado, aplicarlo
+        if (isDaltonicMode.value) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/colors/by-name/daltonicos`)
+                if (response.ok) {
+                    const palette = await response.json()
+                    const formattedPalette = {
+                        colors: [
+                            { label: 'Primary', value: palette.color1 },
+                            { label: 'Secondary', value: palette.color2 },
+                            { label: 'Accent', value: palette.color3 },
+                            { label: 'Success', value: palette.color4 },
+                            { label: 'Background', value: palette.color5 }
+                        ]
+                    }
+                    await applyUserSpecificPalette(formattedPalette, currentUser.value.id_user)
+                }
+            } catch (error) {
+                console.error('Error cargando paleta daltónica:', error)
+            }
+        }
     }
     
     // Escuchar clics fuera del dropdown
@@ -198,6 +371,28 @@ onUnmounted(() => {
         color: $light-6;
         width: 16px;
         text-align: center;
+    }
+}
+
+.daltonic-toggle {
+    color: #6c757d;
+    
+    &:hover {
+        background: #f8f9fa;
+        color: #495057;
+    }
+    
+    &.active {
+        background: #e3f2fd;
+        color: #1976d2;
+        
+        i {
+            color: #1976d2;
+        }
+    }
+    
+    i {
+        color: #6c757d;
     }
 }
 

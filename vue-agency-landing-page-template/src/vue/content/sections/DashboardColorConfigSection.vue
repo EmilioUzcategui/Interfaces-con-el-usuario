@@ -24,16 +24,16 @@
                         <div class="config-sidebar">
                             <!-- Pestañas de Configuración -->
                             <div class="config-tabs">
-                                <button 
-                                    class="tab-button" 
+                                <button
+                                    class="tab-button"
                                     :class="{ active: activeTab === 'colors' }"
                                     @click="activeTab = 'colors'"
                                 >
                                     <i class="fa-solid fa-palette me-2"></i>
                                     Colores
                                 </button>
-                                <button 
-                                    class="tab-button" 
+                                <button
+                                    class="tab-button"
                                     :class="{ active: activeTab === 'typography' }"
                                     @click="activeTab = 'typography'"
                                 >
@@ -41,29 +41,29 @@
                                     Tipografía
                                 </button>
                             </div>
-                            
+
                             <!-- Contenido de Pestaña de Colores -->
                             <div v-if="activeTab === 'colors'" class="tab-content">
                                 <h4 class="section-title">
                                     <i class="fa-solid fa-palette me-2"></i>
                                     Paleta de Colores
                                 </h4>
-                                
+
                                 <div class="color-inputs">
                                     <div class="color-input-group" v-for="color in colorConfig" :key="color.id">
                                         <label :for="color.id" class="color-label">
                                             {{ color.label }}
                                         </label>
                                         <div class="color-input-wrapper">
-                                            <input 
-                                                type="color" 
+                                            <input
+                                                type="color"
                                                 :id="color.id"
                                                 v-model="color.value"
                                                 class="color-picker"
                                                 @input="onColorInput(color.id, $event.target.value)"
                                             />
-                                            <input 
-                                                type="text" 
+                                            <input
+                                                type="text"
                                                 v-model="color.value"
                                                 class="color-text"
                                                 :class="{ 'error': hasColorError(color.id) }"
@@ -77,7 +77,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Campo para nombre de paleta -->
                                 <div class="palette-name-section">
                                     <h5 class="palette-name-title">
@@ -85,8 +85,8 @@
                                         Guardar Paleta
                                     </h5>
                                     <div class="palette-name-input">
-                                        <input 
-                                            type="text" 
+                                        <input
+                                            type="text"
                                             v-model="newPaletteName"
                                             class="form-control"
                                             placeholder="Nombre de la paleta (ej: Mi Paleta Corporativa)"
@@ -95,19 +95,19 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Contenido de Pestaña de Tipografía -->
                             <div v-if="activeTab === 'typography'" class="tab-content">
                                 <h4 class="section-title">
                                     <i class="fa-solid fa-font me-2"></i>
                                     Personalización de Tipografía
                                 </h4>
-                                
+
                                 <div class="font-inputs">
                                     <div class="font-input-group">
                                         <label class="font-label">Tamaño de Títulos (px)</label>
-                                        <input 
-                                            type="number" 
+                                        <input
+                                            type="number"
                                             :value="fontConfig.titleSize"
                                             @input="(e) => onFontSizeInput('titleSize', e.target.value)"
                                             :class="['font-input', { 'error': hasFontError('titleSize') }]"
@@ -117,11 +117,11 @@
                                         />
                                         <div v-if="hasFontError('titleSize')" class="input-error-message">{{ getFontError('titleSize') }}</div>
                                     </div>
-                                    
+
                                     <div class="font-input-group">
                                         <label class="font-label">Tamaño de Subtítulos (px)</label>
-                                        <input 
-                                            type="number" 
+                                        <input
+                                            type="number"
                                             :value="fontConfig.subtitleSize"
                                             @input="(e) => onFontSizeInput('subtitleSize', e.target.value)"
                                             :class="['font-input', { 'error': hasFontError('subtitleSize') }]"
@@ -131,11 +131,11 @@
                                         />
                                         <div v-if="hasFontError('subtitleSize')" class="input-error-message">{{ getFontError('subtitleSize') }}</div>
                                     </div>
-                                    
+
                                     <div class="font-input-group">
                                         <label class="font-label">Tamaño de Párrafos (px)</label>
-                                        <input 
-                                            type="number" 
+                                        <input
+                                            type="number"
                                             :value="fontConfig.paragraphSize"
                                             @input="(e) => onFontSizeInput('paragraphSize', e.target.value)"
                                             :class="['font-input', { 'error': hasFontError('paragraphSize') }]"
@@ -146,13 +146,13 @@
                                         <div v-if="hasFontError('paragraphSize')" class="input-error-message">{{ getFontError('paragraphSize') }}</div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="font-uploads">
                                     <div class="font-upload-group">
                                         <label class="font-label">Fuente Principal (.ttf)</label>
                                         <div class="file-upload-wrapper">
-                                            <input 
-                                                type="file" 
+                                            <input
+                                                type="file"
                                                 ref="primaryFontInput"
                                                 @change="handlePrimaryFontUpload"
                                                 accept=".ttf"
@@ -170,12 +170,12 @@
                                         </div>
                                         <div v-if="hasFontError('primaryFont')" class="input-error-message">{{ getFontError('primaryFont') }}</div>
                                     </div>
-                                    
+
                                     <div class="font-upload-group">
                                         <label class="font-label">Fuente Secundaria (.ttf)</label>
                                         <div class="file-upload-wrapper">
-                                            <input 
-                                                type="file" 
+                                            <input
+                                                type="file"
                                                 ref="secondaryFontInput"
                                                 @change="handleSecondaryFontUpload"
                                                 accept=".ttf"
@@ -202,8 +202,8 @@
                                         Guardar Tipografía
                                     </h5>
                                     <div class="typography-name-input">
-                                        <input 
-                                            type="text" 
+                                        <input
+                                            type="text"
                                             v-model="newTypographyName"
                                             class="form-control"
                                             placeholder="Nombre de la tipografía (ej: Corporativa)"
@@ -212,28 +212,28 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Updated sidebar-actions buttons with proper styling to match the image -->
                             <div class="sidebar-actions">
                                 <!-- Save button that changes based on active tab -->
-                                <button 
-                                    v-if="activeTab === 'colors'" 
-                                    class="btn btn-save" 
+                                <button
+                                    v-if="activeTab === 'colors'"
+                                    class="btn btn-save"
                                     @click="saveCurrentPalette"
                                 >
                                     <i class="fa-solid fa-save me-1"></i>
                                     GUARDAR PALETA
                                 </button>
-                                
-                                <button 
-                                    v-if="activeTab === 'typography'" 
-                                    class="btn btn-save" 
+
+                                <button
+                                    v-if="activeTab === 'typography'"
+                                    class="btn btn-save"
                                     @click="saveCurrentTypography"
                                 >
                                     <i class="fa-solid fa-save me-1"></i>
                                     GUARDAR TIPOGRAFÍA
                                 </button>
-                                
+
                                 <!-- Reset button is context-aware -->
                                 <button class="btn btn-reset" @click="resetChanges">
                                     <i class="fa-solid fa-undo me-1"></i>
@@ -242,7 +242,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Preview del Dashboard -->
                     <div class="col-12 col-lg-8">
                         <div class="dashboard-preview">
@@ -250,65 +250,89 @@
                                 <i class="fa-solid fa-eye me-2"></i>
                                 Vista Previa
                             </h5>
-                            
+
                             <!-- Preview de Tipografía -->
-                            
+
 
                             <!-- Vista Previa Combinada (Colores + Tipografía) -->
                             <div class="combined-preview"
-                           :style="{ fontFamily: fontConfig.secondaryFamily || fontConfig.secondaryFont || 'Saira, Arial, sans-serif' }">
-                                <div class="combined-header"
-                                     :style="{ backgroundColor: colorConfig[0].value, color: '#ffffff' }">
+                                 :style="{
+                                     '--preview-primary': colorConfig[0].value,
+                                     '--preview-secondary': colorConfig[1].value,
+                                     '--preview-accent': colorConfig[2].value,
+                                     '--preview-success': colorConfig[3].value,
+                                     '--preview-background': colorConfig[4].value,
+                                     '--preview-font-family-secondary': fontConfig.secondaryFamily || fontConfig.secondaryFont || 'Saira, Arial, sans-serif',
+                                     '--preview-font-family-primary': fontConfig.primaryFamily || fontConfig.primaryFont || 'Patua One, serif',
+                                     '--preview-title-size': (fontConfig.titleSize || 40) + 'px',
+                                     '--preview-subtitle-size': (fontConfig.subtitleSize || 28) + 'px',
+                                     '--preview-paragraph-size': (fontConfig.paragraphSize || 16) + 'px'
+                                 }">
+                                <div class="combined-header">
                                     <div class="combined-logo">
-                                        <span class="logo-mark" :style="{ backgroundColor: colorConfig[1].value }"></span>
-                                        <span class="logo-text" :style="{ fontFamily: fontConfig.primaryFamily || fontConfig.primaryFont || 'Patua One, serif' }">Agency</span>
+                                        <span class="logo-mark"></span>
+                                        <span class="logo-text">Agency</span>
                                     </div>
                                     <div class="combined-menu">
-                                        <span>Inicio</span>
-                                        <span>Servicios</span>
-                                        <span>Portafolio</span>
-                                        <button class="cta-btn"
-                                                :style="{ backgroundColor: colorConfig[1].value, color: '#fff' }">Contáctanos</button>
+                                        <span class="combined-menu-item">Inicio</span>
+                                        <span class="combined-menu-item">Servicios</span>
+                                        <span class="combined-menu-item">Portafolio</span>
+                                        <button class="cta-btn">Contáctanos</button>
                                     </div>
                                 </div>
-                                <div class="combined-hero" :style="{ backgroundColor: colorConfig[4].value }">
-                                    <h2 class="hero-title" :style="{ fontSize: fontConfig.titleSize + 'px', fontFamily: fontConfig.primaryFamily || fontConfig.primaryFont || 'Patua One, serif', color: colorConfig[2].value === '#000000' ? '#111' : colorConfig[2].value }">
+                                <!-- Added gradient background between color 1 and color 2 for hero section -->
+                                <div class="combined-hero">
+                                    <h2 class="hero-title" style="">
                                         Creamos experiencias digitales
                                     </h2>
-                                    <p class="hero-subtitle" :style="{ fontSize: fontConfig.subtitleSize + 'px', color: '#555', fontFamily: fontConfig.secondaryFamily || fontConfig.secondaryFont || 'Patua One, serif' }">
+                                    <!-- Changed subtitle color from color 2 to color 1 (secondary color) -->
+                                    <p class="hero-subtitle">
                                         Diseño, desarrollo y estrategia para tu marca
                                     </p>
                                     <div class="hero-actions">
-                                        <button class="xl-btn primary"
-                                                :style="{ backgroundColor: colorConfig[1].value, color: '#fff' }">Empieza ahora</button>
-                                        <button class="xl-btn ghost"
-                                                :style="{ borderColor: colorConfig[1].value, color: colorConfig[1].value }">Ver trabajos</button>
+                                        <button class="xl-btn primary">Empieza ahora</button>
+                                        <button class="xl-btn ghost">Ver trabajos</button>
                                     </div>
                                 </div>
+                                <!-- Changed cards section background to color 5 -->
                                 <div class="combined-cards">
-                                    <div class="c-card" :style="{ backgroundColor: '#fff', borderColor: '#eee' }">
-                                        <i class="fa-solid fa-bolt" :style="{ color: colorConfig[1].value }"></i>
-                                        <h6 :style="{ fontFamily: fontConfig.secondaryFamily || fontConfig.secondaryFont || 'Patua One, serif' }">Rápido</h6>
-                                        <p :style="{ fontSize: fontConfig.paragraphSize + 'px', fontFamily: fontConfig.primaryFamily || fontConfig.primaryFont || 'Saira, Arial, sans-serif' }">Implementaciones veloces y de calidad.</p>
+                                    <div class="c-card">
+                                        <i class="fa-solid fa-bolt icon-accent"></i>
+                                        <h6 class="card-title">Rápido</h6>
+                                        <!-- Card description text now uses color 3 (accent color) -->
+                                        <p class="card-desc">Implementaciones veloces y de calidad.</p>
                                     </div>
-                                    <div class="c-card" :style="{ backgroundColor: '#fff', borderColor: '#eee' }">
-                                        <i class="fa-solid fa-shield" :style="{ color: colorConfig[1].value }"></i>
-                                        <h6 :style="{ fontFamily: fontConfig.secondaryFamily || fontConfig.secondaryFont || 'Patua One, serif' }">Seguro</h6>
-                                        <p :style="{ fontSize: fontConfig.paragraphSize + 'px', fontFamily: fontConfig.primaryFamily || fontConfig.primaryFont || 'Saira, Arial, sans-serif' }">Buenas prácticas y seguridad.</p>
+                                    <div class="c-card">
+                                        <i class="fa-solid fa-shield icon-accent"></i>
+                                        <h6 class="card-title">Seguro</h6>
+                                        <p class="card-desc">Buenas prácticas y seguridad.</p>
                                     </div>
-                                    <div class="c-card" :style="{ backgroundColor: '#fff', borderColor: '#eee' }">
-                                        <i class="fa-solid fa-star" :style="{ color: colorConfig[1].value }"></i>
-                                        <h6 :style="{ fontFamily: fontConfig.secondaryFamily || fontConfig.secondaryFont || 'Patua One, serif' }">Calidad</h6>
-                                        <p :style="{ fontSize: fontConfig.paragraphSize + 'px', fontFamily: fontConfig.primaryFamily || fontConfig.primaryFont || 'Saira, Arial, sans-serif' }">Diseños pulidos y modernos.</p>
+                                    <div class="c-card">
+                                        <i class="fa-solid fa-star icon-accent"></i>
+                                        <h6 class="card-title">Calidad</h6>
+                                        <p class="card-desc">Diseños pulidos y modernos.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Sección adicional para mostrar Color 4 (success-color) -->
+                                <div class="combined-footer">
+                                    <div class="footer-content">
+                                        <!-- Changed "¿Listo para comenzar?" to use color 2 (secondary color) -->
+                                        <h5 class="footer-title">¿Listo para comenzar?</h5>
+                                        <!-- Changed "Contáctanos y transformemos..." to use color 3 (accent color) -->
+                                        <p class="footer-desc">Contáctanos y transformemos tu idea en realidad.</p>
+                                        <button class="footer-btn">
+                                            <i class="fa-solid fa-envelope me-2"></i>
+                                            Contactar
+                                        </button>
                                     </div>
                                 </div>
                             </div>
 
-                            
-                                        </div>
+                        </div>
                     </div>
                 </div>
-                
+
                 <!-- Sección de Paletas / Tipografías Guardadas -->
                 <div class="row mt-5">
                     <div class="col-12">
@@ -328,8 +352,8 @@
                                 </div>
 
                                 <div v-else class="palettes-grid">
-                                    <div 
-                                        v-for="palette in savedPalettes" 
+                                    <div
+                                        v-for="palette in savedPalettes"
                                         :key="palette.id"
                                         class="palette-card"
                                         @contextmenu="(e) => openContextMenu(e, palette, 'palette')"
@@ -340,8 +364,8 @@
                                         </div>
 
                                         <div class="palette-colors">
-                                            <div 
-                                                v-for="color in palette.colors" 
+                                            <div
+                                                v-for="color in palette.colors"
                                                 :key="color.id"
                                                 class="color-preview"
                                                 :style="{ backgroundColor: color.value }"
@@ -368,7 +392,7 @@
                                             <small class="palette-date">{{ formatDate(item.createdAt) }}</small>
                                         </div>
                                         <div class="palette-colors">
-                                            <div class="color-preview" style="background:#fff; border:1px solid #dee2e6;" title="Tamaños">
+                                            <div class="color-preview" style="background:#fff; border:1px solid #dee2e6;">
                                                 <div class="typography-sample" style="padding:10px; color:#333;">
                                                     <div class="sample-line" :style="{ fontSize: item.fonts.titleSize + 'px', fontFamily: getFontFamilyName(item.fonts.secondaryFont, 'secondary') }">
                                                         A
@@ -396,7 +420,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        
+
                                     </div>
                                 </div>
                             </div>
@@ -656,9 +680,42 @@ const saveChanges = () => {
     })
 }
 
-const resetChanges = () => {
+const resetChanges = async () => {
     if (activeTab.value === 'typography') {
         // Resetear solo tipografía
+
+        //preguntar si desea resetear
+
+        const result = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Esto reseteará la configuración de tipografía a los valores por defecto.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, resetear',
+            cancelButtonText: 'Cancelar'
+        })
+
+        if (!result.isConfirmed) return
+
+        const response = await fetch('http://localhost:3000/api/tipografias/deactivate-all', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+
+        console.log('Reset typography response status:', response.status)
+
+        if (!response.ok) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo resetear la tipografía en el servidor.'
+            })
+            return
+        }
+
+
         fontConfig.value = {
             titleSize: 40,
             subtitleSize: 28,
@@ -669,37 +726,74 @@ const resetChanges = () => {
         // Clear font errors on reset
         fontErrors.value.primaryFont = null
         fontErrors.value.secondaryFont = null
-        Swal.fire({
+        //preguntar si desea ir al home despues de resetear
+        const goHome = await Swal.fire({
+            title: 'Tipografía reseteada',
+            text: '¿Deseas ir a la página principal?',
             icon: 'success',
-            title: 'Reseteado',
-            text: 'La configuración de tipografía ha sido reseteada a los valores por defecto.'
+            showCancelButton: true,
+            confirmButtonText: 'Sí, ir al home',
+            cancelButtonText: 'No, quedarme aquí'
         })
+        if (goHome.isConfirmed) {
+            window.location.href = '/'
+        }
+
     } else {
+        const result = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: "Esto reseteará la configuración de colores a los valores por defecto.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, resetear',
+        cancelButtonText: 'Cancelar'
+    })
+    if (!result.isConfirmed) return
         // Resetear solo colores
     colorConfig.value = [
-        { id: 'primary-color', label: 'Color Primario', value: '#667eea' },
-        { id: 'secondary-color', label: 'Color Secundario', value: '#764ba2' },
-        { id: 'accent-color', label: 'Color de Acento', value: '#f093fb' },
-        { id: 'success-color', label: 'Color de Éxito', value: '#4facfe' },
-        { id: 'background-color', label: 'Color de Fondo', value: '#f8f9fa' }
+        { id: 'primary-color', label: 'Color Primario', value: '#212529' },
+        { id: 'secondary-color', label: 'Color Secundario', value: '#ff5900' },
+        { id: 'accent-color', label: 'Color de Acento', value: '#000000' },
+        { id: 'success-color', label: 'Color de Éxito', value: '#343a40' },
+        { id: 'background-color', label: 'Color de Fondo', value: '#fcfcfc' }
     ]
-        Swal.fire({
-            icon: 'success',
-            title: 'Reseteado',
-            text: 'La configuración de colores ha sido reseteada a los valores por defecto.'
-        })
+
+    // Aplicar inmediatamente la paleta por defecto al template y persistirla
+    try {
+        applyColorsToTemplate(colorConfig.value)
+        try { themeManager.savePalette({ name: 'default', colors: colorConfig.value }) } catch (e) { /* no crítico */ }
+    } catch (e) {
+        console.warn('No se pudo aplicar la paleta por defecto automáticamente:', e)
     }
+
+    // preguntar si desea ir al home despues de resetear
+    const goHome = await Swal.fire({
+        title: 'Colores reseteados',
+        text: '¿Deseas ir a la página principal?',
+        icon: 'success',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, ir al home',
+        cancelButtonText: 'No, quedarme aquí'
+    })
+    if (goHome.isConfirmed) {
+        window.location.href = '/'
+    }
+    }
+
+
 }
 // Función para aplicar colores al template real
 const applyColorsToTemplate = (colors) => {
     const root = document.documentElement;
-    
+
     root.style.setProperty('--primary-color', colors[0].value);
     root.style.setProperty('--secondary-color', colors[1].value);
     root.style.setProperty('--accent-color', colors[2].value);
     root.style.setProperty('--success-color', colors[3].value);
     root.style.setProperty('--background-color', colors[4].value);
-    
+
     // Guardar en localStorage para persistencia
     localStorage.setItem('activeColorPalette', JSON.stringify(colors));
 }
@@ -715,8 +809,8 @@ const saveCurrentPalette = async () => {
         applyColorsToTemplate(colorConfig.value);
         return
     }
-    
-    
+
+
     // Validar todos los colores antes de guardar
     let hasErrors = false
     colorConfig.value.forEach(color => {
@@ -724,8 +818,16 @@ const saveCurrentPalette = async () => {
             hasErrors = true
         }
     })
-    
-    
+
+    if (hasErrors) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Hay errores en los colores. Por favor corrígelos antes de guardar.'
+        })
+        return;
+    }
+
 
     const localPaletteBase = {
         name: newPaletteName.value.trim(),
@@ -877,16 +979,16 @@ const createAndSavePalette = () => {
         colors: [...colorConfig.value], // Copia de los colores actuales
         createdAt: new Date().toISOString()
     }
-    
+
     // Agregar a la lista
     savedPalettes.value.unshift(newPalette)
-    
+
     // Guardar en localStorage
     savePalettesToStorage()
-    
+
     // Limpiar el input
     newPaletteName.value = ''
-    
+
     Swal.fire({
         icon: 'success',
         title: 'Paleta guardada',
@@ -1086,32 +1188,32 @@ const editTypography = async (item) => {
     const html = `
         <div class="swal-edit-typography">
             <style>
-                .swal-field-label { 
-                    display: block; 
-                    font-weight: 600; 
-                    margin-bottom: 6px; 
+                .swal-field-label {
+                    display: block;
+                    font-weight: 600;
+                    margin-bottom: 6px;
                     color: #34495e;
                 }
-                .swal-input-error { 
-                    border-color: #dc3545 !important; 
+                .swal-input-error {
+                    border-color: #dc3545 !important;
                     box-shadow: 0 0 0 3px rgba(220,53,69,0.08);
                 }
-                .swal-error-msg { 
-                    color: #dc3545; 
-                    font-size: 0.85rem; 
-                    margin-top: 4px; 
+                .swal-error-msg {
+                    color: #dc3545;
+                    font-size: 0.85rem;
+                    margin-top: 4px;
                     margin-bottom: 6px;
                 }
-                .swal-typ-row { 
-                    display: flex; 
-                    gap: 8px; 
-                    align-items: center; 
+                .swal-typ-row {
+                    display: flex;
+                    gap: 8px;
+                    align-items: center;
                     margin-bottom: 8px;
                 }
-                .swal-typ-input { 
-                    width: 100%; 
-                    box-sizing: border-box; 
-                    padding: 8px 10px; 
+                .swal-typ-input {
+                    width: 100%;
+                    box-sizing: border-box;
+                    padding: 8px 10px;
                     border-radius: 6px;
                     border: 1px solid #ced4da;
                     font-size: 0.95rem;
@@ -1135,13 +1237,13 @@ const editTypography = async (item) => {
             <div class="swal-typ-row">
                 <div style="flex:1">
                     <label class="swal-field-label" for="swal-typ-title">Tamaño Título</label>
-                    <input id="swal-typ-title" type="number" min="20" max="80" class="swal-typ-input" 
+                    <input id="swal-typ-title" type="number" min="20" max="80" class="swal-typ-input"
                         value="${item.fonts ? (item.fonts.titleSize || 40) : 40}" />
                     <div id="swal-typ-title-error" class="swal-error-msg"></div>
                 </div>
                 <div style="flex:1">
                     <label class="swal-field-label" for="swal-typ-sub">Tamaño Subtítulo</label>
-                    <input id="swal-typ-sub" type="number" min="16" max="60" class="swal-typ-input" 
+                    <input id="swal-typ-sub" type="number" min="16" max="60" class="swal-typ-input"
                         value="${item.fonts ? (item.fonts.subtitleSize || 28) : 28}" />
                     <div id="swal-typ-sub-error" class="swal-error-msg"></div>
                 </div>
@@ -1149,7 +1251,7 @@ const editTypography = async (item) => {
 
             <div style="margin-bottom:8px;">
                 <label class="swal-field-label" for="swal-typ-para">Tamaño Párrafo</label>
-                <input id="swal-typ-para" type="number" min="12" max="24" class="swal-typ-input" 
+                <input id="swal-typ-para" type="number" min="12" max="24" class="swal-typ-input"
                     value="${item.fonts ? (item.fonts.paragraphSize || 16) : 16}" />
                 <div id="swal-typ-para-error" class="swal-error-msg"></div>
             </div>
@@ -1208,9 +1310,9 @@ const editTypography = async (item) => {
             const validateFile = (el, errEl, label) => {
                 const file = el.files[0];
                 if (!file) { setErr(el, errEl, `${label} es obligatorio`); return false; }
-                if (!file.name.endsWith('.ttf') && !file.name.endsWith('.otf')) { 
-                    setErr(el, errEl, `${label} debe ser un archivo .ttf o .otf`); 
-                    return false; 
+                if (!file.name.endsWith('.ttf') && !file.name.endsWith('.otf')) {
+                    setErr(el, errEl, `${label} debe ser un archivo .ttf o .otf`);
+                    return false;
                 }
                 setErr(el, errEl, '');
                 return true;
@@ -1228,6 +1330,102 @@ const editTypography = async (item) => {
             validateNumber(titleEl, document.getElementById('swal-typ-title-error'), 20, 80, 'Tamaño Título');
             validateNumber(subEl, document.getElementById('swal-typ-sub-error'), 16, 60, 'Tamaño Subtítulo');
             validateNumber(paraEl, document.getElementById('swal-typ-para-error'), 12, 24, 'Tamaño Párrafo');
+
+            // Precargar fuentes existentes (si item.fonts.primaryFont / secondaryFont apuntan a URL o nombre)
+            (async () => {
+                try {
+                    const font1Url = item && item.fonts && item.fonts.primaryFont;
+                    const font2Url = item && item.fonts && item.fonts.secondaryFont;
+                    const font1Input = document.getElementById('swal-typ-font1');
+                    const font2Input = document.getElementById('swal-typ-font2');
+
+                    const ensureStatusEl = (inputEl, id) => {
+                        if (!inputEl) return null
+                        let s = document.getElementById(id)
+                        if (!s) {
+                            s = document.createElement('div')
+                            s.id = id
+                            s.style.fontSize = '0.85rem'
+                            s.style.marginTop = '6px'
+                            s.style.color = '#6c757d'
+                            inputEl.parentNode && inputEl.parentNode.appendChild(s)
+                        }
+                        return s
+                    }
+
+                    const status1 = ensureStatusEl(font1Input, 'swal-typ-font1-status')
+                    const status2 = ensureStatusEl(font2Input, 'swal-typ-font2-status')
+
+                    const buildCandidates = (raw) => {
+                        if (!raw) return []
+                        const candidates = []
+                        const r = String(raw)
+                        if (/^https?:\/\//i.test(r)) candidates.push(r)
+                        if (r.startsWith('/')) {
+                            candidates.push(window.location.origin + r)
+                            candidates.push(r)
+                            candidates.push('http://localhost:3000' + r)
+                        } else {
+                            candidates.push(r)
+                            candidates.push('/uploads/fonts/' + r)
+                            candidates.push(window.location.origin + '/uploads/fonts/' + r)
+                            candidates.push('http://localhost:3000/uploads/fonts/' + r)
+                        }
+                        return [...new Set(candidates)]
+                    }
+
+                    const tryPreload = async (rawUrl, inputEl, statusEl) => {
+                        if (!rawUrl || !inputEl) {
+                            if (statusEl) statusEl.textContent = 'No hay fuente configurada'
+                            return
+                        }
+
+                        const candidates = buildCandidates(rawUrl)
+                        if (statusEl) statusEl.textContent = 'Buscando fuente...'
+
+                        for (const fetchUrl of candidates) {
+                            try {
+                                if (statusEl) statusEl.textContent = `Intentando: ${fetchUrl}`
+                                const resp = await fetch(fetchUrl)
+                                if (!resp.ok) {
+                                    if (statusEl) statusEl.textContent = `No disponible: ${fetchUrl} (${resp.status})`
+                                    continue
+                                }
+                                const blob = await resp.blob()
+                                const name = fileBasename(fetchUrl) || (String(rawUrl).split('/').pop() || 'font.ttf')
+                                const file = new File([blob], name, { type: blob.type || 'font/ttf' })
+                                const dt = new DataTransfer()
+                                dt.items.add(file)
+                                try {
+                                    inputEl.files = dt.files
+                                    inputEl.dataset.preloaded = '1'
+                                    inputEl.dataset.preloadedUrl = fetchUrl
+                                    if (statusEl) statusEl.textContent = `Fuente precargada: ${name}`
+                                    inputEl.dispatchEvent(new Event('change', { bubbles: true }))
+                                    console.log('Precargada fuente desde', fetchUrl)
+                                    return
+                                } catch (assignErr) {
+                                    inputEl.dataset.preloaded = '0'
+                                    inputEl.dataset.preloadedUrl = fetchUrl
+                                    if (statusEl) statusEl.textContent = `Fuente encontrada (usar al guardar): ${name}`
+                                    console.warn('No se pudo asignar input.files programáticamente, usar URL fallback', assignErr)
+                                    return
+                                }
+                            } catch (err) {
+                                console.warn('Intento de precarga falló para', fetchUrl, err)
+                                if (statusEl) statusEl.textContent = `Error intentando: ${fetchUrl}`
+                            }
+                        }
+
+                        if (statusEl) statusEl.textContent = 'No se encontró la fuente en el servidor'
+                    }
+
+                    await tryPreload(font1Url, font1Input, status1)
+                    await tryPreload(font2Url, font2Input, status2)
+                } catch (err) {
+                    console.warn('Precarga de fuentes falló:', err)
+                }
+            })();
         },
         preConfirm: () => {
             const nameEl = document.getElementById('swal-typ-name');
@@ -1241,15 +1439,33 @@ const editTypography = async (item) => {
             const title = parseInt(titleEl.value, 10);
             const sub = parseInt(subEl.value, 10);
             const para = parseInt(paraEl.value, 10);
-            const font1 = font1El.files[0];
-            const font2 = font2El.files[0];
+
+            // archivos seleccionados directamente
+            const rawFile1 = font1El.files && font1El.files[0] ? font1El.files[0] : null
+            const rawFile2 = font2El.files && font2El.files[0] ? font2El.files[0] : null
+            // fallback: URL precargada (dataset.preloadedUrl)
+            const preloaded1 = font1El && font1El.dataset && font1El.dataset.preloadedUrl ? font1El.dataset.preloadedUrl : null
+            const preloaded2 = font2El && font2El.dataset && font2El.dataset.preloadedUrl ? font2El.dataset.preloadedUrl : null
+
+            // Preferir File; si no hay File pero existe preloadedUrl, lo aceptamos
+            const font1 = rawFile1 || (preloaded1 ? { preloadedUrl: preloaded1 } : null)
+            const font2 = rawFile2 || (preloaded2 ? { preloadedUrl: preloaded2 } : null)
+
+            // Validar extensiones de archivos si se seleccionaron directamente
+            const isValidFontFile = (f) => {
+                if (!f) return false
+                const name = String(f.name || '').toLowerCase()
+                return name.endsWith('.ttf') || name.endsWith('.otf')
+            }
+            if (rawFile1 && !isValidFontFile(rawFile1)) { Swal.showValidationMessage('Fuente primaria inválida: el archivo debe ser .ttf o .otf'); return false }
+            if (rawFile2 && !isValidFontFile(rawFile2)) { Swal.showValidationMessage('Fuente secundaria inválida: el archivo debe ser .ttf o .otf'); return false }
 
             if (!name) { Swal.showValidationMessage('El nombre no puede estar vacío'); return false; }
             if (isNaN(title) || title < 20 || title > 80) { Swal.showValidationMessage('Tamaño Título inválido'); return false; }
             if (isNaN(sub) || sub < 16 || sub > 60) { Swal.showValidationMessage('Tamaño Subtítulo inválido'); return false; }
             if (isNaN(para) || para < 12 || para > 24) { Swal.showValidationMessage('Tamaño Párrafo inválido'); return false; }
-            if (!font1) { Swal.showValidationMessage('Debe seleccionar la fuente primaria (.ttf o .otf)'); return false; }
-            if (!font2) { Swal.showValidationMessage('Debe seleccionar la fuente secundaria (.ttf o .otf)'); return false; }
+            if (!font1) { Swal.showValidationMessage('Debe seleccionar o tener precargada la fuente primaria (.ttf o .otf)'); return false; }
+            if (!font2) { Swal.showValidationMessage('Debe seleccionar o tener precargada la fuente secundaria (.ttf o .otf)'); return false; }
 
             return { name, title, sub, para, font1, font2 };
         }
@@ -1265,9 +1481,45 @@ const editTypography = async (item) => {
         target.fonts.titleSize = title;
         target.fonts.subtitleSize = sub;
         target.fonts.paragraphSize = para;
-        target.fonts.primaryFont = font1.name;
-        target.fonts.secondaryFont = font2.name;
+        // Determinar qué se recibió: File o {preloadedUrl}
+        const font1Value = (font1 && font1.preloadedUrl) ? font1.preloadedUrl : (font1 && font1.name ? font1.name : '');
+        const font2Value = (font2 && font2.preloadedUrl) ? font2.preloadedUrl : (font2 && font2.name ? font2.name : '');
+        target.fonts.primaryFont = font1Value;
+        target.fonts.secondaryFont = font2Value;
         try { saveTypographiesToStorage(); } catch (e) {}
+
+        // Si se subió un archivo directamente, cargarlo inmediatamente en document.fonts
+        // y asignar una family para que la plantilla/preview lo use de inmediato.
+        try {
+            if (font1 instanceof File) {
+                const fam = 'EditedPrimary_' + Date.now().toString()
+                // loadFontFromFile está definido más arriba en este archivo
+                try { loadFontFromFile(font1, fam) } catch (err) { console.warn('loadFontFromFile fallo para primary:', err) }
+                fontConfig.value.primaryFamily = fam
+                try { target.fonts.primaryFamily = fam } catch (e) {}
+            } else if (font1 && font1.preloadedUrl) {
+                const fam = 'EditedPrimary_' + Date.now().toString()
+                loadFontFromUrl(font1.preloadedUrl, fam).then(() => {
+                    fontConfig.value.primaryFamily = fam
+                    try { target.fonts.primaryFamily = fam } catch (e) {}
+                }).catch(err => console.warn('loadFontFromUrl fallo para primary:', err))
+            }
+
+            if (font2 instanceof File) {
+                const fam2 = 'EditedSecondary_' + Date.now().toString()
+                try { loadFontFromFile(font2, fam2) } catch (err) { console.warn('loadFontFromFile fallo para secondary:', err) }
+                fontConfig.value.secondaryFamily = fam2
+                try { target.fonts.secondaryFamily = fam2 } catch (e) {}
+            } else if (font2 && font2.preloadedUrl) {
+                const fam2 = 'EditedSecondary_' + Date.now().toString()
+                loadFontFromUrl(font2.preloadedUrl, fam2).then(() => {
+                    fontConfig.value.secondaryFamily = fam2
+                    try { target.fonts.secondaryFamily = fam2 } catch (e) {}
+                }).catch(err => console.warn('loadFontFromUrl fallo para secondary:', err))
+            }
+        } catch (e) {
+            console.warn('Error cargando fuentes tras editar tipografía:', e)
+        }
 
         if (/^\d+$/.test(id)) {
             try {
@@ -1276,13 +1528,28 @@ const editTypography = async (item) => {
                 formData.append('tamanio_titulo', title);
                 formData.append('tamanio_subtitulo', sub);
                 formData.append('tamanio_parrafo', para);
-                formData.append('font1', font1);
-                formData.append('font2', font2);
-                console.log('Enviando FormData para actualizar tipografía:', formData);
+                // Si font1/font2 son File, anexarlos; si son preloadedUrl (strings), anexar la URL como campo
+                if (font1 instanceof File) {
+                    formData.append('font1', font1);
+                } else if (font1 && font1.preloadedUrl) {
+                    formData.append('font1', font1.preloadedUrl);
+                } else if (typeof font1 === 'string' && font1) {
+                    formData.append('font1', font1);
+                }
 
-                const resp = await fetch(`http://localhost:3000/api/tipografias/${id}`, { 
-                    method: 'PUT', 
-                    body: formData 
+                if (font2 instanceof File) {
+                    formData.append('font2', font2);
+                } else if (font2 && font2.preloadedUrl) {
+                    formData.append('font2', font2.preloadedUrl);
+                } else if (typeof font2 === 'string' && font2) {
+                    formData.append('font2', font2);
+                }
+
+                console.log('Enviando FormData para actualizar tipografía (files o URLs si aplican):', formData);
+
+                const resp = await fetch(`http://localhost:3000/api/tipografias/${id}`, {
+                    method: 'PUT',
+                    body: formData
                 });
                 if (!resp.ok) {
                     const t = await resp.text().catch(()=>'');
@@ -1476,7 +1743,7 @@ const editPalette = async (palette) => {
     const html = `
         <div class="swal-edit-palette">
             <style>
-                .swal-input-error{border-color:#dc3545!important;box-shadow:0 0 0 3px rgba(220,53,69,0.08);} 
+                .swal-input-error{border-color:#dc3545!important;box-shadow:0 0 0 3px rgba(220,53,69,0.08);}
                 .swal-error-msg{color:#dc3545;font-size:0.85rem;margin-top:4px;margin-bottom:6px;}
                 .swal-field-label{display:block;font-weight:600;margin-bottom:6px;color:#34495e;font-size:0.9rem}
                 /* evitar overflow horizontal en la modal */
@@ -1510,7 +1777,7 @@ const editPalette = async (palette) => {
         focusConfirm: false,
         showCancelButton: true,
         confirmButtonText: 'Guardar',
-        didOpen: () => {
+            didOpen: () => {
             // sincronizar inputs color <-> text y validar en tiempo real
             const hexPattern = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/
 
@@ -1550,7 +1817,7 @@ const editPalette = async (palette) => {
                 validateName()
             }
 
-            for (let i = 0; i < 5; i++) {
+                for (let i = 0; i < 5; i++) {
                 const colorEl = document.getElementById(`swal-palette-color-${i}`)
                 const textEl = document.getElementById(`swal-palette-color-text-${i}`)
                 const errEl = document.getElementById(`swal-palette-color-error-${i}`)
@@ -1563,11 +1830,14 @@ const editPalette = async (palette) => {
                         setErrorMsg(errEl, 'El color no puede estar vacío')
                         return false
                     }
-                    if (!hexPattern.test(v)) {
+                    // Aceptamos tanto #RGB como #RRGGBB en la validación pero NO normalizamos aquí.
+                    // La expansión se realizará al enviar (preConfirm) para evitar cambios automáticos.
+                    if (!hexPattern.test(v) && !hexPattern.test(expandHex(v))) {
                         setError(textEl, true)
                         setErrorMsg(errEl, 'Formato inválido. Use #RRGGBB o #RGB')
                         return false
                     }
+                    // Es válido: no forzamos cambios en los inputs para no sorprender al usuario
                     setError(textEl, false)
                     setErrorMsg(errEl, '')
                     return true
@@ -1579,12 +1849,9 @@ const editPalette = async (palette) => {
                     validateColorField()
                 })
 
-                // cuando cambie el texto, si es un hex válido, actualizar el color picker y validar
+                // cuando cambie el texto, sólo validar (no normalizar ni reescribir inputs)
                 textEl.addEventListener('input', (e) => {
-                    const v = (e.target.value || '').trim()
-                    if (hexPattern.test(v)) {
-                        try { colorEl.value = v } catch (__) {}
-                    }
+                    // mantener lo que el usuario escribe; sólo validar el formato
                     validateColorField()
                 })
 
@@ -1599,8 +1866,8 @@ const editPalette = async (palette) => {
             for (let i = 0; i < 5; i++) {
                 const colorInput = document.getElementById(`swal-palette-color-${i}`)
                 const colorText = document.getElementById(`swal-palette-color-text-${i}`)
-                const cval = (colorText && colorText.value) ? colorText.value.trim() : (colorInput && colorInput.value) ? colorInput.value : ''
-                colors.push(cval)
+                const raw = (colorText && colorText.value) ? colorText.value.trim() : (colorInput && colorInput.value) ? colorInput.value : ''
+                colors.push(expandHex(raw))
             }
 
             // Validaciones
@@ -1608,7 +1875,7 @@ const editPalette = async (palette) => {
                 Swal.showValidationMessage('El nombre no puede estar vacío')
                 return false
             }
-            const hexPattern = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/
+            const hexPattern = /^#([A-Fa-f0-9]{6})$/ // ya expandimos todo a 6
             for (let i = 0; i < colors.length; i++) {
                 if (!hexPattern.test(colors[i])) {
                     Swal.showValidationMessage(`El color ${i+1} no es un hex válido: ${colors[i]}`)
@@ -1761,14 +2028,14 @@ const loadPalette = async (palette) => {
     // Si confirma, proceder con la carga
     if (result.isConfirmed) {
         colorConfig.value = palette.colors.map(color => ({ ...color }))
-        
+
         // Aplicar colores al template real
         applyColorsToTemplate(palette.colors)
-        
+
         // Guardar y aplicar paleta de forma persistente
         themeManager.savePalette(palette)
         themeManager.applyPalette(palette)
-        
+
         // Segunda validación: mostrar éxito y preguntar si quiere ir al home
         const goHomeResult = await Swal.fire({
             icon: 'success',
@@ -1916,8 +2183,9 @@ const mapColorsPayload = (colorsArr) => {
     const fields = ['color1','color2','color3','color4','color5']
     const payload = {}
     for (let i = 0; i < fields.length; i++) {
-        const v = (colorsArr && colorsArr[i] && colorsArr[i].value) ? colorsArr[i].value : (i === 4 ? '#ffffff' : '#000000')
-        payload[fields[i]] = v
+        const raw = (colorsArr && colorsArr[i] && colorsArr[i].value) ? colorsArr[i].value : (i === 4 ? '#ffffff' : '#000000')
+        // Expandir hex cortos al construir el payload (solo al enviar al backend)
+        payload[fields[i]] = expandHex(raw)
     }
     return payload
 }
@@ -1940,54 +2208,54 @@ const fileBasename = (pathOrUrl) => {
 // helper: extrae el nombre limpio de la fuente sin números ni timestamps
 const getCleanFontName = (pathOrUrl) => {
     if (!pathOrUrl) return 'Sin fuente'
-    
+
     const filename = fileBasename(pathOrUrl)
     if (!filename) return 'Sin fuente'
-    
+
     // Eliminar extensión
     const nameWithoutExt = filename.replace(/\.(ttf|otf|woff2?)$/i, '')
-    
+
     // Eliminar timestamps y números al inicio (formato: números-números-nombre)
     const cleanName = nameWithoutExt.replace(/^\d+-\d+-/, '')
-    
+
     // Eliminar números al final y convertir guiones a espacios
     const fontName = cleanName
         .replace(/-\d+$/, '') // eliminar números al final
         .split('-')
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // capitalizar cada palabra
         .join(' ') // unir con espacios
-    
+
     return fontName || 'Fuente personalizada'
 }
 
 // helper: obtiene el nombre de familia CSS para usar en font-family
 const getFontFamilyName = (pathOrUrl, type = 'primary') => {
     if (!pathOrUrl) return type === 'primary' ? 'Saira, Arial, sans-serif' : 'Patua One, serif'
-    
+
     const filename = fileBasename(pathOrUrl)
     if (!filename) return type === 'primary' ? 'Saira, Arial, sans-serif' : 'Patua One, serif'
-    
+
     // Eliminar extensión
     const nameWithoutExt = filename.replace(/\.(ttf|otf|woff2?)$/i, '')
-    
+
     // Eliminar timestamps y números al inicio
     const cleanName = nameWithoutExt.replace(/^\d+-\d+-/, '')
-    
+
     // Eliminar números al final y convertir guiones a espacios
     const fontName = cleanName
         .replace(/-\d+$/, '')
         .split('-')
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ')
-    
+
     // Crear un nombre de familia CSS válido
     const cssFamilyName = `"${fontName || 'Custom Font'}", ${type === 'primary' ? 'sans-serif' : 'serif'}`
-    
+
     // Cargar la fuente automáticamente si es una URL local
     if (pathOrUrl.startsWith('/uploads/')) {
         loadFontFromUrl(pathOrUrl, fontName || 'Custom Font')
     }
-    
+
     return cssFamilyName
 }
 
@@ -2027,40 +2295,78 @@ const validateFontSizes = () => {
     return isValid;
 }
 
-// Funciones de validación de colores
+// Funciones de validación y normalización de colores
+// Expande hex cortos (#RGB) a formato completo #RRGGBB y normaliza a minúsculas
+const expandHex = (hex) => {
+    if (!hex || typeof hex !== 'string') return hex
+    const h = hex.trim()
+    const m3 = /^#([A-Fa-f0-9]{3})$/.exec(h)
+    if (m3) {
+        const chars = m3[1].split('')
+        return '#' + chars.map(c => (c + c)).join('').toLowerCase()
+    }
+    const m6 = /^#([A-Fa-f0-9]{6})$/.exec(h)
+    if (m6) return '#' + m6[1].toLowerCase()
+    return h
+}
+
 const isValidHexColor = (color) => {
-    // Patrón para validar formato hexadecimal (#RRGGBB o #RGB)
-    const hexPattern = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
-    return hexPattern.test(color);
+    if (!color || typeof color !== 'string') return false
+    const hexPattern = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/
+    return hexPattern.test(color)
 }
 
 const validateColor = (colorId, colorValue) => {
     if (!colorValue || colorValue.trim() === '') {
-        colorErrors.value[colorId] = 'El color no puede estar vacío';
-        return false;
+        colorErrors.value[colorId] = 'El color no puede estar vacío'
+        return false
     }
-    
-    if (!isValidHexColor(colorValue)) {
-        colorErrors.value[colorId] = 'Formato inválido. Use #RRGGBB o #RGB (ej: #ff0000)';
-        return false;
+
+    // Aceptamos tanto #RGB como #RRGGBB en la validación, pero NO normalizamos aquí.
+    // La expansión a 6 caracteres se hará únicamente al preparar el payload para el backend.
+    const normalized = expandHex(colorValue)
+
+    if (!isValidHexColor(normalized)) {
+        colorErrors.value[colorId] = 'Formato inválido. Use #RRGGBB o #RGB (ej: #ff0000)'
+        return false
     }
-    
-    // Si es válido, eliminar el error
-    delete colorErrors.value[colorId];
-    return true;
+
+    // No reescribimos ni forzamos el value del modelo/input aquí para evitar cambios automáticos
+    // que confundan al usuario. Solo limpiamos el error.
+    delete colorErrors.value[colorId]
+    return true
 }
 
 const onColorInput = (colorId, colorValue) => {
-    validateColor(colorId, colorValue);
+    // No normalizamos automáticamente aquí. Guardamos el valor tal cual el usuario lo escribió
+    // y validamos aceptando formatos cortos (#RGB) o largos (#RRGGBB).
+    try {
+        const idx = colorConfig.value.findIndex(c => c.id === colorId)
+        if (idx !== -1) colorConfig.value[idx].value = colorValue
+    } catch (e) {}
+
+    // Actualizar el input[type=color] únicamente si el valor ya es un hex de 6 caracteres
+    try {
+        const picker = document.getElementById(colorId)
+        if (picker && typeof colorValue === 'string') {
+            // sólo asignar al color picker si es un hex válido de 6 caracteres (incluye #)
+            if (/^#[A-Fa-f0-9]{6}$/.test(colorValue)) picker.value = colorValue
+        }
+    } catch (e) {}
+
+    // Validar pero sin mutar el valor
+    validateColor(colorId, colorValue)
 }
 
 const hasColorError = (colorId) => {
-    return colorErrors.value.hasOwnProperty(colorId);
+    return colorErrors.value.hasOwnProperty(colorId)
 }
 
 const getColorError = (colorId) => {
-    return colorErrors.value[colorId] || '';
+    return colorErrors.value[colorId] || ''
 }
+
+
 </script>
 
 <style lang="scss" scoped>
@@ -2112,12 +2418,12 @@ const getColorError = (colorId) => {
     display: flex;
     align-items: center;
     justify-content: center;
-    
+
     &:hover {
         color: #495057;
         background: #f8f9fa;
     }
-    
+
     &.active {
         color: #667eea;
         border-bottom-color: #667eea;
@@ -2131,7 +2437,7 @@ const getColorError = (colorId) => {
 
 .config-section {
     margin-bottom: 2rem;
-    
+
     &:last-of-type {
         margin-bottom: 0;
     }
@@ -2173,7 +2479,7 @@ const getColorError = (colorId) => {
     border-radius: 8px;
     font-size: 1rem;
     transition: all 0.3s ease;
-    
+
     &:focus {
         outline: none;
         border-color: #667eea;
@@ -2214,7 +2520,7 @@ const getColorError = (colorId) => {
     display: flex;
     align-items: center;
     justify-content: center;
-    
+
     &:hover {
         background: #e9ecef;
         border-color: #adb5bd;
@@ -2260,11 +2566,11 @@ const getColorError = (colorId) => {
     border-radius: 8px;
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    
+
     &::-webkit-color-swatch-wrapper {
         padding: 0;
     }
-    
+
     &::-webkit-color-swatch {
         border: none;
         border-radius: 6px;
@@ -2279,18 +2585,18 @@ const getColorError = (colorId) => {
     font-family: 'Courier New', monospace;
     font-size: 0.9rem;
     transition: all 0.3s ease;
-    
+
     &:focus {
         outline: none;
         border-color: #667eea;
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
-    
+
     &.error {
         border-color: #dc3545;
         background-color: #fff5f5;
         box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
-        
+
         &:focus {
             border-color: #dc3545;
             box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
@@ -2309,7 +2615,7 @@ const getColorError = (colorId) => {
     display: flex;
     align-items: center;
     animation: slideDown 0.3s ease;
-    
+
     i {
         color: #dc3545;
         font-size: 0.9rem;
@@ -2331,7 +2637,7 @@ const getColorError = (colorId) => {
     display: flex;
     gap: 0.5rem;
     margin-top: 1rem;
-    
+
     .btn {
         border-radius: 8px;
         font-weight: 600;
@@ -2346,33 +2652,33 @@ const getColorError = (colorId) => {
         align-items: center;
         justify-content: center;
     }
-    
+
     .btn-save {
         background: #ff6b35;
         color: white;
-        
+
         &:hover {
             background: #ff5722;
             transform: translateY(-1px);
             box-shadow: 0 4px 8px rgba(255, 107, 53, 0.3);
         }
-        
+
         &:active {
             transform: translateY(0);
         }
     }
-    
+
     .btn-reset {
         background: white;
         color: #6c757d;
         border: 2px solid #dee2e6 !important;
-        
+
         &:hover {
             background: #f8f9fa;
             border-color: #adb5bd !important;
             color: #495057;
         }
-        
+
         &:active {
             background: #e9ecef;
         }
@@ -2410,7 +2716,7 @@ const getColorError = (colorId) => {
     align-items: center;
     justify-content: center;
     margin-bottom: 1rem;
-    
+
     i {
         color: white;
         font-size: 1.2rem;
@@ -2547,13 +2853,13 @@ const getColorError = (colorId) => {
 .preview-menu {
     display: flex;
     gap: 1.5rem;
-    
+
     span {
         font-size: 0.9rem;
         opacity: 0.9;
         cursor: pointer;
         transition: opacity 0.3s ease;
-        
+
         &:hover {
             opacity: 1;
         }
@@ -2577,13 +2883,13 @@ const getColorError = (colorId) => {
     color: white;
     text-align: center;
     transition: all 0.3s ease;
-    
+
     i {
         font-size: 1.5rem;
         margin-bottom: 0.5rem;
         display: block;
     }
-    
+
     span {
         font-size: 0.8rem;
         font-weight: 600;
@@ -2597,12 +2903,12 @@ const getColorError = (colorId) => {
     border-radius: 10px;
     color: white;
     transition: all 0.3s ease;
-    
+
     h6 {
         font-weight: 700;
         margin-bottom: 0.5rem;
     }
-    
+
     p {
         margin: 0;
         opacity: 0.9;
@@ -2615,7 +2921,29 @@ const getColorError = (colorId) => {
     border-radius: 12px;
     overflow: hidden;
     margin-bottom: 2rem;
-    background: #ffffff;
+    background: var(--preview-background, #ffffff);
+    /* allow preview to be themed via CSS custom properties set on the element */
+}
+
+/* Fix: paragraphs inside the preview must use the preview 'accent' (color 3).
+   There are global rules (e.g. `p { color: var(--accent-color) !important; }`) that
+   can override the preview's intended variables. We add a higher-specificity rule
+   and !important to ensure preview paragraphs use --preview-accent. */
+.dashboard-preview .combined-preview p,
+.dashboard-preview .combined-preview .c-card p,
+.dashboard-preview .combined-preview .card-desc {
+    color: var(--preview-accent, #6c757d) !important;
+    fill: var(--preview-accent, #6c757d) !important;
+}
+
+/* Force color 2 (preview-secondary) on specific preview texts requested */
+.dashboard-preview .combined-preview .hero-title,
+.dashboard-preview .combined-preview .hero-subtitle,
+.dashboard-preview .combined-preview .c-card h6,
+.dashboard-preview .combined-preview .c-card .card-title,
+.dashboard-preview .combined-preview .combined-footer .footer-title {
+    color: var(--preview-secondary, #ff5900) !important;
+    fill: var(--preview-secondary, #ff5900) !important;
 }
 
 .combined-header {
@@ -2623,6 +2951,8 @@ const getColorError = (colorId) => {
     align-items: center;
     justify-content: space-between;
     padding: 0.75rem 1rem;
+    background-color: var(--preview-primary, #212529);
+    color: var(--preview-header-text, #ffffff);
 }
 
 .combined-logo {
@@ -2637,17 +2967,19 @@ const getColorError = (colorId) => {
     height: 28px;
     border-radius: 6px;
     display: inline-block;
+    background-color: var(--preview-secondary, #ff5900);
 }
 
 .combined-menu {
     display: flex;
     align-items: center;
     gap: 1rem;
-    
-    span {
-        opacity: 0.9;
+
+    .combined-menu-item {
+        opacity: 0.95;
         cursor: pointer;
-        font-size: 0.9rem;
+        font-size: var(--preview-paragraph-size, 16px);
+        color: var(--preview-success, #343a40);
     }
 }
 
@@ -2656,20 +2988,31 @@ const getColorError = (colorId) => {
     border-radius: 999px;
     padding: 0.45rem 0.9rem;
     font-weight: 600;
+    background-color: var(--preview-secondary, #ff5900);
+    color: var(--preview-background, #ffffff);
+    transition: background-color 0.18s ease, transform 0.18s ease;
 }
 
 .combined-hero {
     padding: 2rem 1.25rem;
     border-top: 1px solid #ecf0f1;
+    background: linear-gradient(135deg, var(--preview-primary, #212529) 0%, var(--preview-secondary, #ff5900) 100%);
+    color: var(--preview-hero-text, rgba(255,255,255,0.95));
 }
 
 .hero-title {
     margin: 0 0 0.5rem 0;
     line-height: 1.15;
+    font-size: var(--preview-title-size, 40px);
+    font-family: var(--preview-font-family-primary, 'Patua One, serif');
+    color: var(--preview-secondary, #ff5900);
 }
 
 .hero-subtitle {
     margin: 0 0 1.25rem 0;
+    font-size: var(--preview-subtitle-size, 28px);
+    font-family: var(--preview-font-family-secondary, 'Saira, Arial, sans-serif');
+    color: var(--preview-secondary, #ff5900);
 }
 
 .hero-actions {
@@ -2684,6 +3027,17 @@ const getColorError = (colorId) => {
     border: 2px solid transparent;
 }
 
+.xl-btn.primary {
+    background-color: var(--preview-secondary, #ff5900);
+    color: var(--preview-background, #ffffff);
+}
+
+.xl-btn.ghost {
+    background: transparent;
+    border-color: var(--preview-secondary, #ff5900);
+    color: var(--preview-secondary, #ff5900);
+}
+
 .xl-btn.ghost {
     background: transparent;
 }
@@ -2693,6 +3047,7 @@ const getColorError = (colorId) => {
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 1rem;
     padding: 1rem 1.25rem 1.25rem;
+    background-color: var(--preview-background, #ffffff);
 }
 
 .c-card {
@@ -2700,29 +3055,37 @@ const getColorError = (colorId) => {
     border-radius: 10px;
     padding: 1rem;
     text-align: left;
-    
+
     i {
         font-size: 1.25rem;
         margin-bottom: 0.35rem;
         display: inline-block;
+        color: var(--preview-secondary, #ff5900);
     }
     h6 {
         margin: 0 0 0.25rem 0;
         font-weight: 700;
+        color: var(--preview-secondary, #ff5900);
+        font-size: var(--preview-subtitle-size, 18px);
     }
     p {
         margin: 0;
-        color: #6c757d;
+        color: var(--preview-accent, #6c757d);
+        font-size: var(--preview-paragraph-size, 16px);
         line-height: 1.5;
     }
 }
+
+.icon-accent { color: var(--preview-secondary, #ff5900); }
+.card-title { color: var(--preview-secondary, #ff5900); }
+.card-desc { color: var(--preview-accent, #6c757d); }
 
 @include media-breakpoint-down(lg) {
     .config-sidebar {
         position: static;
         margin-bottom: 2rem;
     }
-    
+
     .config-tabs {
         flex-direction: column;
         border-bottom: none;
@@ -2730,37 +3093,37 @@ const getColorError = (colorId) => {
         margin-bottom: 0;
         margin-right: 1rem;
     }
-    
+
     .tab-button {
         border-bottom: none;
         border-right: 3px solid transparent;
         text-align: left;
         justify-content: flex-start;
-        
+
         &.active {
             border-bottom-color: transparent;
             border-right-color: #667eea;
         }
     }
-    
+
     .tab-content {
         min-height: auto;
     }
-    
+
     .preview-cards {
         grid-template-columns: 1fr;
     }
-    
+
     .config-tags {
         justify-content: center;
     }
-    
+
     .color-usage-item {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5rem;
     }
-    
+
     .color-info {
         width: 100%;
     }
@@ -2774,7 +3137,7 @@ const getColorError = (colorId) => {
         margin-right: 0;
         margin-bottom: 2rem;
     }
-    
+
     .tab-button {
         border-right: none;
         border-bottom: 3px solid transparent;
@@ -2782,7 +3145,7 @@ const getColorError = (colorId) => {
         justify-content: center;
         padding: 0.75rem 1rem;
         font-size: 0.8rem;
-        
+
         &.active {
             border-right-color: transparent;
             border-bottom-color: #667eea;
@@ -2790,7 +3153,7 @@ const getColorError = (colorId) => {
     }
 }
 
-// Estilos para el campo de nombre de paleta en la sección de colores
+/* Estilos para el campo de nombre de paleta en la sección de colores */
 .palette-name-section {
     margin-bottom: 2rem;
     margin-top: 1.5rem;
@@ -2798,7 +3161,7 @@ const getColorError = (colorId) => {
     background: #f8f9fa;
     border-radius: 8px;
     border: 1px solid #e9ecef;
-    
+
     .palette-name-title {
         font-size: 1rem;
         font-weight: 600;
@@ -2807,12 +3170,12 @@ const getColorError = (colorId) => {
         margin-bottom: 5px;
         display: flex;
         align-items: center;
-        
+
         i {
             color: #667eea;
         }
     }
-    
+
     .palette-name-input {
         .form-control {
             border: 1px solid #ced4da;
@@ -2820,7 +3183,7 @@ const getColorError = (colorId) => {
             padding: 0.5rem 0.75rem;
             font-size: 0.9rem;
             width: 100%;
-            
+
             &:focus {
                 outline: none;
                 border-color: #667eea;
@@ -2837,7 +3200,7 @@ const getColorError = (colorId) => {
     background: #f8f9fa;
     border-radius: 8px;
     border: 1px solid #e9ecef;
-    
+
     .typography-name-title {
         font-size: 1rem;
         font-weight: 600;
@@ -2845,12 +3208,12 @@ const getColorError = (colorId) => {
         margin-bottom: 0.75rem;
         display: flex;
         align-items: center;
-        
+
         i {
             color: #667eea;
         }
     }
-    
+
     .typography-name-input {
         .form-control {
             border: 1px solid #ced4da;
@@ -2858,7 +3221,7 @@ const getColorError = (colorId) => {
             padding: 0.5rem 0.75rem;
             font-size: 0.9rem;
             width: 100%;
-            
+
             &:focus {
                 outline: none;
                 border-color: #667eea;
@@ -2868,14 +3231,14 @@ const getColorError = (colorId) => {
     }
 }
 
-// Estilos para la sección de paletas guardadas (fuera del sidebar)
+/* Estilos para la sección de paletas guardadas (fuera del sidebar) */
 .saved-palettes-section {
     background: white;
     border-radius: 12px;
     padding: 2rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     border: 1px solid #e9ecef;
-    
+
     .section-title {
         font-size: 1.5rem;
         font-weight: 700;
@@ -2883,11 +3246,11 @@ const getColorError = (colorId) => {
         margin-bottom: 1.5rem;
         display: flex;
         align-items: center;
-        
+
         i {
             color: #667eea;
         }
-        
+
         .palette-count {
             font-size: 1rem;
             font-weight: 500;
@@ -2895,40 +3258,40 @@ const getColorError = (colorId) => {
             margin-left: 0.5rem;
         }
     }
-    
+
     .no-palettes {
         text-align: center;
         padding: 3rem 1rem;
         color: #6c757d;
-        
+
         i {
             font-size: 4rem;
             color: #dee2e6;
             margin-bottom: 1.5rem;
         }
-        
+
         p {
             margin-bottom: 0.5rem;
             font-weight: 500;
             font-size: 1.1rem;
         }
-        
+
         small {
             font-size: 0.9rem;
         }
     }
-    
+
     .palettes-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         gap: 1.5rem;
-        
+
         @include media-breakpoint-down(md) {
             grid-template-columns: 1fr;
             gap: 1rem;
         }
     }
-    
+
     .palette-card {
         background: #f8f9fa;
         border: 1px solid #e9ecef;
@@ -2936,36 +3299,36 @@ const getColorError = (colorId) => {
         padding: 1.5rem;
         transition: all 0.3s ease;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        
+
         &:hover {
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
             transform: translateY(-4px);
             border-color: #667eea;
         }
-        
+
         .palette-header {
             margin-bottom: 1rem;
-            
+
             .palette-name {
                 font-size: 1.1rem;
                 font-weight: 600;
                 color: #2c3e50;
                 margin-bottom: 0.25rem;
             }
-            
+
             .palette-date {
                 color: #6c757d;
                 font-size: 0.85rem;
             }
         }
-        
+
         .palette-colors {
             display: flex;
             gap: 0.75rem;
             margin-bottom: 1.25rem;
             flex-wrap: wrap;
             justify-content: center;
-            
+
             .color-preview {
                 width: 32px;
                 height: 32px;
@@ -2974,26 +3337,26 @@ const getColorError = (colorId) => {
                 box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
                 cursor: pointer;
                 transition: all 0.3s ease;
-                
+
                 &:hover {
                     transform: scale(1.15);
                     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
                 }
             }
         }
-        
+
         .palette-actions {
             display: flex;
             gap: 0.75rem;
             justify-content: center;
-            
+
             .btn {
                 padding: 0.5rem 1rem;
                 font-size: 0.9rem;
                 border-radius: 8px;
                 transition: all 0.3s ease;
                 font-weight: 500;
-                
+
                 &:hover {
                     transform: translateY(-2px);
                     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -3162,5 +3525,38 @@ const getColorError = (colorId) => {
     font-weight: 500;
     word-break: break-word;
     line-height: 1.3;
+}
+
+/* Estilos para la sección footer de la vista previa */
+.combined-footer {
+    padding: 2rem;
+    text-align: center;
+    border-radius: 0 0 10px 10px;
+    background-color: var(--preview-success, #343a40);
+    color: var(--preview-footer-text, #ffffff);
+}
+
+.footer-content h5 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    color: var(--preview-secondary, #ff5900);
+}
+.footer-content p {
+    margin-bottom: 1.5rem;
+    opacity: 0.9;
+    color: var(--preview-accent, #ffffff);
+}
+.footer-btn {
+    transition: all 0.3s ease;
+    background-color: var(--preview-secondary, #ff5900);
+    color: var(--preview-background, #ffffff);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.footer-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 </style>

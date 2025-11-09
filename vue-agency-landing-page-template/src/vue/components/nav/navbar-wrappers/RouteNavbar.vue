@@ -107,6 +107,12 @@ const linkList = computed(() => {
                     return [
                         ...staticLinks,
                         {
+                            path: '/cv',
+                            label: 'Crear CV',
+                            faIcon: 'fa-solid fa-file-alt',
+                            isActive: route.path === '/cv'
+                        },
+                        {
                             path: '/dashboard',
                             label: 'Dashboard',
                             faIcon: 'fa-solid fa-tachometer-alt',
@@ -118,7 +124,16 @@ const linkList = computed(() => {
                 console.error('Error parsing user data:', error)
             }
         }
-        return staticLinks
+        // Si está logueado pero no es admin, agregar enlace de CV
+        return [
+            ...staticLinks,
+            {
+                path: '/cv',
+                label: 'Crear CV',
+                faIcon: 'fa-solid fa-file-alt',
+                isActive: route.path === '/cv'
+            }
+        ]
     }
     
     const authLinks = [

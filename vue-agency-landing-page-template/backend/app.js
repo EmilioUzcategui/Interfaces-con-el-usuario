@@ -6,6 +6,7 @@ import authRoutes from './routes/auth.js';
 import colorRoutes from './routes/color.js';
 import tipografiaRoutes from './routes/tipografia.js';
 import uploadsRoutes from './routes/uploads.js';
+import initPalettes from './init-palettes.js';
 import { fileURLToPath } from 'url'
 import path from 'path'
 //import { testConnection } from './DB/db.js';
@@ -41,6 +42,13 @@ app.get('/api/test', (req, res) => {
 // Probar conexión a la base de datos
 //testConnection();
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
     console.log(`🚀 Servidor ejecutándose en http://localhost:${PORT}`);
+    
+    // Inicializar paletas por defecto
+    try {
+        await initPalettes();
+    } catch (error) {
+        console.error('Error inicializando paletas:', error);
+    }
 });

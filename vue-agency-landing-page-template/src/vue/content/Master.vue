@@ -13,7 +13,7 @@
             <FooterColumn title="About"
                           faIcon="fa-brands fa-font-awesome me-2"
                           :description="[
-                              `This template is maintained by Ryan Balieiro and is based on the <a href='https://vuejs.org/'>Vue</a> framework and the <a href='https://getbootstrap.com/'>Bootstrap</a> framework.`
+                              `This template is maintained and is based on the <a href='https://vuejs.org/'>Vue</a> framework and the <a href='https://getbootstrap.com/'>Bootstrap</a> framework.`
                           ]"
                           :links="[
                               {label: `Privacy Policy`, href: `/privacy-policy`, faIcon: null},
@@ -47,9 +47,9 @@
                           :displayLinksAsButtons="false"/>
         </FooterBlock>
 
-        <FooterBlock :darken="true"
+            <FooterBlock :darken="true"
                      :row="false">
-            <FooterCopyright holder="Ryan Balieiro"
+            <FooterCopyright holder=""
                              url="https://github.com/ryanbalieiro"
                              license="Distributed Under the MIT License"/>
         </FooterBlock>

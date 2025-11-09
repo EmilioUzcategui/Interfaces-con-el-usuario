@@ -8,6 +8,7 @@ import RegisterPage from "/src/vue/content/pages/RegisterPage.vue"
 import DashboardPage from "/src/vue/content/pages/DashboardPage.vue"
 import LicensePage from "/src/vue/content/pages/LicensePage.vue"
 import PolicyPage from "/src/vue/content/pages/PolicyPage.vue"
+import CVPage from "/src/vue/content/pages/CVPage.vue"
 import { loadTypography } from './utils/loadTypography.js'
 import "./assets/styles/dynamic-colors.css"
 import { loadPalette, loadPaletteWhenReady, debugPaletteState } from './utils/themeManager.js' // 👈 Importa las funciones
@@ -98,10 +99,40 @@ const router = createRouter({
         },
 
         {
+            path: "/cv",
+            name: "cv",
+            component: CVPage,
+            props: {
+                label: "Crear CV",
+                faIcon: "fa-solid fa-file-alt",
+                inPageNavbar: false,
+                shouldAlwaysPreload: false,
+                breadcrumbs: [
+                    "/"
+                ]
+            }
+        },
+
+        {
             path: "/:pathMatch(.*)*",
             redirect: "/"
         }
     ]
+})
+// Al navegar, si entramos a una ruta que NO es el dashboard, intentamos (re)cargar
+// la tipografía activa. Esto permite que al volver desde el dashboard al sitio
+// principal la tipografía se aplique sin necesidad de refrescar la página.
+router.afterEach(async (to, from) => {
+    if (!to.path.includes('/dashboard')) {
+        // Sólo cargar si no hay ya estilos inyectados
+        if (!document.getElementById('injected-typography')) {
+            try {
+                await loadTypography()
+            } catch (e) {
+                console.warn('Error cargando tipografía tras navegación:', e)
+            }
+        }
+    }
 })
 await loadTypography() // Carga fuentes antes de renderizar la app
 

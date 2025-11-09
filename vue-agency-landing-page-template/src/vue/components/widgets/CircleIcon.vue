@@ -1,8 +1,10 @@
 <template>
     <!-- Icon Stack -->
     <span class="icon-stack fa-stack">
+        <!-- background circle uses secondary color as before -->
         <i class="fas fa-circle fa-stack-2x" style="color: var(--secondary-color, #ff5900);"/>
-        <i class="fa-stack-1x fa-inverse" :class="props.faIcon"/>
+        <!-- icon glyph now uses the secondary color instead of being forced white -->
+        <i class="fa-stack-1x" :class="props.faIcon" :style="{'color': 'var(--secondary-color, #ff5900)'}"/>
     </span>
 </template>
 

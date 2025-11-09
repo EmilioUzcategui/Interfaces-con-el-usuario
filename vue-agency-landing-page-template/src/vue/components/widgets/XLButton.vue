@@ -1,8 +1,7 @@
 <template>
-    <button class="btn btn-xl"
+    <button class="btn btn-xl foxy-dynamic-button"
             :type="props.type || 'button'"
-            :class="props.class"
-            style="background-color: var(--secondary-color, #ff5900); border-color: var(--secondary-color, #ff5900); color: white;">
+            :class="props.class">
         <i class="me-2" :class="props.icon"/>
         <span v-html="props.label"/>
     </button>

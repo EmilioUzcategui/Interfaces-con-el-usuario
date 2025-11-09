@@ -47,6 +47,7 @@ const _selectItem = (item) => {
 div.btn-group {
     margin: 0 auto;
     width: 50%;
+    display: flex; /* make children share space */
     @include media-breakpoint-down(lg) {
         width: 100%;
         max-width: 600px;
@@ -58,21 +59,48 @@ button.btn {
         xxxl: (padding: 0.3rem 2rem),
         sm: (padding: 0.3rem 0)
     ));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1; /* distribute evenly */
 
-    opacity: 0.8;
-    border-radius: 30px;
-    background-color: darken($light, 5%);
+    opacity: 0.95;
+    background-color: transparent;
+    color: var(--background-color); /* color 5 for tab texts (better contrast) */
 
-    &.active, &:hover {
-        background-color: darken($light, 5%);
-        border-color: $light;
-        color: var(--secondary-color, $primary);
+    border: none;
+    border-radius: 0;
+    margin: 0;
+    padding: 0.6rem 1.2rem;
+    transition: background-color 160ms ease, color 160ms ease;
+
+    /* visual separators between buttons (subtle) */
+    & + & {
+        border-left: 1px solid rgba(255,255,255,0.06);
+    }
+
+    &:hover {
+    background-color: rgba(255,255,255,0.06);
+    color: var(--background-color);
     }
 
     &.active {
-        background-color: var(--secondary-color, $primary);
-        color: var(--accent-color, $text-normal-contrast);
+        background-color: rgba(255,255,255,0.14);
+        color: var(--background-color);
         opacity: 1;
     }
+
+    &:focus {
+        outline: none;
+        box-shadow: none;
+    }
+}
+
+/* Bar background (color 4) */
+.filter-tabs {
+    padding: 6px;
+    border-radius: 30px;
+    background-color: var(--success-color);
+    overflow: hidden; /* Prevent children from visually escaping the pill */
 }
 </style>

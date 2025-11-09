@@ -1,6 +1,6 @@
 <template>
     <!-- Services Section -->
-    <PageSection variant="primary"
+    <PageSection variant="success"
                  :id="props.id">
         <!-- Title -->
         <PageSectionHeader title="Our *Services*"

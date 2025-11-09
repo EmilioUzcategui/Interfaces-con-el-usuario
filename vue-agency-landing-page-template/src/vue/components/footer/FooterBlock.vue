@@ -30,11 +30,13 @@ const className = computed(() => {
 
 div.foxy-footer-block {
     min-height: 40px;
-    background-color: $footer-bg-color;
+    /* Usar color 4 de la paleta (mapeado a --success-color) para el fondo del footer */
+    background-color: var(--success-color, $footer-bg-color);
     padding: 1rem 0;
     text-align: center;
     &-darken {
-        background-color: $footer-bg-highlight-color;
+        /* variante oscura; usar una versión oscurecida de success si está disponible, si no fallback SASS */
+        background-color: var(--success-color, $footer-bg-highlight-color);
     }
 }
 

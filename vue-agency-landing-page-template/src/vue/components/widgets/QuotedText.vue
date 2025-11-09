@@ -1,5 +1,5 @@
 <template>
-    <div class="quoted-text">
+    <div class="quoted-text" :class="$attrs.class">
         <span class="first-span" v-html="firstSpanContent"/>
         <span class="last-span" v-html="lastSpanContent"/>
     </div>
@@ -7,6 +7,10 @@
 
 <script setup>
 import {computed} from "vue"
+
+defineOptions({
+    inheritAttrs: false
+})
 
 const props = defineProps({
     text: String
@@ -38,6 +42,14 @@ const lastSpanContent = computed(() => {
 
 <style lang="scss" scoped>
 @import "/src/scss/_theming.scss";
+
+div.quoted-text {
+    font-size: 1.0rem !important;
+    
+    span {
+        font-size: 1.0rem !important;
+    }
+}
 
 span.last-span {
     white-space: nowrap;

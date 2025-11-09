@@ -150,6 +150,9 @@ div.foxy-project-item-thumb-wrapper {
     width: var(--project-logo-size);
     overflow: hidden;
     border-radius: 25%;
+    /* allow the wrapper background to show behind icon images (useful for transparent PNGs) */
+    background: transparent;
+    transition: background ease-in-out 0.25s, transform ease-in-out 0.25s;
 
     & .image-view {
         width: 100%;
@@ -170,11 +173,30 @@ div.foxy-project-item-thumb-overlay {
     height: 100%;
     border-radius: 25%;
 
-    background: fade-out(lighten($primary, 5%), 0.1);
-    transition: all ease-in-out 0.25s;
+    /* overlay sits above the image; we'll use a ::before pseudo-element to paint
+       a translucent layer using the palette color (--success-color). The pseudo
+       element is placed behind the overlay content so the icon (eye) remains
+       fully opaque while the image below gets a colored tint. */
+    background: transparent;
+    transition: opacity ease-in-out 0.25s;
+    z-index: 2;
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 25%;
+        background: var(--success-color, $success);
+        opacity: 0; /* revealed on hover via parent opacity + this value */
+        transition: opacity ease-in-out 0.25s;
+        z-index: 1;
+        pointer-events: none;
+    }
 
     &-content {
         color: $white;
+        position: relative;
+        z-index: 3;
     }
 }
 
@@ -182,7 +204,7 @@ button.foxy-project-item-title {
     border: none;
     padding: 0;
     background-color: transparent;
-    color: $dark;
+    color: var(--secondary-color, $dark);
 
     margin: calc(var(--project-logo-size)/12) 0 0;
     font-size: calc(var(--project-logo-size)/7.8);
@@ -193,9 +215,10 @@ button.foxy-project-item-title {
     }
 }
 
-p.foxy-project-item-category {
+ p.foxy-project-item-category {
     margin: 0;
     padding: 0;
+     color: var(--secondary-color, $text-muted);
 
     font-size: calc(var(--project-logo-size)/10.5);
     @include media-breakpoint-down(lg) {
@@ -206,10 +229,19 @@ p.foxy-project-item-category {
 div.foxy-project-item:hover {
     div.foxy-project-item-thumb-overlay {
         opacity: 1;
+        /* tint the image with a translucent layer of the success color */
+        &::before { opacity: 0.18; }
+    }
+
+    /* change the rounded icon background to palette color 4 (success) and the title color
+       to the same palette color for consistency */
+    div.foxy-project-item-thumb-wrapper {
+        background: var(--success-color, $success);
+        transform: translateY(-2%);
     }
 
     button.foxy-project-item-title {
-        color: lighten($primary, 10%);
+        color: var(--success-color, $success);
         transition: color ease-in-out 0.3s;
     }
 }

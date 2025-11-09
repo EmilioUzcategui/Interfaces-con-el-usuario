@@ -1,91 +1,290 @@
 :root {
-    --primary-color: #212529;
-    --secondary-color: #ff5900;
-    --accent-color: #000000;
-    --success-color: #343a40;
-    --background-color: #fcfcfc;
-    
-    /* Variables de texto que se actualizan dinámicamente */
-    --text-normal: var(--accent-color);
-    --headings-color: var(--accent-color);
-  }
-  
-  /* Aplicar colores al template */
-  .header-bg {
-    background-color: var(--primary-color) !important;
-  }
-  
-  .secondary-bg {
-    background-color: var(--secondary-color) !important;
-  }
-  
-  .accent-text {
-    color: var(--accent-color) !important;
-  }
-  
-  .success-text {
-    color: var(--success-color) !important;
-  }
-  
-  .background-bg {
-    background-color: var(--background-color) !important;
-  }
-  
-  /* Estilos para textos que se actualizan dinámicamente */
-  h1, h2, h3, h4, h5, h6 {
-    color: var(--secondary-color, var(--accent-color)) !important;
-  }
-  
-  p, .text-normal {
-    color: var(--accent-color) !important;
-  }
-  
-  .foxy-section-header-title {
-    color: var(--secondary-color, var(--accent-color)) !important;
-  }
-  
-  .foxy-section-header-subtitle {
-    color: var(--accent-color, var(--success-color)) !important;
-  }
-  
-  /* Sobrescribir clases de Bootstrap y otros estilos hardcodeados */
-  .text-primary {
-    color: var(--secondary-color, var(--accent-color)) !important;
-  }
-  
-  .text-primary-light {
-    color: var(--secondary-color, var(--accent-color)) !important;
-  }
-  
-  /* Estilos específicos para testimonios */
-  .foxy-testimonial-author {
-    color: var(--accent-color) !important;
-  }
-  
-  .foxy-testimonial-author span {
-    color: var(--secondary-color, var(--accent-color)) !important;
-  }
-  
-  /* Estilos para FAQ */
-  .question-icon {
-    color: var(--secondary-color, var(--accent-color)) !important;
-  }
-  
-  /* Estilos para elementos con asteriscos */
-  span[class*="text-primary"] {
-    color: var(--secondary-color, var(--accent-color)) !important;
-  }
-  
-  /* Estilos adicionales para asegurar cobertura completa */
-  .card-footer p {
-    color: var(--accent-color) !important;
-  }
-  
-  .card-footer span {
-    color: var(--secondary-color, var(--accent-color)) !important;
-  }
-  
-  /* Forzar actualización de todos los elementos de texto */
-  * {
-    transition: color 0.3s ease;
-  }
+  --primary-color: #212529;
+  --secondary-color: #ff5900;
+  --accent-color: #000000;
+  --success-color: #343a40;
+  --background-color: #fcfcfc;
+
+  /* Variables de texto que se actualizan dinámicamente */
+  --text-normal: var(--accent-color);
+  --headings-color: var(--accent-color);
+}
+
+/* Aplicar colores al template */
+.header-bg {
+  background-color: var(--primary-color) !important;
+}
+
+.secondary-bg {
+  background-color: var(--secondary-color) !important;
+}
+
+.accent-text {
+  color: var(--accent-color) !important;
+}
+
+.success-text {
+  color: var(--success-color) !important;
+}
+
+.background-bg {
+  background-color: var(--background-color) !important;
+}
+
+/* Adding success-bg class to apply color 4 as background */
+.success-bg {
+  background-color: var(--success-color) !important;
+}
+
+/* Estilos para textos que se actualizan dinámicamente */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--secondary-color, var(--accent-color)) !important;
+}
+
+p,
+.text-normal {
+  color: var(--accent-color) !important;
+}
+
+.foxy-section-header-title {
+  color: var(--secondary-color, var(--accent-color)) !important;
+}
+
+.foxy-section-header-subtitle {
+  color: var(--accent-color, var(--success-color)) !important;
+}
+
+/* Sobrescribir clases de Bootstrap y otros estilos hardcodeados */
+.text-primary {
+  color: var(--secondary-color, var(--accent-color)) !important;
+}
+
+.text-primary-light {
+  color: var(--secondary-color, var(--accent-color)) !important;
+}
+
+/* Estilos específicos para testimonios */
+.foxy-testimonial-author {
+  color: var(--accent-color) !important;
+}
+
+.foxy-testimonial-author span {
+  color: var(--secondary-color, var(--accent-color)) !important;
+}
+
+/* Estilos para FAQ */
+.question-icon {
+  color: var(--secondary-color, var(--accent-color)) !important;
+}
+
+/* Estilos para elementos con asteriscos */
+span[class*="text-primary"] {
+  color: var(--secondary-color, var(--accent-color)) !important;
+}
+
+/* Estilos adicionales para asegurar cobertura completa */
+.card-footer p {
+  color: var(--accent-color) !important;
+}
+
+.card-footer span {
+  color: var(--secondary-color, var(--accent-color)) !important;
+}
+
+/* Estilos específicos para la sección de servicios */
+.foxy-item-feature h5 {
+  color: var(--secondary-color, var(--accent-color)) !important;
+}
+
+.foxy-item-feature p {
+  color: var(--accent-color) !important;
+}
+
+.foxy-item-feature .text-muted {
+  color: var(--accent-color) !important;
+}
+
+/* Estilos específicos para iconos de la sección de servicios */
+.foxy-item-feature .icon-stack .fa-circle {
+  color: var(--secondary-color, #ff5900) !important;
+}
+
+.foxy-item-feature .icon-stack .fa-stack-1x {
+  color: white !important;
+}
+
+/* Estilos específicos para la sección FAQ */
+.foxy-item-faq-question h5 {
+  color: var(--secondary-color, var(--accent-color)) !important;
+}
+
+.foxy-item-faq-question p {
+  color: var(--accent-color) !important;
+}
+
+.foxy-item-faq-question .text-light-7 {
+  color: var(--accent-color) !important;
+}
+
+.foxy-item-faq-question .question-icon {
+  color: var(--secondary-color, var(--accent-color)) !important;
+}
+
+/* Estilos específicos para la sección timeline (Our Story) */
+.foxy-timeline-item h3 {
+  color: var(--secondary-color, var(--accent-color)) !important;
+}
+
+.foxy-timeline-item .badge {
+  color: var(--accent-color) !important;
+}
+
+.foxy-timeline-item .text-muted {
+  color: var(--accent-color) !important;
+}
+
+/* Estilos específicos para la sección Zork App */
+.foxy-project-info-featured-content .title {
+  color: var(--accent-color) !important;
+}
+
+.foxy-project-info-featured-content .project-title {
+  color: var(--secondary-color, var(--accent-color)) !important;
+}
+
+.foxy-project-info-featured-content .description {
+  color: var(--accent-color) !important;
+}
+
+/* Estilos específicos para botones con máxima especificidad */
+button.foxy-dynamic-button.btn.btn-xl {
+  color: white !important;
+  background-color: var(--secondary-color, #ff5900) !important;
+  border-color: var(--secondary-color, #ff5900) !important;
+}
+
+.foxy-dynamic-button {
+  color: white !important;
+  background-color: var(--secondary-color, #ff5900) !important;
+  border-color: var(--secondary-color, #ff5900) !important;
+}
+
+.foxy-dynamic-button:hover {
+  color: white !important;
+  background-color: var(--secondary-color, #ff5900) !important;
+  border-color: var(--secondary-color, #ff5900) !important;
+}
+
+.foxy-dynamic-button:focus {
+  color: white !important;
+  background-color: var(--secondary-color, #ff5900) !important;
+  border-color: var(--secondary-color, #ff5900) !important;
+}
+
+.foxy-dynamic-button:active {
+  color: white !important;
+  background-color: var(--secondary-color, #ff5900) !important;
+  border-color: var(--secondary-color, #ff5900) !important;
+}
+
+/* Estilos específicos para botones con clases adicionales */
+.btn-primary-light.foxy-dynamic-button {
+  color: white !important;
+  background-color: var(--secondary-color, #ff5900) !important;
+  border-color: var(--secondary-color, #ff5900) !important;
+}
+
+.btn-primary-light.foxy-dynamic-button:hover {
+  color: white !important;
+  background-color: var(--secondary-color, #ff5900) !important;
+  border-color: var(--secondary-color, #ff5900) !important;
+}
+
+.btn-submit.foxy-dynamic-button {
+  color: white !important;
+  background-color: var(--secondary-color, #ff5900) !important;
+  border-color: var(--secondary-color, #ff5900) !important;
+}
+
+.btn-submit.foxy-dynamic-button:hover {
+  color: white !important;
+  background-color: var(--secondary-color, #ff5900) !important;
+  border-color: var(--secondary-color, #ff5900) !important;
+}
+
+/* Estilos específicos para la paginación de Swiper */
+.swiper-pagination-bullet {
+  background-color: var(--accent-color, rgba(0, 0, 0, 0.2)) !important;
+}
+
+.swiper-pagination-bullet:hover {
+  background-color: var(--secondary-color, rgba(0, 0, 0, 0.5)) !important;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: var(--secondary-color, #ff5900) !important;
+}
+
+/* Estilos específicos para el formulario de contacto */
+.foxy-contact-form-row input:focus,
+.foxy-contact-form-row textarea:focus {
+  border-color: var(--secondary-color, #ff5900) !important;
+}
+
+.foxy-contact-form-row .form-group-focused .input-group-attach {
+  background-color: var(--secondary-color, #ff5900) !important;
+  border-color: var(--secondary-color, #ff5900) !important;
+}
+
+.foxy-contact-form-row input:-webkit-autofill:focus {
+  border-color: var(--secondary-color, #ff5900) !important;
+}
+
+/* Estilos específicos para enlaces de tiendas de aplicaciones */
+.social-links .social-link {
+  background-color: var(--secondary-color, #ff5900) !important;
+  border-color: var(--secondary-color, #ff5900) !important;
+}
+
+.social-links .social-link:hover {
+  background-color: var(--primary-color, #212529) !important;
+  border-color: var(--primary-color, #212529) !important;
+}
+
+/* Icon color handling: por defecto los iconos pueden ser blancos, pero al hacer hover
+   queremos que el icono use el color 2 de la paleta (var(--secondary-color)).
+   Soportamos tanto <i> (font icons) como <svg>. */
+.social-links .social-link i,
+.social-links .social-link svg {
+  color: white !important;
+  fill: white !important;
+  transition: color 0.18s ease, fill 0.18s ease;
+}
+
+.social-links .social-link:hover i,
+.social-links .social-link:hover svg,
+.social-links .social-link:focus i,
+.social-links .social-link:focus svg {
+  color: var(--secondary-color) !important;
+  fill: var(--secondary-color) !important;
+}
+
+.social-links .social-link-color-black {
+  background-color: var(--secondary-color, #ff5900) !important;
+  border-color: var(--secondary-color, #ff5900) !important;
+}
+
+.social-links .social-link-color-black:hover {
+  background-color: var(--primary-color, #212529) !important;
+  border-color: var(--primary-color, #212529) !important;
+}
+
+/* Forzar actualización de todos los elementos de texto */
+* {
+  transition: color 0.3s ease;
+}

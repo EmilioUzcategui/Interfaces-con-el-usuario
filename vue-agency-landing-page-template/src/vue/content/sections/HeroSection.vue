@@ -2,7 +2,7 @@
   <PageHeader 
     :id="props.id"
     title="*Foxy* Landing Page"
-    subtitle="An agency template by <strong>Ryan Balieiro</strong> – made with <strong>Vue3</strong> and <strong>Bootstrap 5</strong>"
+  subtitle="An agency template – made with <strong>Vue3</strong> and <strong>Bootstrap 5</strong>"
     logo-url="images/logo/agency-logo.png"
     :show-button="true"
     button-icon="fa-solid fa-search"

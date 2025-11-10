@@ -240,33 +240,64 @@
                 <!-- Template Elegante -->
                 <div v-else-if="selectedTemplate === 'elegant'" class="cv-content-elegant">
                     <div class="cv-elegant-container">
-                        <div class="cv-elegant-sidebar"></div>
+                        <div class="cv-elegant-sidebar">
+                            <div class="cv-elegant-sidebar-content">
+                                <div v-if="cvData?.competences?.length > 0" class="cv-elegant-sidebar-section">
+                                    <h3 class="cv-elegant-sidebar-title">COMPETENCIAS</h3>
+                                    <div class="cv-elegant-sidebar-competences">
+                                        <div v-for="(comp, index) in cvData.competences" :key="`comp-${index}`" class="cv-elegant-sidebar-competence-item">
+                                            <span class="cv-elegant-sidebar-competence-name">{{ comp.name }}</span>
+                                            <div class="cv-elegant-sidebar-progress-bar">
+                                                <div class="cv-elegant-sidebar-progress-fill" :style="{ width: getCompetenceLevel(comp.level) + '%' }"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div v-if="cvData?.languages?.length > 0" class="cv-elegant-sidebar-section">
+                                    <h3 class="cv-elegant-sidebar-title">IDIOMAS</h3>
+                                    <div class="cv-elegant-sidebar-languages">
+                                        <div v-for="(lang, index) in cvData.languages" :key="`lang-${index}`" class="cv-elegant-sidebar-language-item">
+                                            <span class="cv-elegant-sidebar-language-name">{{ lang.name }}</span>
+                                            <div class="cv-elegant-sidebar-progress-bar">
+                                                <div class="cv-elegant-sidebar-progress-fill" :style="{ width: getCompetenceLevel(lang.level) + '%' }"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div v-if="cvData?.hobbies?.length > 0" class="cv-elegant-sidebar-section">
+                                    <h3 class="cv-elegant-sidebar-title">PASATIEMPOS E INTERESES</h3>
+                                    <div class="cv-elegant-sidebar-hobbies">
+                                        <div v-for="(hobby, index) in cvData.hobbies" :key="`hobby-${index}`" class="cv-elegant-sidebar-hobby-item">
+                                            <span class="cv-elegant-sidebar-hobby-bullet"></span>
+                                            <span>{{ hobby }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="cv-elegant-main">
                             <div class="cv-elegant-card">
                                 <div class="cv-elegant-header">
-                                    <div class="cv-elegant-profile-photo" v-if="cvData?.personalInfo?.photoBase64">
+                                    <div v-if="cvData?.personalInfo?.photoBase64" class="cv-elegant-photo-wrapper">
+                                        <div class="cv-elegant-profile-photo">
                                         <img :src="cvData.personalInfo.photoBase64" alt="Foto de perfil">
+                                        </div>
                                     </div>
                                     <div class="cv-elegant-info">
                                         <h1>{{ fullNameUppercase }}</h1>
-                                        <h2 v-if="cvData?.personalInfo?.jobTitle" class="cv-elegant-job-title">{{ cvData.personalInfo.jobTitle }}</h2>
                                         <div class="cv-elegant-contact">
                                             <div v-if="cvData?.personalInfo?.email" class="cv-elegant-contact-item">
-                                                <div class="cv-elegant-contact-icon">
                                                     <i class="fa-solid fa-envelope"></i>
-                                                </div>
                                                 <span>{{ cvData.personalInfo.email }}</span>
                                             </div>
                                             <div v-if="cvData?.personalInfo?.phone" class="cv-elegant-contact-item">
-                                                <div class="cv-elegant-contact-icon">
                                                     <i class="fa-solid fa-phone"></i>
-                                                </div>
                                                 <span>{{ cvData.personalInfo.phone }}</span>
                                             </div>
                                             <div v-if="fullAddress" class="cv-elegant-contact-item">
-                                                <div class="cv-elegant-contact-icon">
                                                     <i class="fa-solid fa-location-dot"></i>
-                                                </div>
                                                 <span>{{ fullAddress }}</span>
                                             </div>
                                         </div>
@@ -274,103 +305,46 @@
                                 </div>
                                 <div class="cv-elegant-content-box">
                                     <div v-if="cvData?.profile" class="cv-elegant-section">
-                                        <div class="cv-elegant-section-header">
-                                            <span class="cv-elegant-section-badge">PERFIL</span>
-                                        </div>
+                                        <h3 class="cv-elegant-section-title">PERFIL</h3>
                                         <div class="cv-elegant-section-text" v-html="cvData.profile"></div>
                                     </div>
 
-                                    <div v-if="hasExperience" class="cv-elegant-section">
-                                        <div class="cv-elegant-section-header">
-                                            <span class="cv-elegant-section-badge">EXPERIENCIA PROFESIONAL</span>
-                                        </div>
-                                        <div v-for="(exp, index) in filteredExperience" :key="`exp-${index}`" class="cv-elegant-item">
-                                            <div class="cv-elegant-item-header">
-                                                <div>
-                                                    <h4 class="cv-elegant-item-title">{{ exp.position }}</h4>
-                                                    <span class="cv-elegant-item-company">{{ exp.employer }}</span>
-                                                </div>
-                                                <span class="cv-elegant-item-date">
-                                                    {{ formatDateRange(exp.startMonth, exp.startYear, exp.endMonth, exp.endYear, exp.current) }}
-                                                </span>
-                                            </div>
-                                            <div v-if="exp.location" class="cv-elegant-item-location">
-                                                <i class="fa-solid fa-map-marker-alt"></i>
-                                                <span>{{ exp.location }}</span>
-                                            </div>
-                                            <div v-if="exp.description" class="cv-elegant-item-description" v-html="exp.description"></div>
-                                        </div>
-                                    </div>
-
                                     <div v-if="hasEducation" class="cv-elegant-section">
-                                        <div class="cv-elegant-section-header">
-                                            <span class="cv-elegant-section-badge">FORMACIÓN ACADÉMICA</span>
-                                        </div>
+                                        <h3 class="cv-elegant-section-title">FORMACIÓN</h3>
                                         <div v-for="(edu, index) in filteredEducation" :key="`edu-${index}`" class="cv-elegant-item">
                                             <div class="cv-elegant-item-header">
-                                                <div>
                                                     <h4 class="cv-elegant-item-title">{{ edu.formation }}</h4>
-                                                    <span class="cv-elegant-item-company">{{ edu.institution }}</span>
-                                                </div>
                                                 <span class="cv-elegant-item-date">
                                                     {{ formatDateRange(edu.startMonth, edu.startYear, edu.endMonth, edu.endYear, edu.current) }}
                                                 </span>
                                             </div>
-                                            <div v-if="edu.location" class="cv-elegant-item-location">
-                                                <i class="fa-solid fa-map-marker-alt"></i>
-                                                <span>{{ edu.location }}</span>
+                                            <div v-if="edu.institution || edu.location" class="cv-elegant-item-meta">
+                                                <span v-if="edu.institution">{{ edu.institution }}</span>
+                                                <span v-if="edu.institution && edu.location">, </span>
+                                                <span v-if="edu.location">{{ edu.location }}</span>
                                             </div>
                                             <div v-if="edu.description" class="cv-elegant-item-description" v-html="edu.description"></div>
                                         </div>
                                     </div>
 
-                                    <div v-if="cvData?.competences?.length > 0" class="cv-elegant-section">
-                                        <div class="cv-elegant-section-header">
-                                            <span class="cv-elegant-section-badge">COMPETENCIAS</span>
+                                    <div v-if="hasExperience" class="cv-elegant-section">
+                                        <h3 class="cv-elegant-section-title">EXPERIENCIA</h3>
+                                        <div v-for="(exp, index) in filteredExperience" :key="`exp-${index}`" class="cv-elegant-item">
+                                            <div class="cv-elegant-item-header">
+                                                <h4 class="cv-elegant-item-title">{{ exp.position }}</h4>
+                                                <span class="cv-elegant-item-date">
+                                                    {{ formatDateRange(exp.startMonth, exp.startYear, exp.endMonth, exp.endYear, exp.current) }}
+                                                </span>
                                         </div>
-                                        <div class="cv-elegant-competences">
-                                            <div v-for="(comp, index) in cvData.competences" :key="`comp-${index}`" class="cv-elegant-competence-item">
-                                                <span class="cv-elegant-competence-name">{{ comp.name }}</span>
-                                                <span class="cv-elegant-competence-level">{{ comp.level }}</span>
+                                            <div v-if="exp.employer || exp.location" class="cv-elegant-item-meta">
+                                                <span v-if="exp.employer">{{ exp.employer }}</span>
+                                                <span v-if="exp.employer && exp.location">, </span>
+                                                <span v-if="exp.location">{{ exp.location }}</span>
                                             </div>
+                                            <div v-if="exp.description" class="cv-elegant-item-description" v-html="exp.description"></div>
                                         </div>
                                     </div>
-
-                                    <div v-if="cvData?.skills?.length > 0" class="cv-elegant-section">
-                                        <div class="cv-elegant-section-header">
-                                            <span class="cv-elegant-section-badge">HABILIDADES</span>
                                         </div>
-                                        <div class="cv-elegant-competences">
-                                            <div v-for="(skill, index) in cvData.skills" :key="`skill-${index}`" class="cv-elegant-competence-item">
-                                                <span class="cv-elegant-competence-name">{{ skill.name }}</span>
-                                                <span class="cv-elegant-competence-level">{{ skill.level }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div v-if="cvData?.languages?.length > 0" class="cv-elegant-section">
-                                        <div class="cv-elegant-section-header">
-                                            <span class="cv-elegant-section-badge">IDIOMAS</span>
-                                        </div>
-                                        <div class="cv-elegant-languages">
-                                            <div v-for="(lang, index) in cvData.languages" :key="`lang-${index}`" class="cv-elegant-language-item">
-                                                <span>{{ lang.name }}</span>
-                                                <span class="cv-elegant-language-level">{{ lang.level }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div v-if="cvData?.hobbies?.length > 0" class="cv-elegant-section">
-                                        <div class="cv-elegant-section-header">
-                                            <span class="cv-elegant-section-badge">INTERESES</span>
-                                        </div>
-                                        <div class="cv-elegant-hobbies">
-                                            <span v-for="(hobby, index) in cvData.hobbies" :key="`hobby-${index}`" class="cv-elegant-hobby-tag">
-                                                {{ hobby }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -419,7 +393,7 @@
                         <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
                     </button>
                     
-                    <!-- Botón de colores solo para template dark -->
+                    <!-- Botón de colores para templates dark y elegant -->
                     <div  class="cv-color-btn-wrapper">
                         <button 
                             class="toolbar-btn cv-color-btn" 
@@ -562,6 +536,26 @@ const darkGrayColor = computed(() => {
     return '#333333';
 });
 
+// Computed para obtener el color de la plantilla elegante
+const elegantColor = computed(() => {
+    // Si hay un color seleccionado explícitamente, usarlo
+    if (selectedColor.value && selectedColor.value.value) {
+        return selectedColor.value.value;
+    }
+    // Por defecto, usar el color teal original
+    return '#94c4c4';
+});
+
+// Computed para obtener el color del box-shadow de la plantilla elegante
+const elegantColorRgba = computed(() => {
+    const color = elegantColor.value;
+    // Convertir hex a rgb para el rgba
+    const r = parseInt(color.slice(1, 3), 16);
+    const g = parseInt(color.slice(3, 5), 16);
+    const b = parseInt(color.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, 0.25)`;
+});
+
 onMounted(() => {
     loadActivePalette();
     document.addEventListener('click', handleClickOutside);
@@ -658,7 +652,8 @@ const getCompetenceLevel = (level) => {
         'Básico': 30,
         'Intermedio': 60,
         'Avanzado': 80,
-        'Experto': 100
+        'Experto': 100,
+        'Nativo': 100
     };
     return levelMap[level] || 50;
 };
@@ -675,6 +670,131 @@ const getSkillRating = (level) => {
 
 // Referencia al elemento del preview
 const previewContainerRef = ref(null);
+
+// Función para recortar espacios en blanco del canvas
+const trimCanvas = (canvas) => {
+    const ctx = canvas.getContext('2d');
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+    
+    let top = 0;
+    let bottom = canvas.height;
+    let left = 0;
+    let right = canvas.width;
+    
+    // Función auxiliar para verificar si un pixel tiene contenido real
+    const hasContent = (r, g, b, a) => {
+        // Considerar que un pixel tiene contenido si:
+        // 1. No es completamente transparente (alpha > 0)
+        // 2. No es completamente blanco (255, 255, 255)
+        // 3. No es un fondo gris claro (para todas las plantillas)
+        // 4. Tiene algún color significativo
+        if (a === 0) return false;
+        // Permitir un pequeño margen para píxeles casi blancos (por anti-aliasing)
+        const isWhite = r > 250 && g > 250 && b > 250;
+        // Detectar fondos grises claros comunes en las plantillas:
+        // - #f3f6f8 (elegant) = rgb(243, 246, 248)
+        // - #f6f9fa (elegant container) = rgb(246, 249, 250)
+        // - Fondos blancos y grises muy claros
+        const isLightGray = r >= 240 && r <= 255 && g >= 240 && g <= 255 && b >= 240 && b <= 255;
+        return !isWhite && !isLightGray;
+    };
+    
+    // Encontrar el borde superior
+    for (let y = 0; y < canvas.height; y++) {
+        let foundContent = false;
+        for (let x = 0; x < canvas.width; x++) {
+            const idx = (y * canvas.width + x) * 4;
+            const r = data[idx];
+            const g = data[idx + 1];
+            const b = data[idx + 2];
+            const a = data[idx + 3];
+            
+            if (hasContent(r, g, b, a)) {
+                top = y;
+                foundContent = true;
+                break;
+            }
+        }
+        if (foundContent) break;
+    }
+    
+    // Encontrar el borde inferior
+    for (let y = canvas.height - 1; y >= top; y--) {
+        let foundContent = false;
+        for (let x = 0; x < canvas.width; x++) {
+            const idx = (y * canvas.width + x) * 4;
+            const r = data[idx];
+            const g = data[idx + 1];
+            const b = data[idx + 2];
+            const a = data[idx + 3];
+            
+            if (hasContent(r, g, b, a)) {
+                bottom = y + 1;
+                foundContent = true;
+                break;
+            }
+        }
+        if (foundContent) break;
+    }
+    
+    // Encontrar el borde izquierdo
+    for (let x = 0; x < canvas.width; x++) {
+        let foundContent = false;
+        for (let y = top; y < bottom; y++) {
+            const idx = (y * canvas.width + x) * 4;
+            const r = data[idx];
+            const g = data[idx + 1];
+            const b = data[idx + 2];
+            const a = data[idx + 3];
+            
+            if (hasContent(r, g, b, a)) {
+                left = x;
+                foundContent = true;
+                break;
+            }
+        }
+        if (foundContent) break;
+    }
+    
+    // Encontrar el borde derecho
+    for (let x = canvas.width - 1; x >= left; x--) {
+        let foundContent = false;
+        for (let y = top; y < bottom; y++) {
+            const idx = (y * canvas.width + x) * 4;
+            const r = data[idx];
+            const g = data[idx + 1];
+            const b = data[idx + 2];
+            const a = data[idx + 3];
+            
+            if (hasContent(r, g, b, a)) {
+                right = x + 1;
+                foundContent = true;
+                break;
+            }
+        }
+        if (foundContent) break;
+    }
+    
+    // Asegurar que las dimensiones sean válidas
+    const width = Math.max(1, right - left);
+    const height = Math.max(1, bottom - top);
+    
+    // Crear un nuevo canvas con las dimensiones recortadas
+    const trimmedCanvas = document.createElement('canvas');
+    trimmedCanvas.width = width;
+    trimmedCanvas.height = height;
+    const trimmedCtx = trimmedCanvas.getContext('2d');
+    
+    // Copiar la región recortada
+    trimmedCtx.drawImage(
+        canvas,
+        left, top, width, height,
+        0, 0, width, height
+    );
+    
+    return trimmedCanvas;
+};
 
 // Función para capturar el CV como imagen
 const captureCVAsImage = async () => {
@@ -698,24 +818,103 @@ const captureCVAsImage = async () => {
         // Esperar un momento para que los cambios se apliquen
         await new Promise(resolve => setTimeout(resolve, 100));
 
-        // Capturar el CV como canvas
-        const canvas = await html2canvas(cvContainer, {
-            backgroundColor: '#ffffff',
+        // Para la plantilla elegante, obtener el contenedor específico
+        let targetElement = cvContainer;
+        let captureHeight = cvContainer.scrollHeight;
+        
+        if (selectedTemplate.value === 'elegant') {
+            const elegantContainer = cvContainer.querySelector('.cv-elegant-container');
+            if (elegantContainer) {
+                targetElement = elegantContainer;
+                // Calcular la altura real del contenido sin espacios en blanco
+                const sidebar = elegantContainer.querySelector('.cv-elegant-sidebar');
+                const card = elegantContainer.querySelector('.cv-elegant-card');
+                
+                if (sidebar && card) {
+                    // Obtener el último elemento visible en cada columna
+                    const sidebarChildren = Array.from(sidebar.children);
+                    const cardChildren = Array.from(card.children);
+                    
+                    let maxBottom = 0;
+                    
+                    // Encontrar el último elemento visible en la sidebar
+                    sidebarChildren.forEach(child => {
+                        const rect = child.getBoundingClientRect();
+                        const containerRect = elegantContainer.getBoundingClientRect();
+                        const relativeBottom = rect.bottom - containerRect.top;
+                        if (relativeBottom > maxBottom) {
+                            maxBottom = relativeBottom;
+                        }
+                    });
+                    
+                    // Encontrar el último elemento visible en el card
+                    cardChildren.forEach(child => {
+                        const rect = child.getBoundingClientRect();
+                        const containerRect = elegantContainer.getBoundingClientRect();
+                        const relativeBottom = rect.bottom - containerRect.top;
+                        if (relativeBottom > maxBottom) {
+                            maxBottom = relativeBottom;
+                        }
+                    });
+                    
+                    // Usar la altura del último elemento más un pequeño padding
+                    captureHeight = maxBottom > 0 ? maxBottom + 20 : Math.max(sidebar.offsetHeight, card.offsetHeight) + 20;
+                }
+            }
+        }
+
+        // Capturar el CV como canvas usando el ancho visible real
+        // Para la plantilla elegante, calcular el ancho real del contenido (sidebar + card)
+        let captureWidth = targetElement.offsetWidth || targetElement.clientWidth;
+        if (selectedTemplate.value === 'elegant') {
+            const elegantContainer = cvContainer.querySelector('.cv-elegant-container');
+            if (elegantContainer) {
+                const sidebar = elegantContainer.querySelector('.cv-elegant-sidebar');
+                const card = elegantContainer.querySelector('.cv-elegant-card');
+                if (sidebar && card) {
+                    // Usar getBoundingClientRect para obtener el ancho real del contenido visible
+                    const sidebarRect = sidebar.getBoundingClientRect();
+                    const cardRect = card.getBoundingClientRect();
+                    // El ancho total es desde el inicio del sidebar hasta el final del card
+                    const containerRect = elegantContainer.getBoundingClientRect();
+                    // Calcular el ancho real: desde el left del sidebar hasta el right del card
+                    const realWidth = (cardRect.right - sidebarRect.left);
+                    captureWidth = realWidth;
+                }
+            }
+        }
+        
+        // Para dark y modern, usar scrollHeight para capturar todo el contenido
+        const captureHeightFinal = selectedTemplate.value === 'elegant' 
+            ? captureHeight 
+            : (targetElement.scrollHeight || targetElement.offsetHeight || targetElement.clientHeight);
+        
+        const canvas = await html2canvas(targetElement, {
+            backgroundColor: null, // Sin fondo para que trimCanvas pueda detectar espacios vacíos en todas las plantillas
             scale: 2, // Mayor calidad
             logging: false,
             useCORS: true,
             allowTaint: false,
-            width: cvContainer.scrollWidth,
-            height: cvContainer.scrollHeight
+            width: captureWidth,
+            height: captureHeightFinal,
+            windowWidth: captureWidth,
+            windowHeight: captureHeightFinal
         });
 
         // Restaurar la visibilidad del toolbar y la galería
         if (toolbar) toolbar.style.display = originalToolbarDisplay;
         if (gallery) gallery.style.display = originalGalleryDisplay;
 
+        // Recortar espacios en blanco solo para la plantilla elegante
+        // Para dark y modern, usar el canvas completo sin recortar
+        let finalCanvas = canvas;
+        if (selectedTemplate.value === 'elegant') {
+            finalCanvas = trimCanvas(canvas);
+        }
+
         // Convertir canvas a blob
         return new Promise((resolve) => {
-            canvas.toBlob((blob) => {
+            finalCanvas.toBlob((blob) => {
                 if (blob) {
                     resolve(blob);
                 } else {
@@ -846,7 +1045,7 @@ defineExpose({
         }
 
         &.thumb-elegant {
-            background: linear-gradient(165deg, #1f2a48 0%, #222f53 40%, #68d4ff 40%, #68d4ff 58%, #ffffff 58%, #f4f7fc 100%);
+            background: linear-gradient(165deg, #25252e 0%, #25252e 35%, #94c4c4 35%, #94c4c4 58%, #ffffff 58%, #f4f7fc 100%);
         }
 
         &.thumb-dark {
@@ -889,6 +1088,10 @@ defineExpose({
         box-shadow: none;
         border-radius: 0;
         overflow: visible;
+        min-height: auto;
+        height: auto;
+        display: flex;
+        flex-direction: column;
     }
 
     &.template-dark {
@@ -1120,37 +1323,173 @@ defineExpose({
 // ========== TEMPLATE ELEGANTE (CV WIZARD) ==========
 .cv-content-elegant {
     margin: 0;
-    padding: 32px 0 96px;
+    padding: 0;
     box-sizing: border-box;
-    font-family: 'Montserrat', 'Arial', sans-serif;
+    font-family: var(--font-primary, 'Montserrat', 'Arial', sans-serif);
     background: #f3f6f8;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: flex-start;
     width: 100%;
+    height: auto;
     min-height: 100%;
+    flex: 1;
 }
 
 // CONTENEDOR PRINCIPAL - estructura base
 .cv-elegant-container {
     width: 100%;
-    max-width: 940px;
+    max-width: 100%;
     display: flex;
     align-items: stretch;
     justify-content: flex-start;
     gap: 0;
     position: relative;
-    padding: 0 0 72px;
+    padding: 0;
+    height: auto;
+    min-height: 0;
 }
 
 // Barra lateral oscura
 .cv-elegant-sidebar {
     width: 260px;
     background: #25252e;
-    border-radius: 24px;
+    border-radius: 0;
     box-shadow: 0 32px 60px rgba(15, 23, 42, 0.25);
     position: relative;
     z-index: 1;
+    padding: 24px;
+    height: auto;
+    align-self: stretch;
+}
+
+.cv-elegant-sidebar-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-top: 20px;
+    margin-top: 240px; // Más espacio para que el header no cubra las secciones del sidebar
+}
+
+// FOTO: contenedor blanco con foto que se superpone al sidebar
+.cv-elegant-photo-wrapper {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+}
+
+.cv-elegant-profile-photo {
+    border: 4px solid white;
+    border-radius: 50%;
+    overflow: hidden;
+    width: 120px;
+    height: 120px;
+    flex-shrink: 0;
+    background: #fff;
+}
+
+.cv-elegant-profile-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+// Secciones del sidebar
+.cv-elegant-sidebar-section {
+    margin-bottom: 20px;
+}
+
+.cv-elegant-sidebar-title {
+    color: white;
+    font-size: var(--size-subtitle, 14px);
+    font-family: var(--font-secondary, 'Montserrat', 'Arial', sans-serif);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 16px 0;
+}
+
+// Competencias e idiomas en sidebar
+.cv-elegant-sidebar-competences,
+.cv-elegant-sidebar-languages {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.cv-elegant-sidebar-competence-item,
+.cv-elegant-sidebar-language-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.cv-elegant-sidebar-competence-name,
+.cv-elegant-sidebar-language-name {
+    color: white;
+    font-size: var(--size-paragraph, 14px);
+    font-family: var(--font-primary, 'Montserrat', 'Arial', sans-serif);
+    font-weight: 400;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.cv-elegant-sidebar-progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.cv-elegant-sidebar-progress-fill {
+    height: 100%;
+    background: v-bind(elegantColor);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+// Hobbies en sidebar
+.cv-elegant-sidebar-hobbies {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cv-elegant-sidebar-hobby-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    font-size: var(--size-paragraph, 14px);
+    font-family: var(--font-primary, 'Montserrat', 'Arial', sans-serif);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+
+    span {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        word-break: break-word;
+    }
+}
+
+.cv-elegant-sidebar-hobby-bullet {
+    width: 8px;
+    height: 8px;
+    background: v-bind(elegantColor);
+    flex-shrink: 0;
+    display: block;
 }
 
 // Contenedor principal de la tarjeta
@@ -1166,53 +1505,34 @@ defineExpose({
 
 .cv-elegant-card {
     background: #ffffff;
-    border-radius: 22px;
+    border-radius: 0;
     box-shadow: 0 32px 60px rgba(15, 23, 42, 0.18);
     padding: 44px 52px 54px;
     width: 100%;
-    max-width: 620px;
+    max-width: 100%;
     overflow: visible;
+    height: auto;
+    flex: 1;
+    min-width: 0;
 }
 
-// HEADER: franja verde superior
+// HEADER: franja teal superior que se superpone al sidebar
 .cv-elegant-header {
+    position: relative;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 32px;
-    background: #29ff37;
-    border-radius: 18px;
-    padding: 30px 38px;
-    box-shadow: 0 24px 48px rgba(41, 255, 55, 0.25);
+    background: v-bind(elegantColor);
+    border-radius: 0;
+    padding: 30px 38px 40px 38px; // Padding simétrico para centrar el contenido
+    box-shadow: 0 24px 48px v-bind(elegantColorRgba);
     margin-bottom: 48px;
-    width: 100%;
-}
-
-// Caja blanca para el contenido
-.cv-elegant-content-box {
-    display: flex;
-    flex-direction: column;
-    gap: 36px;
-    width: 100%;
-}
-
-// FOTO: avatar circular con borde oscuro
-.cv-elegant-profile-photo {
-    border: 6px solid #11131b;
-    border-radius: 50%;
-    overflow: hidden;
-    width: 118px;
-    height: 118px;
-    flex-shrink: 0;
-    box-shadow: 0 18px 30px rgba(0, 0, 0, 0.32);
-    background: #fff;
-}
-
-// Ajuste para que la imagen llene el contenedor
-.cv-elegant-profile-photo img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+    margin-left: -287px; // Se extiende hasta donde empieza el texto de competencias (24px desde el borde del sidebar)
+    width: calc(100% + 287px); // Compensa el margin negativo
+    z-index: 10;
+    min-height: 180px; // Altura mínima para dar más espacio a la imagen
+    
 }
 
 // INFO (nombre y datos de contacto)
@@ -1220,59 +1540,57 @@ defineExpose({
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
     gap: 12px;
+    flex: 1;
+    text-align: center;
 }
 
 .cv-elegant-info h1 {
-    font-size: 36px;
-    color: #0b0d16;
+    font-size: var(--size-title, 36px);
+    font-family: var(--font-secondary, 'Montserrat', 'Arial', sans-serif);
+    color: white;
     margin: 0;
     font-weight: 700;
     letter-spacing: 1.2px;
     text-transform: uppercase;
     line-height: 1.05;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
-.cv-elegant-job-title {
-    font-size: 17px;
-    color: #0b0d16;
-    margin: 2px 0 14px 0;
-    font-weight: 500;
-    letter-spacing: 0.6px;
-    line-height: 1.2;
-}
-
-// Contacto con iconos modernos
+// Contacto con iconos en header teal
 .cv-elegant-contact {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    margin-top: 6px;
+    margin-top: 12px;
 }
 
 .cv-elegant-contact-item {
     display: flex;
     align-items: center;
     gap: 12px;
-    color: #0f172a;
-    font-size: 15px;
-    font-weight: 500;
-}
-
-.cv-elegant-contact-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 12px;
-    background: #111621;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    box-shadow: 0 12px 24px rgba(17, 24, 39, 0.25);
+    color: white;
+    font-size: var(--size-paragraph, 15px);
+    font-family: var(--font-primary, 'Montserrat', 'Arial', sans-serif);
+    font-weight: 400;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
 
     i {
-        font-size: 15px;
-        color: #f8fafc;
+        font-size: 16px;
+        width: 20px;
+    flex-shrink: 0;
+    }
+
+    span {
+        min-width: 0;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        word-break: break-word;
     }
 }
 
@@ -1281,34 +1599,39 @@ defineExpose({
     display: flex;
     flex-direction: column;
     gap: 16px;
+    margin-bottom: 24px;
 }
 
-.cv-elegant-section-header {
-    display: flex;
-    align-items: center;
-}
-
-.cv-elegant-section-badge {
+.cv-elegant-section-title {
     display: inline-block;
-    background: #29ff37;
-    color: #040707;
-    padding: 10px 22px;
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 1.1px;
+    width: fit-content;
+    background: v-bind(elegantColor);
+    color: white;
+    font-size: var(--size-subtitle, 14px);
+    font-family: var(--font-secondary, 'Montserrat', 'Arial', sans-serif);
+    font-weight: 600;
     text-transform: uppercase;
-    box-shadow: 0 6px 16px rgba(41, 255, 55, 0.2);
+    letter-spacing: 0.5px;
+    margin: 0 0 16px 0;
+    padding: 10px 20px;
+    white-space: nowrap;
 }
 
 .cv-elegant-section-text {
     color: #1f2937;
     line-height: 1.7;
-    font-size: 14px;
+    font-size: var(--size-paragraph, 14px);
+    font-family: var(--font-primary, 'Montserrat', 'Arial', sans-serif);
     font-weight: 400;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
 
     :deep(p) {
         margin: 0 0 0.85rem 0;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        word-break: break-word;
 
         &:last-child {
             margin-bottom: 0;
@@ -1319,11 +1642,13 @@ defineExpose({
 // Items (experiencia / educación)
 .cv-elegant-item {
     padding-bottom: 1.3rem;
+    margin-bottom: 1.3rem;
     border-bottom: 1px solid #e6e8eb;
 
     &:last-child {
         border-bottom: none;
         padding-bottom: 0;
+        margin-bottom: 0;
     }
 }
 
@@ -1333,120 +1658,64 @@ defineExpose({
     gap: 16px;
     align-items: flex-start;
     margin-bottom: 8px;
+
+    > div {
+        min-width: 0;
+        flex: 1;
+    }
 }
 
 .cv-elegant-item-title {
-    font-size: 16px;
+    font-size: var(--size-subtitle, 16px);
+    font-family: var(--font-secondary, 'Montserrat', 'Arial', sans-serif);
     font-weight: 700;
-    color: #0b0d16;
-    margin: 0 0 4px 0;
+    color: #1f2937;
+    margin: 0;
     line-height: 1.3;
-}
-
-.cv-elegant-item-company {
-    font-size: 14px;
-    font-weight: 500;
-    color: #4b5563;
-    display: block;
-    line-height: 1.4;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .cv-elegant-item-date {
-    font-size: 13px;
-    color: #60708a;
-    font-weight: 500;
+    font-size: var(--size-paragraph, 13px);
+    font-family: var(--font-primary, 'Montserrat', 'Arial', sans-serif);
+    color: #6b7280;
+    font-weight: 400;
     white-space: nowrap;
     flex-shrink: 0;
 }
 
-// Ubicación y descripción
-.cv-elegant-item-location {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: #6b7280;
-    margin-bottom: 10px;
-    
-    i {
-        font-size: 13px;
-        color: #29ff37;
-    }
+.cv-elegant-item-meta {
+    font-size: var(--size-paragraph, 14px);
+    font-family: var(--font-primary, 'Montserrat', 'Arial', sans-serif);
+    color: #4b5563;
+    font-weight: 400;
+    margin-bottom: 8px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .cv-elegant-item-description {
     color: #1f2937;
     line-height: 1.7;
-    font-size: 14px;
+    font-size: var(--size-paragraph, 14px);
+    font-family: var(--font-primary, 'Montserrat', 'Arial', sans-serif);
     margin-top: 8px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
 
     :deep(p) {
         margin: 0 0 0.55rem 0;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        word-break: break-word;
 
         &:last-child {
             margin-bottom: 0;
         }
-    }
-}
-
-// Competencias / idiomas / hobbies
-.cv-elegant-competences,
-.cv-elegant-languages {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.cv-elegant-competence-item,
-.cv-elegant-language-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid #e7eaee;
-
-    &:last-child {
-        border-bottom: none;
-    }
-}
-
-.cv-elegant-competence-name {
-    font-weight: 600;
-    color: #0b0d16;
-    font-size: 14px;
-}
-
-.cv-elegant-competence-level {
-    font-size: 13px;
-    color: #6b7280;
-    font-weight: 500;
-}
-
-.cv-elegant-language-level {
-    font-size: 13px;
-    color: #6b7280;
-    font-weight: 500;
-}
-
-.cv-elegant-hobbies {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.cv-elegant-hobby-tag {
-    padding: 8px 14px;
-    background: #f3f4f6;
-    border: 1px solid #e2e5e9;
-    border-radius: 20px;
-    font-size: 13px;
-    color: #1f2937;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    
-    &:hover {
-        background: #e9edf1;
-        border-color: #29ff37;
     }
 }
 
@@ -1482,8 +1751,22 @@ defineExpose({
 
     .cv-elegant-sidebar {
         width: 100%;
-        height: 220px;
-        border-radius: 24px;
+        border-radius: 0;
+        padding: 24px;
+    }
+
+    .cv-elegant-sidebar-content {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 24px;
+        justify-content: center;
+        margin-top: 0; // Sin espacio para la foto en responsive
+    }
+
+    .cv-elegant-sidebar-section {
+        flex: 1;
+        min-width: 200px;
     }
 
     .cv-elegant-main {
@@ -1498,8 +1781,19 @@ defineExpose({
 
     .cv-elegant-header {
         flex-direction: column;
-        align-items: center;
-        text-align: center;
+        align-items: flex-start;
+        text-align: left;
+        padding: 30px 38px;
+        margin-left: 0; // Sin superposición en responsive
+        width: 100%; // Ancho normal en responsive
+    }
+
+    .cv-elegant-photo-wrapper {
+        position: static;
+        left: auto;
+        top: auto;
+        transform: none;
+        margin: 0 auto 20px;
     }
 
     .cv-elegant-info h1 {
@@ -1515,12 +1809,28 @@ defineExpose({
     .cv-elegant-header {
         gap: 20px;
         padding: 24px;
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .cv-elegant-sidebar-content {
+        flex-direction: column;
+        margin-top: 0;
+    }
+    
+    .cv-elegant-photo-wrapper {
+        width: 120px;
+        height: 120px;
+        position: static;
+        left: auto;
+        top: auto;
+        transform: none;
+        margin: 0 auto 20px;
     }
 
     .cv-elegant-profile-photo {
-        width: 96px;
-        height: 96px;
-        border-width: 5px;
+        width: 100px;
+        height: 100px;
     }
 
     .cv-elegant-info h1 {

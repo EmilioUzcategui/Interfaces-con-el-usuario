@@ -92,59 +92,21 @@ router.post('/', uploadCVImage.single('cvImage'), async (req, res) => {
         // Ruta del archivo relativa para guardar en la BD
         const filePath = `/uploads/users/${req.file.filename}`;
 
-        // Verificar si ya existe un CV para este usuario
-        const existingCV = await pool.query(
-            'SELECT id_cv, file_path FROM cvs WHERE user_id = $1',
-            [userId]
+        // Siempre crear un nuevo CV (no actualizar el existente)
+        const result = await pool.query(
+            `INSERT INTO cvs (
+                user_id,
+                file_path,
+                uploaded_at
+            ) VALUES ($1, $2, CURRENT_TIMESTAMP) RETURNING id_cv`,
+            [userId, filePath]
         );
 
-        if (existingCV.rows.length > 0) {
-            // Actualizar CV existente
-            const cvId = existingCV.rows[0].id_cv;
-            const oldFilePath = existingCV.rows[0].file_path;
-
-            // Eliminar el archivo anterior si existe
-            if (oldFilePath) {
-                try {
-                    const oldFullPath = path.resolve(`./backend/public${oldFilePath}`);
-                    if (fs.existsSync(oldFullPath)) {
-                        fs.unlinkSync(oldFullPath);
-                    }
-                } catch (e) {
-                    console.error('Error al eliminar archivo anterior:', e);
-                }
-            }
-
-            await pool.query(
-                `UPDATE cvs SET 
-                    file_path = $1,
-                    uploaded_at = CURRENT_TIMESTAMP
-                WHERE id_cv = $2`,
-                [filePath, cvId]
-            );
-
-            res.json({
-                message: 'CV actualizado exitosamente',
-                cvId: cvId,
-                filePath: filePath
-            });
-        } else {
-            // Crear nuevo CV
-            const result = await pool.query(
-                `INSERT INTO cvs (
-                    user_id,
-                    file_path,
-                    uploaded_at
-                ) VALUES ($1, $2, CURRENT_TIMESTAMP) RETURNING id_cv`,
-                [userId, filePath]
-            );
-
-            res.status(201).json({
-                message: 'CV creado exitosamente',
-                cvId: result.rows[0].id_cv,
-                filePath: filePath
-            });
-        }
+        res.status(201).json({
+            message: 'CV creado exitosamente',
+            cvId: result.rows[0].id_cv,
+            filePath: filePath
+        });
     } catch (error) {
         console.error('Error al guardar CV:', error);
 
@@ -190,11 +152,20 @@ router.get('/:userId', async (req, res) => {
     }
 });
 
-// GET /api/cv - Obtener todos los CVs (opcional, para administración)
+// GET /api/cv - Obtener todos los CVs con información del usuario
 router.get('/', async (req, res) => {
     try {
         const result = await pool.query(
-            'SELECT id_cv, user_id, file_path, uploaded_at FROM cvs ORDER BY uploaded_at DESC'
+            `SELECT 
+                c.id_cv, 
+                c.user_id, 
+                c.file_path, 
+                c.uploaded_at,
+                u.name,
+                u.email
+            FROM cvs c
+            INNER JOIN users u ON c.user_id = u.id_user
+            ORDER BY c.uploaded_at DESC`
         );
 
         res.json(result.rows);

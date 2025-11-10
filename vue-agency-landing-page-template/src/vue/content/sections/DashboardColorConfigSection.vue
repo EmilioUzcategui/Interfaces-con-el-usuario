@@ -1613,16 +1613,56 @@ const loadTypography = async (item) => {
     })
     if (!result.isConfirmed) return
 
-    const response = await fetch(`http://localhost:3000/api/tipografias/${item.id}/activate`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'  // ✅ Indica que envías JSON
-        },
-        body: JSON.stringify({active: true})  // ✅ Convierte el objeto a string JSON
+    // Verificar si el ID es numérico (ID real de la base de datos)
+    const idStr = String(item.id || '')
+    const isNumeric = /^\d+$/.test(idStr)
+    
+    if (!isNumeric) {
+        // Si el ID no es numérico, buscar la tipografía por nombre en la base de datos
+        try {
+            const resp = await fetch('http://localhost:3000/api/tipografias')
+            if (resp.ok) {
+                const data = await resp.json()
+                const found = data.find(t => t.nombre === item.name || t.id_tipografia === item.id)
+                if (found && found.id_tipografia) {
+                    // Usar el ID real de la base de datos
+                    const realId = String(found.id_tipografia)
+                    const response = await fetch(`http://localhost:3000/api/tipografias/${realId}/activar`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    if (!response.ok) {
+                        const t = await response.text().catch(()=>'')
+                        console.error(`Error activating typography on server: ${response.status} ${t}`)
+                        Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo activar la tipografía en el servidor.' })
+                        return
+                    }
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'No se encontró la tipografía en el servidor.' })
+                    return
+                }
+            }
+        } catch (err) {
+            console.error('Error buscando tipografía en servidor:', err)
+            Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo buscar la tipografía en el servidor.' })
+            return
+        }
+    } else {
+        // El ID es numérico, usar directamente
+        const response = await fetch(`http://localhost:3000/api/tipografias/${idStr}/activar`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            }
         });
-    if (!response.ok) {
-        const t = await response.text().catch(()=>'')
-        console.error(`Error activating typography on server: ${response.status} ${t}`)
+        if (!response.ok) {
+            const t = await response.text().catch(()=>'')
+            console.error(`Error activating typography on server: ${response.status} ${t}`)
+            Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo activar la tipografía en el servidor.' })
+            return
+        }
     }
 
 

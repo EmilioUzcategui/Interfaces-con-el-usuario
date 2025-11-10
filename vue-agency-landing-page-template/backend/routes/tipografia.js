@@ -96,6 +96,7 @@ router.put("/:id", async (req, res) => {
 router.put("/:id/activar", async (req, res) => {
     try {
         const { id } = req.params
+        console.log("ID de la tipografía a activar:", id)   
         
         // Primero desactivar todas
         await pool.query("UPDATE tipografia SET active = false")

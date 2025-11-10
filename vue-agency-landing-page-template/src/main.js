@@ -6,6 +6,8 @@ import HomePage from "/src/vue/content/pages/HomePage.vue"
 import LoginPage from "/src/vue/content/pages/LoginPage.vue"
 import RegisterPage from "/src/vue/content/pages/RegisterPage.vue"
 import DashboardPage from "/src/vue/content/pages/DashboardPage.vue"
+import AppearanceConfigPage from "/src/vue/content/pages/AppearanceConfigPage.vue"
+import CurriculumsPage from "/src/vue/content/pages/CurriculumsPage.vue"
 import LicensePage from "/src/vue/content/pages/LicensePage.vue"
 import PolicyPage from "/src/vue/content/pages/PolicyPage.vue"
 import CVPage from "/src/vue/content/pages/CVPage.vue"
@@ -65,6 +67,36 @@ const router = createRouter({
                 inPageNavbar: false,
                 shouldAlwaysPreload: false,
                 breadcrumbs: []
+            }
+        },
+
+        {
+            path: "/dashboard/appearance",
+            name: "appearance-config",
+            component: AppearanceConfigPage,
+            props: {
+                label: "Configuración de Apariencia",
+                faIcon: "fa-solid fa-palette",
+                inPageNavbar: false,
+                shouldAlwaysPreload: false,
+                breadcrumbs: [
+                    "/dashboard"
+                ]
+            }
+        },
+
+        {
+            path: "/dashboard/curriculums",
+            name: "curriculums",
+            component: CurriculumsPage,
+            props: {
+                label: "Curriculums",
+                faIcon: "fa-solid fa-file-alt",
+                inPageNavbar: false,
+                shouldAlwaysPreload: false,
+                breadcrumbs: [
+                    "/dashboard"
+                ]
             }
         },
 

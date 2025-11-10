@@ -6,6 +6,7 @@ import authRoutes from './routes/auth.js';
 import colorRoutes from './routes/color.js';
 import tipografiaRoutes from './routes/tipografia.js';
 import uploadsRoutes from './routes/uploads.js';
+import cvRoutes from './routes/cv.js';
 import initPalettes from './init-palettes.js';
 import { fileURLToPath } from 'url'
 import path from 'path'
@@ -32,6 +33,7 @@ app.use('/api', authRoutes);
 app.use('/api/colors', colorRoutes);
 app.use('/api/tipografias', tipografiaRoutes);
 app.use('/api/uploads', uploadsRoutes);
+app.use('/api/cv', cvRoutes);
 
 
 // Ruta de prueba

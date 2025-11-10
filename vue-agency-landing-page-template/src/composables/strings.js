@@ -44,7 +44,12 @@ const MAP = {
     "logout": "Sign Out",
     "register_title": "Crear Cuenta",
     "register_subtitle": "Únete a nosotros",
-    "register_description": "Completa el formulario para crear tu cuenta y comenzar a usar nuestros servicios."
+    "register_description": "Completa el formulario para crear tu cuenta y comenzar a usar nuestros servicios.",
+    "cv_title": "Crear CV Profesional",
+    "cv_subtitle": "Completa tu información para crear un CV profesional",
+    "cv_description": "Llena todos los campos requeridos para generar tu currículum",
+    "saving_cv": "Guardando CV...",
+    "error_saving_cv": "Error al guardar el CV"
 }
 
 export function useStrings() {

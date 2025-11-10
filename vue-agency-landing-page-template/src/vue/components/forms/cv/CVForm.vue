@@ -24,7 +24,7 @@ const props = defineProps({
     }
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'submit-success'])
 
 const router = useRouter()
 const layout = useLayout()
@@ -51,10 +51,9 @@ const errorMessage = computed(() => {
 })
 
 const _onFormSubmit = async (cvData) => {
-    // Iniciar spinner y que dure un segundo mínimo
+    // Iniciar spinner
     setSpinnerEnabled && setSpinnerEnabled(true, strings.get('saving_cv') || 'Guardando CV...')
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
+    
     try {
         // Obtener usuario actual del localStorage
         const userData = localStorage.getItem('currentUser')
@@ -64,52 +63,19 @@ const _onFormSubmit = async (cvData) => {
 
         const user = JSON.parse(userData)
         
-        // Agregar el ID del usuario a los datos del CV
-        const cvDataWithUser = {
-            ...cvData,
-            userId: user.id_user
-        }
-
-        const response = await fetch('http://localhost:3000/api/cv', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(cvDataWithUser)
-        })
-
-        const data = await response.json()
+        // Emitir evento de éxito para que se pueda capturar y enviar la imagen
+        // El envío real al backend se hace desde CVSection después de capturar la imagen
+        emit('submit-success', user.id_user)
         
         _resetScroll()
-        setSpinnerEnabled && setSpinnerEnabled(false)
         
-        if (response.ok) {
-            // Mostrar mensaje de éxito
-            apiResponse.value = {
-                success: true,
-                data: data
-            }
-            successMessage.value = 'CV guardado exitosamente'
-            
-            // Limpiar mensaje después de 5 segundos y resetear el formulario
-            setTimeout(() => {
-                successMessage.value = null
-                // Resetear el formulario después de mostrar el éxito
-                apiResponse.value = null
-            }, 5000)
-        } else {
-            // Mostrar error
-            apiResponse.value = {
-                success: false, 
-                error: data.error || 'Error al guardar el CV'
-            }
-        }
+        // El spinner se desactivará cuando se complete el envío de la imagen en CVSection
     } catch (error) {
-        console.error('Error al guardar CV:', error)
+        console.error('Error al procesar formulario:', error)
         setSpinnerEnabled && setSpinnerEnabled(false)
         apiResponse.value = {
             success: false, 
-            error: error.message || 'Error de conexión. Intenta de nuevo.'
+            error: error.message || 'Error al procesar el formulario.'
         }
     }
 }

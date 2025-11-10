@@ -25,7 +25,7 @@ const projectModalTarget = inject("projectModalTarget")
 const LoaderAnimationStatus = inject("LoaderAnimationStatus")
 const loaderAnimationStatus = inject("loaderAnimationStatus")
 
-const excludedNames = new Set(["dashboard", "login", "register"])
+const excludedNames = new Set(["dashboard", "login", "register", "appearance-config", "curriculums"])
 const isExcludedRoute = computed(() => excludedNames.has(route.name))
 
 const shouldSlot = computed(() => {

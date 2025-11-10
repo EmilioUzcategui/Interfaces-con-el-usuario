@@ -122,4 +122,34 @@ router.post('/login', async (req, res) => {
     }
 });
 
+router.get('/users/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await pool.query(
+            'SELECT id_user, name, email FROM users WHERE id_user = $1',
+            [id]
+        );
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+        const user = result.rows[0];
+        res.json(user);
+    } catch (error) {
+        console.error('Error al obtener usuario:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+router.get('/users', async (req, res) => {
+    try {
+        const result = await pool.query(
+            'SELECT id_user, name, email FROM users'
+        );
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error al obtener usuarios:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
 export default router;

@@ -33,7 +33,7 @@ const spinnerActive = inject("spinnerActive")
 const spinnerMessage = inject("spinnerMessage")
 
 const route = useRoute()
-const excludedNames = new Set(["dashboard", "login", "register"]) 
+const excludedNames = new Set(["dashboard", "login", "register", "appearance-config", "curriculums"]) 
 const isExcludedRoute = computed(() => excludedNames.has(route.name))
 
 const isReady = computed(() => {

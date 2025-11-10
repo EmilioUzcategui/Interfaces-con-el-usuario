@@ -109,21 +109,15 @@ const dashboardLinks = ref([
         icon: 'fa-solid fa-globe'
     },
     {
-        id: 'stats',
-        label: 'Estadísticas',
-        url: '#dashboard-stats',
-        icon: 'fa-solid fa-chart-line'
-    },
-    {
-        id: 'features',
-        label: 'Características',
-        url: '#dashboard-features',
-        icon: 'fa-solid fa-star'
+        id: 'curriculums',
+        label: 'Curriculums',
+        url: '/dashboard/curriculums',
+        icon: 'fa-solid fa-file-alt'
     },
     {
         id: 'config',
-        label: 'Configuración',
-        url: '#dashboard-color-config',
+        label: 'Configuración de Apariencia',
+        url: '/dashboard/appearance',
         icon: 'fa-solid fa-palette'
     }
 ])

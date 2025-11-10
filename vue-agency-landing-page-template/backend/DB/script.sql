@@ -34,4 +34,10 @@ create table tipografia (
 
 update tipografia set active = true where id_tipografia = 1;
 
-
+-- Tabla de CVs
+create table cvs (
+    id_cv integer primary key,
+    user_id integer not null references users(id_user) on delete cascade,
+    file_path varchar(255) not null,
+    uploaded_at timestamp default current_timestamp
+);

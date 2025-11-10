@@ -278,6 +278,7 @@
                                 class="form-select" 
                                 :id="`edu-start-month-${index}`"
                                 v-model="edu.startMonth"
+                                @change="validateEducation(index)"
                             >
                                 <option value="">Selecciona</option>
                                 <option v-for="month in months" :key="month.value" :value="month.value">{{ month.label }}</option>
@@ -308,6 +309,7 @@
                                 class="form-select" 
                                 :id="`edu-end-month-${index}`"
                                 v-model="edu.endMonth"
+                                @change="validateEducation(index)"
                             >
                                 <option value="">Selecciona</option>
                                 <option v-for="month in months" :key="month.value" :value="month.value">{{ month.label }}</option>
@@ -320,17 +322,22 @@
                                 class="form-select" 
                                 :id="`edu-end-year-${index}`"
                                 v-model="edu.endYear"
+                                :class="{ 'is-invalid': errors.education?.[index]?.endYear }"
+                                @change="validateEducation(index)"
                             >
                                 <option value="">Selecciona</option>
                                 <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
                             </select>
+                            <div v-if="errors.education?.[index]?.endYear" class="invalid-feedback">
+                                {{ errors.education[index].endYear }}
+                            </div>
                             <div class="form-check mt-2">
                                 <input 
                                     class="form-check-input" 
                                     type="checkbox" 
                                     :id="`edu-current-${index}`"
                                     v-model="edu.current"
-                                    @change="edu.current ? (edu.endMonth = '', edu.endYear = '') : null"
+                                    @change="handleEducationCurrentToggle(index)"
                                 >
                                 <label class="form-check-label" :for="`edu-current-${index}`">
                                     En curso
@@ -431,6 +438,7 @@
                                 class="form-select" 
                                 :id="`exp-start-month-${index}`"
                                 v-model="exp.startMonth"
+                                @change="validateExperience(index)"
                             >
                                 <option value="">Selecciona</option>
                                 <option v-for="month in months" :key="month.value" :value="month.value">{{ month.label }}</option>
@@ -461,6 +469,7 @@
                                 class="form-select" 
                                 :id="`exp-end-month-${index}`"
                                 v-model="exp.endMonth"
+                                @change="validateExperience(index)"
                             >
                                 <option value="">Selecciona</option>
                                 <option v-for="month in months" :key="month.value" :value="month.value">{{ month.label }}</option>
@@ -473,17 +482,22 @@
                                 class="form-select" 
                                 :id="`exp-end-year-${index}`"
                                 v-model="exp.endYear"
+                                :class="{ 'is-invalid': errors.experience?.[index]?.endYear }"
+                                @change="validateExperience(index)"
                             >
                                 <option value="">Selecciona</option>
                                 <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
                             </select>
+                            <div v-if="errors.experience?.[index]?.endYear" class="invalid-feedback">
+                                {{ errors.experience[index].endYear }}
+                            </div>
                             <div class="form-check mt-2">
                                 <input 
                                     class="form-check-input" 
                                     type="checkbox" 
                                     :id="`exp-current-${index}`"
                                     v-model="exp.current"
-                                    @change="exp.current ? (exp.endMonth = '', exp.endYear = '') : null"
+                                    @change="handleExperienceCurrentToggle(index)"
                                 >
                                 <label class="form-check-label" :for="`exp-current-${index}`">
                                     Trabajo actual
@@ -557,6 +571,66 @@
                             <strong>{{ comp.name }}</strong> - <span class="text-muted">{{ comp.level }}</span>
                         </div>
                         <button type="button" class="btn btn-sm btn-outline-danger" @click="removeCompetence(index)">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Habilidades (solo para plantilla Elegante) -->
+            <div v-if="selectedTemplate && selectedTemplate.value === 'elegant'" class="form-section">
+                <h3 class="section-title">
+                    <i class="fa-solid fa-tools me-2"></i>
+                    Habilidades
+                </h3>
+                
+                <div class="skill-input mb-3 p-3 border rounded">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="skill-name" class="form-label">Habilidad</label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="skill-name"
+                                v-model="skillInput.name"
+                                placeholder="Ej: JavaScript, Vue.js..."
+                            >
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="skill-level" class="form-label">Nivel</label>
+                            <select 
+                                class="form-select" 
+                                id="skill-level"
+                                v-model="skillInput.level"
+                            >
+                                <option value="">Selecciona un nivel</option>
+                                <option value="Básico">Básico</option>
+                                <option value="Intermedio">Intermedio</option>
+                                <option value="Avanzado">Avanzado</option>
+                                <option value="Experto">Experto</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-primary" @click="addSkill">
+                            <i class="fa-solid fa-plus me-1"></i>
+                            Agregar Habilidad
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" @click="clearSkillInput">
+                            <i class="fa-solid fa-eraser me-1"></i>
+                            Limpiar Campos
+                        </button>
+                    </div>
+                </div>
+
+                <div v-if="form.skills.length > 0" class="skills-list">
+                    <div v-for="(skill, index) in form.skills" :key="index" class="skill-item mb-2 p-2 border rounded d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ skill.name }}</strong> - <span class="text-muted">{{ skill.level }}</span>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-danger" @click="removeSkill(index)">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </div>
@@ -696,6 +770,7 @@ const emit = defineEmits(['submit', 'update:formData']);
 
 const setSpinnerEnabled = inject("setSpinnerEnabled", null);
 const spinnerEnabled = inject("spinnerEnabled", ref(false));
+const selectedTemplate = inject('selectedTemplate', ref('modern'));
 
 const loading = ref(false);
 
@@ -724,6 +799,32 @@ const months = [
     { value: '11', label: 'Noviembre' },
     { value: '12', label: 'Diciembre' }
 ];
+
+const getYearNumber = (value) => value ? parseInt(value, 10) : null;
+const getMonthNumber = (value) => value ? parseInt(value, 10) : null;
+const isDateRangeInvalid = (startYear, startMonth, endYear, endMonth) => {
+    const startYearNum = getYearNumber(startYear);
+    const endYearNum = getYearNumber(endYear);
+
+    if (startYearNum === null || endYearNum === null) {
+        return false;
+    }
+
+    if (endYearNum < startYearNum) {
+        return true;
+    }
+
+    if (endYearNum === startYearNum) {
+        const startMonthNum = getMonthNumber(startMonth);
+        const endMonthNum = getMonthNumber(endMonth);
+
+        if (startMonthNum !== null && endMonthNum !== null && endMonthNum < startMonthNum) {
+            return true;
+        }
+    }
+
+    return false;
+};
 
 const form = reactive({
     personalInfo: {
@@ -761,6 +862,7 @@ const form = reactive({
         description: ''
     }],
     competences: [],
+    skills: [], // Habilidades solo para plantilla elegant
     languages: [],
     hobbies: []
 });
@@ -780,6 +882,11 @@ const competenceInput = reactive({
 });
 
 const languageInput = reactive({
+    name: '',
+    level: ''
+});
+
+const skillInput = reactive({
     name: '',
     level: ''
 });
@@ -868,6 +975,7 @@ const validateExperience = (index) => {
     delete errors.experience[index].employer;
     delete errors.experience[index].location;
     delete errors.experience[index].startYear;
+    delete errors.experience[index].endYear;
     
     if (!exp.position.trim()) {
         errors.experience[index].position = 'El puesto es requerido';
@@ -881,6 +989,16 @@ const validateExperience = (index) => {
     if (!exp.startYear) {
         errors.experience[index].startYear = 'El año de inicio es requerido';
     }
+
+    if (!exp.current && exp.endYear) {
+        if (isDateRangeInvalid(exp.startYear, exp.startMonth, exp.endYear, exp.endMonth)) {
+            errors.experience[index].endYear = 'La fecha de fin debe ser posterior a la de inicio.';
+        }
+    }
+
+    if (exp.current) {
+        delete errors.experience[index].endYear;
+    }
 };
 
 const validateEducation = (index) => {
@@ -893,6 +1011,7 @@ const validateEducation = (index) => {
     delete errors.education[index].institution;
     delete errors.education[index].location;
     delete errors.education[index].startYear;
+    delete errors.education[index].endYear;
     
     if (!edu.formation.trim()) {
         errors.education[index].formation = 'La formación es requerida';
@@ -906,6 +1025,34 @@ const validateEducation = (index) => {
     if (!edu.startYear) {
         errors.education[index].startYear = 'El año de inicio es requerido';
     }
+
+    if (!edu.current && edu.endYear) {
+        if (isDateRangeInvalid(edu.startYear, edu.startMonth, edu.endYear, edu.endMonth)) {
+            errors.education[index].endYear = 'La fecha de fin debe ser posterior a la de inicio.';
+        }
+    }
+
+    if (edu.current) {
+        delete errors.education[index].endYear;
+    }
+};
+
+const handleExperienceCurrentToggle = (index) => {
+    const exp = form.experience[index];
+    if (exp.current) {
+        exp.endMonth = '';
+        exp.endYear = '';
+    }
+    validateExperience(index);
+};
+
+const handleEducationCurrentToggle = (index) => {
+    const edu = form.education[index];
+    if (edu.current) {
+        edu.endMonth = '';
+        edu.endYear = '';
+    }
+    validateEducation(index);
 };
 
 const addExperience = () => {
@@ -965,6 +1112,25 @@ const removeCompetence = (index) => {
 const clearCompetenceInput = () => {
     competenceInput.name = '';
     competenceInput.level = '';
+};
+
+const addSkill = () => {
+    if (skillInput.name.trim() && skillInput.level) {
+        form.skills.push({
+            name: skillInput.name.trim(),
+            level: skillInput.level
+        });
+        clearSkillInput();
+    }
+};
+
+const removeSkill = (index) => {
+    form.skills.splice(index, 1);
+};
+
+const clearSkillInput = () => {
+    skillInput.name = '';
+    skillInput.level = '';
 };
 
 const addLanguage = () => {
@@ -1058,6 +1224,7 @@ const handleSubmit = async (e) => {
         education: form.education.filter(edu => edu.formation.trim() || edu.institution.trim()),
         experience: form.experience.filter(exp => exp.position.trim() || exp.employer.trim()),
         competences: form.competences,
+        skills: form.skills, // Habilidades solo para plantilla elegant
         languages: form.languages,
         hobbies: form.hobbies
     };
@@ -1076,6 +1243,7 @@ const getFormData = () => {
         education: form.education.filter(edu => edu.formation.trim() || edu.institution.trim()),
         experience: form.experience.filter(exp => exp.position.trim() || exp.employer.trim()),
         competences: form.competences,
+        skills: form.skills, // Habilidades solo para plantilla elegant
         languages: form.languages,
         hobbies: form.hobbies
     };
@@ -1088,6 +1256,7 @@ watch(() => [
     form.education,
     form.experience,
     form.competences,
+    form.skills, // Habilidades solo para plantilla elegant
     form.languages,
     form.hobbies,
     photoPreview.value

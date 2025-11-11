@@ -9,11 +9,10 @@
 <script setup>
 import Navbar from "/src/vue/components/nav/navbar/Navbar.vue"
 import {computed, inject, onMounted, onUnmounted, ref, watch} from "vue"
-import {useRoute, useRouter} from "vue-router"
+import {useRoute} from "vue-router"
 import {useLayout} from "/src/composables/layout.js"
 
 const route = useRoute()
-const router = useRouter()
 const layout = useLayout()
 
 /**
@@ -39,7 +38,6 @@ const checkLoginStatus = () => {
 }
 
 onMounted(() => {
-    // Monitorear cambios en localStorage y eventos de login/logout
     checkLoginStatus()
     window.addEventListener('storage', checkLoginStatus)
     window.addEventListener('userLogin', checkLoginStatus)
@@ -53,23 +51,22 @@ onUnmounted(() => {
 })
 
 const linkList = computed(() => {
-    const sections = currentPageSections?.value
-    const sectionLinks = sections && sections.length ? sections.map(section => {
-        return {
+    const sections = currentPageSections?.value || []
+
+    const sectionLinks = sections
+        .filter(section => section?.name && section?.hash)
+        .map(section => ({
             path: section.hash,
             label: section.name,
             faIcon: section.faIcon,
             isActive: currentSection.value?.id === section.id
-        }
-    }).filter(section => section.label && section.path) : []
+        }))
 
-    // Si está logueado, verificar si es administrador
     if (isLoggedIn.value) {
         const userData = localStorage.getItem('currentUser')
         if (userData) {
             try {
                 const user = JSON.parse(userData)
-                // Si es administrador (id_user === 1), agregar enlace al dashboard
                 if (user.id_user === 1) {
                     const cvLink = {
                         path: '/cv',
@@ -89,7 +86,6 @@ const linkList = computed(() => {
                 console.error('Error parsing user data:', error)
             }
         }
-        // Si está logueado pero no es admin, agregar enlace de CV
         const cvLink = {
             path: '/cv',
             label: 'Crear CV',
@@ -99,7 +95,6 @@ const linkList = computed(() => {
         return [...sectionLinks, cvLink]
     }
 
-    // Agregar enlace de login al final solo si NO está logueado
     const loginLink = {
         path: '/login',
         label: 'Login',
@@ -153,7 +148,7 @@ const _onWindowEvent = () => {
         return
     }
 
-    const sections = currentPageSections?.value
+    const sections = currentPageSections?.value || []
     for (const section of sections) {
         const sectionDiv = document.querySelector(section.hash)
         if (!sectionDiv) continue

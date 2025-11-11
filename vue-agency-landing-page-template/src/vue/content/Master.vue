@@ -16,9 +16,7 @@
                               `This template is maintained and is based on the <a href='https://vuejs.org/'>Vue</a> framework and the <a href='https://getbootstrap.com/'>Bootstrap</a> framework.`
                           ]"
                           :links="[
-                              {label: `Privacy Policy`, href: `/privacy-policy`, faIcon: null},
-                              {label: `License`, href: `/license`, faIcon: null},
-                              {label: `Github Repo`, href: `https://github.com/ryanbalieiro/vue-agency-landing-page-template`, faIcon: null},
+                              {label: `Github Repo`, href: `https://github.com/ryanbalieiro/vue-agency-landing-page-template`, faIcon: null}
                           ]"
                           :displayLinksAsButtons="false"/>
 

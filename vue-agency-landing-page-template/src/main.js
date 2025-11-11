@@ -151,12 +151,9 @@ const router = createRouter({
         }
     ]
 })
-// Al navegar, si entramos a una ruta que NO es el dashboard, intentamos (re)cargar
-// la tipografía activa. Esto permite que al volver desde el dashboard al sitio
-// principal la tipografía se aplique sin necesidad de refrescar la página.
+
 router.afterEach(async (to, from) => {
     if (!to.path.includes('/dashboard')) {
-        // Sólo cargar si no hay ya estilos inyectados
         if (!document.getElementById('injected-typography')) {
             try {
                 await loadTypography()

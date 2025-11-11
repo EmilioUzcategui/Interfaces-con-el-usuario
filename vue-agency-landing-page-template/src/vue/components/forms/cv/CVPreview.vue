@@ -10,8 +10,8 @@
                         </div>
                         <div class="cv-header-info-modern">
                             <h1 class="cv-name-modern">{{ fullName }}</h1>
-                            <h2 class="cv-job-title-modern" v-if="cvData?.personalInfo?.jobTitle">
-                                {{ cvData.personalInfo.jobTitle }}
+                            <h2 class="cv-job-title-modern" v-if="jobTitleToDisplay">
+                                {{ jobTitleToDisplay }}
                             </h2>
                             <div class="cv-contact-info-modern">
                                 <div v-if="cvData?.personalInfo?.email" class="contact-item-modern">
@@ -125,8 +125,8 @@
                             <div class="cv-name-section-dark">
                                 <h1 class="cv-name-dark">{{ firstName }}</h1>
                                 <h1 class="cv-lastname-dark">{{ lastName }}</h1>
-                                <h2 class="cv-job-title-dark" v-if="cvData?.personalInfo?.jobTitle">
-                                    {{ cvData.personalInfo.jobTitle }}
+                                <h2 class="cv-job-title-dark" v-if="jobTitleToDisplay">
+                                    {{ jobTitleToDisplay }}
                                 </h2>
                             </div>
                         </div>
@@ -590,6 +590,16 @@ const fullAddress = computed(() => {
     const { address, postalCode, city } = props.cvData.personalInfo;
     const parts = [address, postalCode, city].filter(Boolean);
     return parts.join(', ') || '';
+});
+
+const jobTitleToDisplay = computed(() => {
+    const info = props.cvData?.personalInfo;
+    if (!info) return '';
+    if (!info.jobTitle) return '';
+    if (info.useJobTitleAsTitle === false) {
+        return '';
+    }
+    return info.jobTitle;
 });
 
 const hasExperience = computed(() => {

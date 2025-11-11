@@ -134,6 +134,17 @@
                         <div v-if="errors.personalInfo?.jobTitle" class="invalid-feedback">
                             {{ errors.personalInfo.jobTitle }}
                         </div>
+                        <div class="form-check form-switch mt-2">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                id="useJobTitleAsTitle"
+                                v-model="form.personalInfo.useJobTitleAsTitle"
+                            >
+                            <label class="form-check-label" for="useJobTitleAsTitle">
+                                Usar como título
+                            </label>
+                        </div>
                     </div>
 
                     <div class="col-md-6 mb-3">
@@ -1025,6 +1036,7 @@ const form = reactive({
         firstName: '',
         lastName: '',
         jobTitle: '',
+        useJobTitleAsTitle: true,
         email: '',
         phone: '',
         address: '',

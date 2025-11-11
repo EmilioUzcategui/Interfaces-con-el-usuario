@@ -7,7 +7,7 @@
     :show-button="true"
     button-icon="fa-solid fa-search"
     button-label="Find Out More"
-    button-url="#about"
+  button-url="#services"
   />
 </template>
 

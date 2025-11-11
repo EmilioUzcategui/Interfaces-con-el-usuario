@@ -274,5 +274,47 @@ router.put('/:cvId', uploadCVImage.single('cvImage'), async (req, res) => {
     }
 });
 
+// DELETE /api/cv/:cvId - Eliminar un CV
+router.delete('/:cvId', async (req, res) => {
+    try {
+        const { cvId } = req.params;
+
+        // Verificar si el CV existe y obtener la ruta del archivo
+        const cvCheck = await pool.query(
+            'SELECT id_cv, file_path FROM cvs WHERE id_cv = $1',
+            [cvId]
+        );
+
+        if (cvCheck.rows.length === 0) {
+            return res.status(404).json({ error: 'CV no encontrado' });
+        }
+
+        // Eliminar el archivo físico si existe
+        const filePath = cvCheck.rows[0].file_path;
+        if (filePath) {
+            try {
+                const fullPath = path.resolve('./backend/public', filePath);
+                if (fs.existsSync(fullPath)) {
+                    fs.unlinkSync(fullPath);
+                }
+            } catch (e) {
+                console.error('Error al eliminar archivo físico:', e);
+                // Continuar aunque falle la eliminación del archivo
+            }
+        }
+
+        // Eliminar el registro de la base de datos
+        await pool.query('DELETE FROM cvs WHERE id_cv = $1', [cvId]);
+
+        res.json({
+            message: 'CV eliminado exitosamente',
+            cvId: cvId
+        });
+    } catch (error) {
+        console.error('Error al eliminar CV:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
 export default router;
 

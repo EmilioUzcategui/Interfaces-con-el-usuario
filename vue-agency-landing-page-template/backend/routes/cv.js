@@ -123,7 +123,54 @@ router.post('/', uploadCVImage.single('cvImage'), async (req, res) => {
     }
 });
 
-// GET /api/cv/:userId - Obtener CV de un usuario
+// GET /api/cv - Obtener todos los CVs con información del usuario
+router.get('/', async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT 
+                c.id_cv, 
+                c.user_id, 
+                c.file_path, 
+                c.uploaded_at,
+                u.name,
+                u.email
+            FROM cvs c
+            INNER JOIN users u ON c.user_id = u.id_user
+            ORDER BY c.uploaded_at DESC`
+        );
+
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error al obtener CVs:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+// GET /api/cv/user/:userId - Obtener todos los CVs de un usuario específico (debe ir antes de /:userId)
+router.get('/user/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        const result = await pool.query(
+            `SELECT 
+                c.id_cv, 
+                c.user_id, 
+                c.file_path, 
+                c.uploaded_at
+            FROM cvs c
+            WHERE c.user_id = $1
+            ORDER BY c.uploaded_at DESC`,
+            [userId]
+        );
+
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error al obtener CVs del usuario:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+// GET /api/cv/:userId - Obtener CV de un usuario (último CV)
 router.get('/:userId', async (req, res) => {
     console.log('Obteniendo CV para usuario:', req.params.userId);
     try {
@@ -152,25 +199,77 @@ router.get('/:userId', async (req, res) => {
     }
 });
 
-// GET /api/cv - Obtener todos los CVs con información del usuario
-router.get('/', async (req, res) => {
+// PUT /api/cv/:cvId - Actualizar un CV existente (solo imagen y fecha)
+router.put('/:cvId', uploadCVImage.single('cvImage'), async (req, res) => {
     try {
-        const result = await pool.query(
-            `SELECT 
-                c.id_cv, 
-                c.user_id, 
-                c.file_path, 
-                c.uploaded_at,
-                u.name,
-                u.email
-            FROM cvs c
-            INNER JOIN users u ON c.user_id = u.id_user
-            ORDER BY c.uploaded_at DESC`
+        const { cvId } = req.params;
+
+        // Validar que se haya subido una imagen
+        if (!req.file) {
+            return res.status(400).json({ error: 'Imagen del CV requerida' });
+        }
+
+        // Verificar si el CV existe
+        const cvCheck = await pool.query(
+            'SELECT id_cv, file_path FROM cvs WHERE id_cv = $1',
+            [cvId]
         );
 
-        res.json(result.rows);
+        if (cvCheck.rows.length === 0) {
+            // Eliminar el archivo si el CV no existe
+            if (req.file.path) {
+                try {
+                    fs.unlinkSync(req.file.path);
+                } catch (e) {
+                    console.error('Error al eliminar archivo:', e);
+                }
+            }
+            return res.status(404).json({ error: 'CV no encontrado' });
+        }
+
+        // Eliminar la imagen anterior si existe
+        const oldFilePath = cvCheck.rows[0].file_path;
+        if (oldFilePath) {
+            try {
+                const oldFullPath = path.resolve('./backend/public', oldFilePath);
+                if (fs.existsSync(oldFullPath)) {
+                    fs.unlinkSync(oldFullPath);
+                }
+            } catch (e) {
+                console.error('Error al eliminar imagen anterior:', e);
+                // Continuar aunque falle la eliminación
+            }
+        }
+
+        // Ruta del archivo relativa para guardar en la BD
+        const filePath = `/uploads/users/${req.file.filename}`;
+
+        // Actualizar el CV (solo file_path y uploaded_at)
+        const result = await pool.query(
+            `UPDATE cvs 
+            SET file_path = $1, uploaded_at = CURRENT_TIMESTAMP 
+            WHERE id_cv = $2 
+            RETURNING id_cv, user_id, file_path, uploaded_at`,
+            [filePath, cvId]
+        );
+
+        res.json({
+            message: 'CV actualizado exitosamente',
+            cvId: result.rows[0].id_cv,
+            filePath: result.rows[0].file_path
+        });
     } catch (error) {
-        console.error('Error al obtener CVs:', error);
+        console.error('Error al actualizar CV:', error);
+
+        // Eliminar el archivo si hubo un error
+        if (req.file && req.file.path) {
+            try {
+                fs.unlinkSync(req.file.path);
+            } catch (e) {
+                console.error('Error al eliminar archivo:', e);
+            }
+        }
+
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 });

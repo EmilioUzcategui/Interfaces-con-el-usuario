@@ -121,6 +121,20 @@ router.put("/:id/activar", async (req, res) => {
     }
 })
 
+// Desactivar todas las tipografías
+router.post("/deactivate-all", async (req, res) => {
+    try {
+        await pool.query("UPDATE tipografia SET active = false")
+        
+        res.json({
+            message: "Todas las tipografías han sido desactivadas exitosamente"
+        })
+    } catch (error) {
+        console.error("Error al desactivar todas las tipografías:", error)
+        res.status(500).json({ error: "Error al desactivar todas las tipografías" })
+    }
+})
+
 // Eliminar tipografía
 router.delete("/:id", async (req, res) => {
     try {

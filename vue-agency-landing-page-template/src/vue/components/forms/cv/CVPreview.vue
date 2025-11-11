@@ -1193,7 +1193,7 @@ defineExpose({
         .cv-job-title-modern {
             font-size: 1.25rem;
             font-weight: 500;
-            color: var(--secondary-color, #ff5900);
+            color: white;
             margin: 0 0 1rem 0;
         }
 
@@ -1210,7 +1210,7 @@ defineExpose({
                 font-size: 0.9rem;
 
                 i {
-                    color: var(--secondary-color, #ff5900);
+                    color: white;
                     width: 16px;
                 }
             }
@@ -1232,7 +1232,7 @@ defineExpose({
         align-items: center;
 
         i {
-            color: var(--secondary-color, #ff5900);
+            color: white;
         }
     }
 
@@ -1265,7 +1265,7 @@ defineExpose({
         .cv-item-company-modern {
             font-size: 1rem;
             font-weight: 500;
-            color: var(--secondary-color, #ff5900);
+            color: white;
         }
     }
 
@@ -1277,7 +1277,7 @@ defineExpose({
         color: $text-muted;
 
         .cv-item-location-modern i {
-            color: var(--secondary-color, #ff5900);
+            color: white;
         }
     }
 
@@ -1325,7 +1325,7 @@ defineExpose({
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: var(--font-primary, 'Montserrat', 'Arial', sans-serif);
+    font-family: var(--font-primary, var(--font-base, 'Saira', 'Arial', sans-serif));
     background: #f3f6f8;
     display: flex;
     justify-content: flex-start;
@@ -1409,9 +1409,9 @@ defineExpose({
 }
 
 .cv-elegant-sidebar-title {
-    color: white;
+    color: gray !important;
     font-size: var(--size-subtitle, 14px);
-    font-family: var(--font-secondary, 'Montserrat', 'Arial', sans-serif);
+    font-family: var(--font-secondary, var(--font-headings, 'Patua One', 'Arial', sans-serif));
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1437,7 +1437,7 @@ defineExpose({
 .cv-elegant-sidebar-language-name {
     color: white;
     font-size: var(--size-paragraph, 14px);
-    font-family: var(--font-primary, 'Montserrat', 'Arial', sans-serif);
+    font-family: var(--font-primary, var(--font-base, 'Saira', 'Arial', sans-serif));
     font-weight: 400;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -1447,8 +1447,7 @@ defineExpose({
 .cv-elegant-sidebar-progress-bar {
     width: 100%;
     height: 6px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 3px;
+    background: white ;
     overflow: hidden;
 }
 
@@ -1472,7 +1471,7 @@ defineExpose({
     gap: 10px;
     color: white;
     font-size: var(--size-paragraph, 14px);
-    font-family: var(--font-primary, 'Montserrat', 'Arial', sans-serif);
+    font-family: var(--font-primary, var(--font-base, 'Saira', 'Arial', sans-serif));
     word-wrap: break-word;
     overflow-wrap: break-word;
     word-break: break-word;
@@ -1548,8 +1547,8 @@ defineExpose({
 
 .cv-elegant-info h1 {
     font-size: var(--size-title, 36px);
-    font-family: var(--font-secondary, 'Montserrat', 'Arial', sans-serif);
-    color: white;
+    font-family: var(--font-secondary, var(--font-headings, 'Patua One', 'Arial', sans-serif));
+    color: white !important;
     margin: 0;
     font-weight: 700;
     letter-spacing: 1.2px;
@@ -1574,7 +1573,7 @@ defineExpose({
     gap: 12px;
     color: white;
     font-size: var(--size-paragraph, 15px);
-    font-family: var(--font-primary, 'Montserrat', 'Arial', sans-serif);
+    font-family: var(--font-primary, var(--font-base, 'Saira', 'Arial', sans-serif));
     font-weight: 400;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -1606,9 +1605,9 @@ defineExpose({
     display: inline-block;
     width: fit-content;
     background: v-bind(elegantColor);
-    color: white;
+    color: white !important;
     font-size: var(--size-subtitle, 14px);
-    font-family: var(--font-secondary, 'Montserrat', 'Arial', sans-serif);
+    font-family: var(--font-secondary, var(--font-headings, 'Patua One', 'Arial', sans-serif));
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1621,7 +1620,7 @@ defineExpose({
     color: #1f2937;
     line-height: 1.7;
     font-size: var(--size-paragraph, 14px);
-    font-family: var(--font-primary, 'Montserrat', 'Arial', sans-serif);
+    font-family: var(--font-primary, var(--font-base, 'Saira', 'Arial', sans-serif));
     font-weight: 400;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -1667,9 +1666,9 @@ defineExpose({
 
 .cv-elegant-item-title {
     font-size: var(--size-subtitle, 16px);
-    font-family: var(--font-secondary, 'Montserrat', 'Arial', sans-serif);
+    font-family: var(--font-secondary, var(--font-headings, 'Patua One', 'Arial', sans-serif));
     font-weight: 700;
-    color: #1f2937;
+    color: #1f2937 !important;
     margin: 0;
     line-height: 1.3;
     word-wrap: break-word;
@@ -1679,7 +1678,7 @@ defineExpose({
 
 .cv-elegant-item-date {
     font-size: var(--size-paragraph, 13px);
-    font-family: var(--font-primary, 'Montserrat', 'Arial', sans-serif);
+    font-family: var(--font-primary, var(--font-base, 'Saira', 'Arial', sans-serif));
     color: #6b7280;
     font-weight: 400;
     white-space: nowrap;
@@ -1688,7 +1687,7 @@ defineExpose({
 
 .cv-elegant-item-meta {
     font-size: var(--size-paragraph, 14px);
-    font-family: var(--font-primary, 'Montserrat', 'Arial', sans-serif);
+    font-family: var(--font-primary, var(--font-base, 'Saira', 'Arial', sans-serif));
     color: #4b5563;
     font-weight: 400;
     margin-bottom: 8px;
@@ -1701,7 +1700,7 @@ defineExpose({
     color: #1f2937;
     line-height: 1.7;
     font-size: var(--size-paragraph, 14px);
-    font-family: var(--font-primary, 'Montserrat', 'Arial', sans-serif);
+    font-family: var(--font-primary, var(--font-base, 'Saira', 'Arial', sans-serif));
     margin-top: 8px;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -1907,7 +1906,7 @@ defineExpose({
             .cv-name-dark {
                 font-size: 2.2rem;
                 font-weight: 700;
-                color: white;
+                color: white !important;
                 margin: 0;
                 line-height: 1.2;
             }
@@ -1915,7 +1914,7 @@ defineExpose({
             .cv-lastname-dark {
                 font-size: 2.8rem;
                 font-weight: 700;
-                color: white;
+                color: white !important;
                 margin: 0;
                 line-height: 1.2;
             }
@@ -1923,7 +1922,7 @@ defineExpose({
             .cv-job-title-dark {
                 font-size: 1.4rem;
                 font-weight: 400;
-                color: #E74C3C;
+                color: red !important;
                 margin: 0.5rem 0 0 0;
             }
         }
@@ -1941,7 +1940,7 @@ defineExpose({
             .cv-profile-title-dark {
                 font-size: 1.1rem;
                 font-weight: 700;
-                color: white;
+                color: white !important;
                 margin: 0 0 0.75rem 0;
                 text-transform: uppercase;
             }
@@ -2021,7 +2020,7 @@ defineExpose({
     
     .cv-section-title-dark {
         background: v-bind(darkGrayColor);
-        color: white;
+        color: white !important;
         font-size: 1.1rem;
         font-weight: 700;
         text-align: center;
@@ -2080,7 +2079,7 @@ defineExpose({
         .cv-item-title-dark {
             font-size: 1rem;
             font-weight: 700;
-            color: #333333;
+            color: #333333 !important;
             margin: 0;
             word-wrap: break-word;
             word-break: break-word;

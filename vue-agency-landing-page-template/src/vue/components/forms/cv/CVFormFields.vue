@@ -11,6 +11,70 @@
                :message="successMessage"/>
 
         <form @submit.prevent="handleSubmit" class="needs-validation" novalidate>
+            <!-- Opción de crear o actualizar CV -->
+            <div class="form-section mb-4">
+                <h3 class="section-title">
+                    <i class="fa-solid fa-cog me-2"></i>
+                    Opciones
+                </h3>
+                
+                <div class="mb-3">
+                    <label class="form-label">Acción</label>
+                    <div class="btn-group w-100" role="group">
+                        <input 
+                            type="radio" 
+                            class="btn-check" 
+                            id="action-create" 
+                            value="create"
+                            v-model="actionType"
+                            @change="onActionTypeChange"
+                        >
+                        <label class="btn btn-outline-primary" for="action-create">
+                            <i class="fa-solid fa-plus me-2"></i>Crear Nuevo CV
+                        </label>
+
+                        <input 
+                            type="radio" 
+                            class="btn-check" 
+                            id="action-update" 
+                            value="update"
+                            v-model="actionType"
+                            @change="onActionTypeChange"
+                        >
+                        <label class="btn btn-outline-primary" for="action-update">
+                            <i class="fa-solid fa-pencil me-2"></i>Actualizar CV Existente
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Selector de CV existente (solo cuando se elige actualizar) -->
+                <div v-if="actionType === 'update'" class="mb-3">
+                    <label for="existingCv" class="form-label">Seleccionar CV a actualizar *</label>
+                    <select 
+                        class="form-select" 
+                        id="existingCv"
+                        v-model="selectedCvId"
+                        :class="{ 'is-invalid': errors.selectedCvId }"
+                        @change="onCvSelected"
+                        required
+                    >
+                        <option value="">-- Seleccione un CV --</option>
+                        <option v-for="cv in userCvs" :key="cv.id_cv" :value="cv.id_cv">
+                            CV #{{ cv.id_cv }} - {{ formatDate(cv.uploaded_at) }}
+                        </option>
+                    </select>
+                    <div v-if="errors.selectedCvId" class="invalid-feedback">
+                        {{ errors.selectedCvId }}
+                    </div>
+                    <div v-if="loadingCvs" class="form-text">
+                        <i class="fa-solid fa-spinner fa-spin me-2"></i>Cargando CVs...
+                    </div>
+                    <div v-if="!loadingCvs && userCvs.length === 0 && actionType === 'update'" class="form-text text-warning">
+                        <i class="fa-solid fa-exclamation-triangle me-2"></i>No tienes CVs guardados. Debes crear uno nuevo primero.
+                    </div>
+                </div>
+            </div>
+
             <!-- Datos Personales -->
             <div class="form-section">
                 <h3 class="section-title">
@@ -531,10 +595,16 @@
                             <input 
                                 type="text" 
                                 class="form-control" 
+                                :class="{ 'is-invalid': competenceInputError }"
                                 id="competence-name"
                                 v-model="competenceInput.name"
+                                @blur="validateCompetenceInput"
+                                @input="clearCompetenceInputError"
                                 placeholder="Ej: JavaScript, Vue.js..."
                             >
+                            <div v-if="competenceInputError" class="invalid-feedback">
+                                {{ competenceInputError }}
+                            </div>
                         </div>
 
                         <div class="col-md-6 mb-3">
@@ -651,10 +721,16 @@
                             <input 
                                 type="text" 
                                 class="form-control" 
+                                :class="{ 'is-invalid': languageInputError }"
                                 id="language-name"
                                 v-model="languageInput.name"
+                                @blur="validateLanguageInput"
+                                @input="clearLanguageInputError"
                                 placeholder="Ej: Inglés, Francés..."
                             >
+                            <div v-if="languageInputError" class="invalid-feedback">
+                                {{ languageInputError }}
+                            </div>
                         </div>
 
                         <div class="col-md-6 mb-3">
@@ -711,10 +787,16 @@
                             <input 
                                 type="text" 
                                 class="form-control" 
+                                :class="{ 'is-invalid': hobbyInputError }"
                                 id="hobby-name"
                                 v-model="hobbyInput"
+                                @blur="validateHobbyInput"
+                                @input="clearHobbyInputError"
                                 placeholder="Ej: Lectura, Deportes, Música..."
                             >
+                            <div v-if="hobbyInputError" class="invalid-feedback">
+                                {{ hobbyInputError }}
+                            </div>
                         </div>
                     </div>
 
@@ -740,10 +822,10 @@
 
             <!-- Submit Button -->
             <div class="d-grid mt-4">
-                <button type="submit" class="btn btn-primary btn-lg" :disabled="loading">
+                <button type="submit" class="btn btn-primary btn-lg" :disabled="loading || (actionType === 'update' && !selectedCvId)">
                     <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
-                    <i v-if="!loading" class="fa-solid fa-save me-2"></i>
-                    {{ loading ? 'Guardando...' : 'Guardar CV' }}
+                    <i v-if="!loading" :class="actionType === 'update' ? 'fa-solid fa-pencil me-2' : 'fa-solid fa-save me-2'"></i>
+                    {{ loading ? (actionType === 'update' ? 'Actualizando...' : 'Guardando...') : (actionType === 'update' ? 'Actualizar CV' : 'Guardar CV') }}
                 </button>
             </div>
         </form>
@@ -754,6 +836,7 @@
 import { ref, reactive, computed, inject, watch } from 'vue';
 import Alert from "/src/vue/components/widgets/Alert.vue";
 import WYSIWYGEditor from "/src/vue/components/forms/cv/WYSIWYGEditor.vue";
+import Swal from 'sweetalert2';
 
 const props = defineProps({
     errorMessage: {
@@ -773,6 +856,10 @@ const spinnerEnabled = inject("spinnerEnabled", ref(false));
 const selectedTemplate = inject('selectedTemplate', ref('modern'));
 
 const loading = ref(false);
+const actionType = ref('create'); // 'create' o 'update'
+const selectedCvId = ref(null);
+const userCvs = ref([]);
+const loadingCvs = ref(false);
 
 // Sincronizar loading con spinnerEnabled
 if (spinnerEnabled) {
@@ -780,6 +867,64 @@ if (spinnerEnabled) {
         loading.value = newVal || false;
     }, { immediate: true });
 }
+
+// Cargar CVs del usuario cuando se selecciona la opción de actualizar
+const loadUserCvs = async () => {
+    try {
+        loadingCvs.value = true;
+        const userData = localStorage.getItem('currentUser');
+        if (!userData) {
+            console.error('No hay usuario en localStorage');
+            return;
+        }
+
+        const user = JSON.parse(userData);
+        console.log('Cargando CVs para usuario:', user.id_user);
+        const response = await fetch(`http://localhost:3000/api/cv/user/${user.id_user}`);
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log('CVs cargados:', data);
+            userCvs.value = data;
+        } else {
+            const errorText = await response.text();
+            console.error('Error al cargar CVs del usuario:', response.status, errorText);
+            userCvs.value = [];
+        }
+    } catch (error) {
+        console.error('Error al cargar CVs:', error);
+        userCvs.value = [];
+    } finally {
+        loadingCvs.value = false;
+    }
+};
+
+// Manejar cambio de tipo de acción
+const onActionTypeChange = () => {
+    selectedCvId.value = null;
+    if (actionType.value === 'update') {
+        loadUserCvs();
+    }
+};
+
+// Manejar selección de CV
+const onCvSelected = () => {
+    console.log('CV seleccionado:', selectedCvId.value);
+    errors.selectedCvId = null;
+};
+
+// Formatear fecha para mostrar en el selector
+const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+};
 
 // Generar años (desde 1950 hasta el año actual + 5)
 const currentYear = new Date().getFullYear();
@@ -823,6 +968,35 @@ const isDateRangeInvalid = (startYear, startMonth, endYear, endMonth) => {
         }
     }
 
+    return false;
+};
+
+// Función para validar que una fecha no sea mayor a noviembre de 2025
+const isDateAfterNovember2025 = (year, month) => {
+    const yearNum = getYearNumber(year);
+    const monthNum = getMonthNumber(month);
+    
+    if (yearNum === null) {
+        return false;
+    }
+    
+    // Si el año es mayor a 2025, es inválido
+    if (yearNum > 2025) {
+        return true;
+    }
+    
+    // Si el año es 2025, verificar el mes
+    if (yearNum === 2025) {
+        // Si no hay mes, no podemos validar (pero no es mayor a noviembre)
+        if (monthNum === null) {
+            return false;
+        }
+        // Si el mes es mayor a 11 (noviembre), es inválido
+        if (monthNum > 11) {
+            return true;
+        }
+    }
+    
     return false;
 };
 
@@ -872,7 +1046,10 @@ const errors = reactive({
     profile: null,
     education: [],
     experience: [],
-    competences: null
+    competences: [],
+    languages: [],
+    hobbies: [],
+    selectedCvId: null
 });
 
 const photoPreview = ref(null);
@@ -880,11 +1057,13 @@ const competenceInput = reactive({
     name: '',
     level: ''
 });
+const competenceInputError = ref(null);
 
 const languageInput = reactive({
     name: '',
     level: ''
 });
+const languageInputError = ref(null);
 
 const skillInput = reactive({
     name: '',
@@ -892,6 +1071,7 @@ const skillInput = reactive({
 });
 
 const hobbyInput = ref('');
+const hobbyInputError = ref(null);
 
 const handlePhotoChange = (e) => {
     const file = e.target.files[0];
@@ -988,10 +1168,18 @@ const validateExperience = (index) => {
     }
     if (!exp.startYear) {
         errors.experience[index].startYear = 'El año de inicio es requerido';
+    } else {
+        // Validar que la fecha de inicio no sea mayor a noviembre de 2025
+        if (isDateAfterNovember2025(exp.startYear, exp.startMonth)) {
+            errors.experience[index].startYear = 'La fecha de inicio no puede ser mayor a noviembre de 2025';
+        }
     }
 
     if (!exp.current && exp.endYear) {
-        if (isDateRangeInvalid(exp.startYear, exp.startMonth, exp.endYear, exp.endMonth)) {
+        // Validar que la fecha de fin no sea mayor a noviembre de 2025
+        if (isDateAfterNovember2025(exp.endYear, exp.endMonth)) {
+            errors.experience[index].endYear = 'La fecha de fin no puede ser mayor a noviembre de 2025';
+        } else if (isDateRangeInvalid(exp.startYear, exp.startMonth, exp.endYear, exp.endMonth)) {
             errors.experience[index].endYear = 'La fecha de fin debe ser posterior a la de inicio.';
         }
     }
@@ -1024,10 +1212,18 @@ const validateEducation = (index) => {
     }
     if (!edu.startYear) {
         errors.education[index].startYear = 'El año de inicio es requerido';
+    } else {
+        // Validar que la fecha de inicio no sea mayor a noviembre de 2025
+        if (isDateAfterNovember2025(edu.startYear, edu.startMonth)) {
+            errors.education[index].startYear = 'La fecha de inicio no puede ser mayor a noviembre de 2025';
+        }
     }
 
     if (!edu.current && edu.endYear) {
-        if (isDateRangeInvalid(edu.startYear, edu.startMonth, edu.endYear, edu.endMonth)) {
+        // Validar que la fecha de fin no sea mayor a noviembre de 2025
+        if (isDateAfterNovember2025(edu.endYear, edu.endMonth)) {
+            errors.education[index].endYear = 'La fecha de fin no puede ser mayor a noviembre de 2025';
+        } else if (isDateRangeInvalid(edu.startYear, edu.startMonth, edu.endYear, edu.endMonth)) {
             errors.education[index].endYear = 'La fecha de fin debe ser posterior a la de inicio.';
         }
     }
@@ -1095,18 +1291,54 @@ const removeEducation = (index) => {
     errors.education.splice(index, 1);
 };
 
+// Función para validar que un texto no sea solo números
+const isOnlyNumbers = (text) => {
+    if (!text || !text.trim()) return false;
+    // Verificar si el texto (sin espacios) contiene solo dígitos
+    return /^\d+$/.test(text.trim().replace(/\s/g, ''));
+};
+
+const validateCompetenceInput = () => {
+    const name = competenceInput.name.trim();
+    if (name && isOnlyNumbers(name)) {
+        competenceInputError.value = 'El nombre de la competencia no puede ser solo números';
+    } else {
+        competenceInputError.value = null;
+    }
+};
+
+const clearCompetenceInputError = () => {
+    competenceInputError.value = null;
+};
+
 const addCompetence = () => {
-    if (competenceInput.name.trim() && competenceInput.level) {
+    const name = competenceInput.name.trim();
+    
+    if (!name) {
+        return;
+    }
+    
+    // Validar antes de agregar
+    if (isOnlyNumbers(name)) {
+        competenceInputError.value = 'El nombre de la competencia no puede ser solo números';
+        return;
+    }
+    
+    if (name && competenceInput.level) {
         form.competences.push({
-            name: competenceInput.name.trim(),
+            name: name,
             level: competenceInput.level
         });
         clearCompetenceInput();
+        competenceInputError.value = null;
     }
 };
 
 const removeCompetence = (index) => {
     form.competences.splice(index, 1);
+    if (errors.competences[index]) {
+        errors.competences.splice(index, 1);
+    }
 };
 
 const clearCompetenceInput = () => {
@@ -1133,18 +1365,47 @@ const clearSkillInput = () => {
     skillInput.level = '';
 };
 
+const validateLanguageInput = () => {
+    const name = languageInput.name.trim();
+    if (name && isOnlyNumbers(name)) {
+        languageInputError.value = 'El nombre del idioma no puede ser solo números';
+    } else {
+        languageInputError.value = null;
+    }
+};
+
+const clearLanguageInputError = () => {
+    languageInputError.value = null;
+};
+
 const addLanguage = () => {
-    if (languageInput.name.trim() && languageInput.level) {
+    const name = languageInput.name.trim();
+    
+    if (!name) {
+        return;
+    }
+    
+    // Validar antes de agregar
+    if (isOnlyNumbers(name)) {
+        languageInputError.value = 'El nombre del idioma no puede ser solo números';
+        return;
+    }
+    
+    if (name && languageInput.level) {
         form.languages.push({
-            name: languageInput.name.trim(),
+            name: name,
             level: languageInput.level
         });
         clearLanguageInput();
+        languageInputError.value = null;
     }
 };
 
 const removeLanguage = (index) => {
     form.languages.splice(index, 1);
+    if (errors.languages[index] !== undefined) {
+        errors.languages.splice(index, 1);
+    }
 };
 
 const clearLanguageInput = () => {
@@ -1152,15 +1413,129 @@ const clearLanguageInput = () => {
     languageInput.level = '';
 };
 
+const validateHobbyInput = () => {
+    const hobby = hobbyInput.value.trim();
+    if (hobby && isOnlyNumbers(hobby)) {
+        hobbyInputError.value = 'El pasatiempo no puede ser solo números';
+    } else {
+        hobbyInputError.value = null;
+    }
+};
+
+const clearHobbyInputError = () => {
+    hobbyInputError.value = null;
+};
+
 const addHobby = () => {
-    if (hobbyInput.value.trim()) {
-        form.hobbies.push(hobbyInput.value.trim());
+    const hobby = hobbyInput.value.trim();
+    
+    if (!hobby) {
+        return;
+    }
+    
+    // Validar antes de agregar
+    if (isOnlyNumbers(hobby)) {
+        hobbyInputError.value = 'El pasatiempo no puede ser solo números';
+        return;
+    }
+    
+    if (hobby) {
+        form.hobbies.push(hobby);
         hobbyInput.value = '';
+        hobbyInputError.value = null;
     }
 };
 
 const removeHobby = (index) => {
     form.hobbies.splice(index, 1);
+    if (errors.hobbies[index] !== undefined) {
+        errors.hobbies.splice(index, 1);
+    }
+};
+
+// Función para recopilar todos los errores en un formato legible
+const collectErrors = () => {
+    const errorList = [];
+    
+    // Errores de información personal
+    const personalFields = {
+        firstName: 'Nombre',
+        lastName: 'Apellidos',
+        jobTitle: 'Título del trabajo',
+        email: 'Correo electrónico',
+        phone: 'Teléfono',
+        address: 'Dirección',
+        postalCode: 'Código postal',
+        city: 'Localidad'
+    };
+    
+    Object.keys(personalFields).forEach(field => {
+        if (errors.personalInfo[field]) {
+            errorList.push(`• ${personalFields[field]}: ${errors.personalInfo[field]}`);
+        }
+    });
+    
+    // Error de perfil
+    if (errors.profile) {
+        errorList.push(`• Perfil: ${errors.profile}`);
+    }
+    
+    // Errores de experiencia
+    form.experience.forEach((exp, index) => {
+        const expErrors = errors.experience[index] || {};
+        Object.keys(expErrors).forEach(field => {
+            const fieldNames = {
+                position: 'Puesto',
+                employer: 'Empresa',
+                location: 'Ubicación',
+                startMonth: 'Mes de inicio',
+                startYear: 'Año de inicio',
+                endMonth: 'Mes de fin',
+                endYear: 'Año de fin'
+            };
+            errorList.push(`• Experiencia ${index + 1} - ${fieldNames[field] || field}: ${expErrors[field]}`);
+        });
+    });
+    
+    // Errores de educación
+    form.education.forEach((edu, index) => {
+        const eduErrors = errors.education[index] || {};
+        Object.keys(eduErrors).forEach(field => {
+            const fieldNames = {
+                formation: 'Formación',
+                institution: 'Institución',
+                location: 'Ubicación',
+                startMonth: 'Mes de inicio',
+                startYear: 'Año de inicio',
+                endMonth: 'Mes de fin',
+                endYear: 'Año de fin'
+            };
+            errorList.push(`• Educación ${index + 1} - ${fieldNames[field] || field}: ${eduErrors[field]}`);
+        });
+    });
+    
+    // Errores de competencias
+    errors.competences.forEach((error, index) => {
+        if (error) {
+            errorList.push(`• Competencia ${index + 1}: ${error}`);
+        }
+    });
+    
+    // Errores de idiomas
+    errors.languages.forEach((error, index) => {
+        if (error) {
+            errorList.push(`• Idioma ${index + 1}: ${error}`);
+        }
+    });
+    
+    // Errores de pasatiempos
+    errors.hobbies.forEach((error, index) => {
+        if (error) {
+            errorList.push(`• Pasatiempo ${index + 1}: ${error}`);
+        }
+    });
+    
+    return errorList;
 };
 
 const validateForm = () => {
@@ -1169,7 +1544,9 @@ const validateForm = () => {
     errors.profile = null;
     errors.education = [];
     errors.experience = [];
-    errors.competences = null;
+    errors.competences = [];
+    errors.languages = [];
+    errors.hobbies = [];
     
     let isValid = true;
     
@@ -1203,18 +1580,118 @@ const validateForm = () => {
         }
     });
     
+    // Validar competencias (no pueden ser solo números)
+    // Asegurar que el array de errores tenga la misma longitud que el array de competencias
+    while (errors.competences.length < form.competences.length) {
+        errors.competences.push(null);
+    }
+    form.competences.forEach((comp, index) => {
+        if (isOnlyNumbers(comp.name)) {
+            errors.competences[index] = 'El nombre de la competencia no puede ser solo números';
+            isValid = false;
+        } else {
+            errors.competences[index] = null;
+        }
+    });
+    
+    // Validar idiomas (no pueden ser solo números)
+    // Asegurar que el array de errores tenga la misma longitud que el array de idiomas
+    while (errors.languages.length < form.languages.length) {
+        errors.languages.push(null);
+    }
+    form.languages.forEach((lang, index) => {
+        if (isOnlyNumbers(lang.name)) {
+            errors.languages[index] = 'El nombre del idioma no puede ser solo números';
+            isValid = false;
+        } else {
+            errors.languages[index] = null;
+        }
+    });
+    
+    // Validar pasatiempos (no pueden ser solo números)
+    // Asegurar que el array de errores tenga la misma longitud que el array de pasatiempos
+    while (errors.hobbies.length < form.hobbies.length) {
+        errors.hobbies.push(null);
+    }
+    form.hobbies.forEach((hobby, index) => {
+        if (isOnlyNumbers(hobby)) {
+            errors.hobbies[index] = 'El pasatiempo no puede ser solo números';
+            isValid = false;
+        } else {
+            errors.hobbies[index] = null;
+        }
+    });
+    
     return isValid;
 };
 
 const handleSubmit = async (e) => {
     e.preventDefault();
     
+    console.log('handleSubmit llamado - actionType:', actionType.value, 'selectedCvId:', selectedCvId.value);
+    
+    // Validar que si es actualizar, se haya seleccionado un CV
+    if (actionType.value === 'update' && !selectedCvId.value) {
+        errors.selectedCvId = 'Debe seleccionar un CV para actualizar';
+        console.error('Error: No se seleccionó un CV para actualizar');
+        
+        await Swal.fire({
+            icon: 'error',
+            title: 'Error de validación',
+            html: '<p>Debe seleccionar un CV para actualizar.</p>',
+            confirmButtonText: 'Entendido',
+            customClass: {
+                popup: 'swal2-popup-custom',
+                title: 'swal2-title-custom',
+                content: 'swal2-content-custom',
+                confirmButton: 'swal2-confirm-custom'
+            }
+        });
+        return;
+    } else {
+        errors.selectedCvId = null;
+    }
+    
     if (!validateForm()) {
+        console.log('Validación del formulario falló');
+        
+        // Recopilar todos los errores
+        const errorList = collectErrors();
+        
+        // Si hay errores, mostrar alerta
+        if (errorList.length > 0) {
+            // Mostrar alerta con todos los errores
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error de validación',
+                html: `
+                    <p style="text-align: left; margin-bottom: 1rem; font-weight: 600;">Por favor, corrige los siguientes errores:</p>
+                    <div style="text-align: left; max-height: 400px; overflow-y: auto; background: #f8f9fa; padding: 1rem; border-radius: 8px;">
+                        ${errorList.map(error => `<p style="margin: 0.5rem 0; color: #dc3545;">${error}</p>`).join('')}
+                    </div>
+                `,
+                confirmButtonText: 'Entendido',
+                width: '600px',
+                customClass: {
+                    popup: 'swal2-popup-custom',
+                    title: 'swal2-title-custom',
+                    content: 'swal2-content-custom',
+                    confirmButton: 'swal2-confirm-custom'
+                }
+            });
+        }
         return;
     }
     
+    // Convertir cvId a número si es string
+    const cvIdToSend = actionType.value === 'update' && selectedCvId.value 
+        ? (typeof selectedCvId.value === 'string' ? parseInt(selectedCvId.value, 10) : selectedCvId.value)
+        : null;
+    
     // Preparar datos para enviar
     const cvData = {
+        actionType: actionType.value, // 'create' o 'update'
+        cvId: cvIdToSend,
         personalInfo: {
             ...form.personalInfo,
             // Convertir foto a base64 si existe
@@ -1229,6 +1706,7 @@ const handleSubmit = async (e) => {
         hobbies: form.hobbies
     };
     
+    console.log('Enviando datos del CV:', { actionType: cvData.actionType, cvId: cvData.cvId });
     emit('submit', cvData);
 };
 

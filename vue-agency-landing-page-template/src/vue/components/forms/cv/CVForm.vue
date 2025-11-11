@@ -51,8 +51,11 @@ const errorMessage = computed(() => {
 })
 
 const _onFormSubmit = async (cvData) => {
+    console.log('CVForm._onFormSubmit - cvData recibido:', cvData)
+    
     // Iniciar spinner
-    setSpinnerEnabled && setSpinnerEnabled(true, strings.get('saving_cv') || 'Guardando CV...')
+    const actionText = cvData.actionType === 'update' ? 'Actualizando CV...' : 'Guardando CV...'
+    setSpinnerEnabled && setSpinnerEnabled(true, strings.get('saving_cv') || actionText)
     
     try {
         // Obtener usuario actual del localStorage
@@ -63,9 +66,17 @@ const _onFormSubmit = async (cvData) => {
 
         const user = JSON.parse(userData)
         
-        // Emitir evento de éxito para que se pueda capturar y enviar la imagen
+        const submitData = {
+            userId: user.id_user,
+            actionType: cvData.actionType || 'create',
+            cvId: cvData.cvId || null
+        }
+        
+        console.log('CVForm._onFormSubmit - emitiendo submit-success con:', submitData)
+        
+        // Emitir evento de éxito con información de acción y CV ID si es actualización
         // El envío real al backend se hace desde CVSection después de capturar la imagen
-        emit('submit-success', user.id_user)
+        emit('submit-success', submitData)
         
         _resetScroll()
         

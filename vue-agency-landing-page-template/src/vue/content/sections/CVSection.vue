@@ -38,69 +38,115 @@ const cvPreviewRef = ref(null)
 const setSpinnerEnabled = inject("setSpinnerEnabled", null)
 
 // Manejar el envío exitoso del formulario
-const handleSubmitSuccess = async (userId) => {
+const handleSubmitSuccess = async (submitData) => {
+    console.log('CVSection.handleSubmitSuccess - submitData recibido:', submitData)
+    
     // Esperar a que Vue actualice el DOM
     await nextTick()
     
     // Esperar un momento adicional para asegurar que el CV se renderice completamente
     setTimeout(async () => {
-        if (cvPreviewRef.value && cvPreviewRef.value.captureCVAsImage) {
-            try {
-                // Capturar la imagen del CV
-                const imageBlob = await cvPreviewRef.value.captureCVAsImage()
-                
-                if (!imageBlob) {
-                    console.error('No se pudo capturar la imagen del CV')
-                    return
-                }
+        if (!cvPreviewRef.value || !cvPreviewRef.value.captureCVAsImage) {
+            console.error('cvPreviewRef no está disponible o no tiene captureCVAsImage')
+            setSpinnerEnabled && setSpinnerEnabled(false)
+            return
+        }
+        
+        try {
+            console.log('Capturando imagen del CV...')
+            // Capturar la imagen del CV
+            const imageBlob = await cvPreviewRef.value.captureCVAsImage()
+            
+            if (!imageBlob) {
+                console.error('No se pudo capturar la imagen del CV')
+                setSpinnerEnabled && setSpinnerEnabled(false)
+                return
+            }
 
-                // Obtener el userId del localStorage si no se pasó como parámetro
+            console.log('Imagen capturada, tamaño:', imageBlob.size, 'bytes')
+
+            // Obtener datos del submit (puede ser userId o un objeto con más info)
+            let userId, actionType, cvId;
+            
+            if (typeof submitData === 'object' && submitData !== null) {
+                userId = submitData.userId;
+                actionType = submitData.actionType || 'create';
+                cvId = submitData.cvId || null;
+            } else {
+                // Compatibilidad con formato anterior
+                userId = submitData;
+                actionType = 'create';
+                cvId = null;
+            }
+
+            console.log('Datos extraídos - userId:', userId, 'actionType:', actionType, 'cvId:', cvId)
+
+            // Si no se pasó userId, obtenerlo del localStorage
+            if (!userId) {
                 const userData = localStorage.getItem('currentUser')
                 if (!userData) {
                     console.error('Usuario no autenticado')
+                    setSpinnerEnabled && setSpinnerEnabled(false)
                     return
                 }
-
                 const user = JSON.parse(userData)
-                const finalUserId = userId || user.id_user
-
-                // Crear FormData para enviar la imagen
-                const formData = new FormData()
-                formData.append('cvImage', imageBlob, `CV_${Date.now()}.png`)
-                formData.append('userId', finalUserId)
-
-                // Enviar la imagen al backend
-                const response = await fetch('http://localhost:3000/api/cv', {
-                    method: 'POST',
-                    body: formData
-                })
-
-                const data = await response.json()
-
-                // Desactivar spinner
-                setSpinnerEnabled && setSpinnerEnabled(false)
-
-                if (response.ok) {
-                    console.log('CV guardado exitosamente:', data)
-                    // También descargar la imagen localmente
-                    const imageUrl = URL.createObjectURL(imageBlob)
-                    const link = document.createElement('a')
-                    link.href = imageUrl
-                    link.download = `CV_${Date.now()}.png`
-                    document.body.appendChild(link)
-                    link.click()
-                    document.body.removeChild(link)
-                    setTimeout(() => URL.revokeObjectURL(imageUrl), 100)
-                } else {
-                    console.error('Error al guardar CV:', data.error)
-                    alert('Error al guardar el CV: ' + (data.error || 'Error desconocido'))
-                }
-            } catch (error) {
-                console.error('Error al capturar o enviar el CV como imagen:', error)
-                // Desactivar spinner en caso de error
-                setSpinnerEnabled && setSpinnerEnabled(false)
-                alert('Error al guardar el CV: ' + (error.message || 'Error desconocido'))
+                userId = user.id_user
             }
+
+            // Crear FormData para enviar la imagen
+            const formData = new FormData()
+            formData.append('cvImage', imageBlob, `CV_${Date.now()}.png`)
+            
+            // Determinar URL y método según la acción
+            let url, method;
+            if (actionType === 'update' && cvId) {
+                url = `http://localhost:3000/api/cv/${cvId}`
+                method = 'PUT'
+                console.log('Actualizando CV - URL:', url, 'Método:', method, 'cvId:', cvId)
+            } else {
+                formData.append('userId', userId)
+                url = 'http://localhost:3000/api/cv'
+                method = 'POST'
+                console.log('Creando CV - URL:', url, 'Método:', method, 'userId:', userId)
+            }
+
+            console.log('Enviando petición al backend...')
+            // Enviar la imagen al backend
+            const response = await fetch(url, {
+                method: method,
+                body: formData
+            })
+
+            console.log('Respuesta recibida - Status:', response.status, 'OK:', response.ok)
+            const data = await response.json()
+            console.log('Datos de respuesta:', data)
+
+            // Desactivar spinner
+            setSpinnerEnabled && setSpinnerEnabled(false)
+
+            if (response.ok) {
+                const successMessage = actionType === 'update' ? 'CV actualizado exitosamente' : 'CV guardado exitosamente'
+                console.log(successMessage + ':', data)
+                alert(successMessage)
+                // También descargar la imagen localmente
+                const imageUrl = URL.createObjectURL(imageBlob)
+                const link = document.createElement('a')
+                link.href = imageUrl
+                link.download = `CV_${Date.now()}.png`
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+                setTimeout(() => URL.revokeObjectURL(imageUrl), 100)
+            } else {
+                const errorMessage = actionType === 'update' ? 'Error al actualizar el CV' : 'Error al guardar el CV'
+                console.error(errorMessage + ':', data.error)
+                alert(errorMessage + ': ' + (data.error || 'Error desconocido'))
+            }
+        } catch (error) {
+            console.error('Error al capturar o enviar el CV como imagen:', error)
+            // Desactivar spinner en caso de error
+            setSpinnerEnabled && setSpinnerEnabled(false)
+            alert('Error al procesar el CV: ' + (error.message || 'Error desconocido'))
         }
     }, 500) // Esperar 500ms para que todo se renderice
 }

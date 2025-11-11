@@ -647,8 +647,8 @@
                 </div>
             </div>
 
-            <!-- Habilidades (solo para plantilla Elegante) -->
-            <div v-if="selectedTemplate && selectedTemplate.value === 'elegant'" class="form-section">
+            <!-- Habilidades -->
+            <div class="form-section">
                 <h3 class="section-title">
                     <i class="fa-solid fa-tools me-2"></i>
                     Habilidades
@@ -661,10 +661,16 @@
                             <input 
                                 type="text" 
                                 class="form-control" 
+                                :class="{ 'is-invalid': skillInputError }"
                                 id="skill-name"
                                 v-model="skillInput.name"
+                                @blur="validateSkillInput"
+                                @input="clearSkillInputError"
                                 placeholder="Ej: JavaScript, Vue.js..."
                             >
+                            <div v-if="skillInputError" class="invalid-feedback">
+                                {{ skillInputError }}
+                            </div>
                         </div>
 
                         <div class="col-md-6 mb-3">
@@ -855,6 +861,20 @@ const setSpinnerEnabled = inject("setSpinnerEnabled", null);
 const spinnerEnabled = inject("spinnerEnabled", ref(false));
 const selectedTemplate = inject('selectedTemplate', ref('modern'));
 
+// Computed para determinar si mostrar la sección de habilidades
+const showSkillsSection = computed(() => {
+    if (!selectedTemplate) {
+        console.log('selectedTemplate no está disponible');
+        return false;
+    }
+    // selectedTemplate es un ref, accedemos directamente a .value
+    const templateValue = selectedTemplate.value;
+    console.log('showSkillsSection - templateValue:', templateValue, 'selectedTemplate completo:', selectedTemplate);
+    const shouldShow = templateValue === 'elegant' || templateValue === 'dark';
+    console.log('shouldShow:', shouldShow);
+    return shouldShow;
+});
+
 const loading = ref(false);
 const actionType = ref('create'); // 'create' o 'update'
 const selectedCvId = ref(null);
@@ -1036,7 +1056,7 @@ const form = reactive({
         description: ''
     }],
     competences: [],
-    skills: [], // Habilidades solo para plantilla elegant
+    skills: [], // Habilidades para plantillas elegant y dark
     languages: [],
     hobbies: []
 });
@@ -1047,6 +1067,7 @@ const errors = reactive({
     education: [],
     experience: [],
     competences: [],
+    skills: [],
     languages: [],
     hobbies: [],
     selectedCvId: null
@@ -1069,6 +1090,7 @@ const skillInput = reactive({
     name: '',
     level: ''
 });
+const skillInputError = ref(null);
 
 const hobbyInput = ref('');
 const hobbyInputError = ref(null);
@@ -1346,23 +1368,53 @@ const clearCompetenceInput = () => {
     competenceInput.level = '';
 };
 
+const validateSkillInput = () => {
+    const name = skillInput.name.trim();
+    if (name && isOnlyNumbers(name)) {
+        skillInputError.value = 'El nombre de la habilidad no puede ser solo números';
+    } else {
+        skillInputError.value = null;
+    }
+};
+
+const clearSkillInputError = () => {
+    skillInputError.value = null;
+};
+
 const addSkill = () => {
-    if (skillInput.name.trim() && skillInput.level) {
+    const name = skillInput.name.trim();
+    
+    if (!name) {
+        return;
+    }
+    
+    // Validar antes de agregar
+    if (isOnlyNumbers(name)) {
+        skillInputError.value = 'El nombre de la habilidad no puede ser solo números';
+        return;
+    }
+    
+    if (name && skillInput.level) {
         form.skills.push({
-            name: skillInput.name.trim(),
+            name: name,
             level: skillInput.level
         });
         clearSkillInput();
+        skillInputError.value = null;
     }
 };
 
 const removeSkill = (index) => {
     form.skills.splice(index, 1);
+    if (errors.skills[index] !== undefined) {
+        errors.skills.splice(index, 1);
+    }
 };
 
 const clearSkillInput = () => {
     skillInput.name = '';
     skillInput.level = '';
+    skillInputError.value = null;
 };
 
 const validateLanguageInput = () => {
@@ -1521,6 +1573,13 @@ const collectErrors = () => {
         }
     });
     
+    // Errores de habilidades
+    errors.skills.forEach((error, index) => {
+        if (error) {
+            errorList.push(`• Habilidad ${index + 1}: ${error}`);
+        }
+    });
+    
     // Errores de idiomas
     errors.languages.forEach((error, index) => {
         if (error) {
@@ -1545,6 +1604,7 @@ const validateForm = () => {
     errors.education = [];
     errors.experience = [];
     errors.competences = [];
+    errors.skills = [];
     errors.languages = [];
     errors.hobbies = [];
     
@@ -1591,6 +1651,20 @@ const validateForm = () => {
             isValid = false;
         } else {
             errors.competences[index] = null;
+        }
+    });
+    
+    // Validar habilidades (no pueden ser solo números)
+    // Asegurar que el array de errores tenga la misma longitud que el array de habilidades
+    while (errors.skills.length < form.skills.length) {
+        errors.skills.push(null);
+    }
+    form.skills.forEach((skill, index) => {
+        if (isOnlyNumbers(skill.name)) {
+            errors.skills[index] = 'El nombre de la habilidad no puede ser solo números';
+            isValid = false;
+        } else {
+            errors.skills[index] = null;
         }
     });
     
@@ -1701,7 +1775,7 @@ const handleSubmit = async (e) => {
         education: form.education.filter(edu => edu.formation.trim() || edu.institution.trim()),
         experience: form.experience.filter(exp => exp.position.trim() || exp.employer.trim()),
         competences: form.competences,
-        skills: form.skills, // Habilidades solo para plantilla elegant
+        skills: form.skills, // Habilidades para plantillas elegant y dark
         languages: form.languages,
         hobbies: form.hobbies
     };
@@ -1721,7 +1795,7 @@ const getFormData = () => {
         education: form.education.filter(edu => edu.formation.trim() || edu.institution.trim()),
         experience: form.experience.filter(exp => exp.position.trim() || exp.employer.trim()),
         competences: form.competences,
-        skills: form.skills, // Habilidades solo para plantilla elegant
+        skills: form.skills, // Habilidades para plantillas elegant y dark
         languages: form.languages,
         hobbies: form.hobbies
     };

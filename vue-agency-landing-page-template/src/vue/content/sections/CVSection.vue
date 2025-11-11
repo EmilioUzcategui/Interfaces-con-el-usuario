@@ -12,7 +12,9 @@
             <div class="cv-full-width-container">
                 <div class="row g-4">
                     <div class="col-12 col-lg-5">
-                        <CVForm v-model="cvFormData" @submit-success="handleSubmitSuccess"/>
+                        <div class="cv-form-wrapper">
+                            <CVForm v-model="cvFormData" @submit-success="handleSubmitSuccess"/>
+                        </div>
                     </div>
                     <div class="col-12 col-lg-7">
                         <CVPreview ref="cvPreviewRef" :cv-data="cvFormData"/>
@@ -30,12 +32,36 @@ import PageSectionContent from "/src/vue/components/layout/PageSectionContent.vu
 import CVForm from "/src/vue/components/forms/cv/CVForm.vue"
 import CVPreview from "/src/vue/components/forms/cv/CVPreview.vue"
 import {useStrings} from "/src/composables/strings.js"
-import {ref, nextTick, inject} from "vue"
+import {ref, nextTick, inject, provide, watch} from "vue"
 
 const strings = useStrings()
 const cvFormData = ref(null)
 const cvPreviewRef = ref(null)
 const setSpinnerEnabled = inject("setSpinnerEnabled", null)
+
+// Ref para el template seleccionado - se actualizará desde CVPreview
+const selectedTemplate = ref('modern')
+
+// Provide selectedTemplate para que CVFormFields pueda acceder
+provide('selectedTemplate', selectedTemplate)
+
+// Función para actualizar el template desde CVPreview
+const updateSelectedTemplate = (templateValue) => {
+    selectedTemplate.value = templateValue
+}
+
+// Watch para sincronizar cuando CVPreview esté disponible
+watch(cvPreviewRef, (newRef) => {
+    if (newRef && newRef.selectedTemplate) {
+        // Sincronizar valor inicial
+        selectedTemplate.value = newRef.selectedTemplate.value || 'modern'
+        
+        // Watch el valor del ref de CVPreview para cambios reactivos
+        watch(() => newRef.selectedTemplate.value, (newValue) => {
+            selectedTemplate.value = newValue
+        }, { immediate: true })
+    }
+}, { immediate: true })
 
 // Manejar el envío exitoso del formulario
 const handleSubmitSuccess = async (submitData) => {
@@ -178,6 +204,33 @@ const handleSubmitSuccess = async (submitData) => {
 .cv-full-width-container {
     width: 100%;
     max-width: 100%;
+}
+
+.cv-form-wrapper {
+    position: sticky;
+    top: 2rem;
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    
+    // Estilo personalizado para el scrollbar
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+        
+        &:hover {
+            background: #555;
+        }
+    }
 }
 </style>
 

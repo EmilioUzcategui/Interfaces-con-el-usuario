@@ -219,15 +219,15 @@
                                 </div>
                             </div>
 
-                            <div v-if="cvData?.competences?.length > 0" class="cv-section-dark">
+                            <div v-if="cvData?.skills?.length > 0" class="cv-section-dark">
                                 <h3 class="cv-section-title-dark">Habilidades</h3>
                                 <div class="cv-section-content-dark">
-                                    <div v-for="(comp, index) in cvData.competences" :key="index" class="cv-skill-item-dark">
-                                        <span class="skill-name-dark">{{ comp.name }}</span>
+                                    <div v-for="(skill, index) in cvData.skills" :key="index" class="cv-skill-item-dark">
+                                        <span class="skill-name-dark">{{ skill.name }}</span>
                                         <div class="skill-rating-dark">
                                             <span v-for="i in 5" :key="i" 
                                                   class="skill-dot-dark" 
-                                                  :class="{ 'skill-dot-filled-dark': i <= getSkillRating(comp.level) }">
+                                                  :class="{ 'skill-dot-filled-dark': i <= getSkillRating(skill.level) }">
                                             </span>
                                         </div>
                                     </div>
@@ -930,7 +930,8 @@ const captureCVAsImage = async () => {
 
 // Exponer la función para uso externo
 defineExpose({
-    captureCVAsImage
+    captureCVAsImage,
+    selectedTemplate
 });
 </script>
 
@@ -942,6 +943,31 @@ defineExpose({
     top: 2rem;
     max-height: calc(100vh - 4rem);
     overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 0.5rem;
+    
+    // Estilo personalizado para el scrollbar
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+        
+        &:hover {
+            background: #555;
+        }
+    }
+    
+    // Para Firefox
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
 
     .cv-preview-shell {
         display: flex;

@@ -33,6 +33,7 @@ import CVForm from "/src/vue/components/forms/cv/CVForm.vue"
 import CVPreview from "/src/vue/components/forms/cv/CVPreview.vue"
 import {useStrings} from "/src/composables/strings.js"
 import {ref, nextTick, inject, provide, watch} from "vue"
+import Swal from "sweetalert2"
 
 const strings = useStrings()
 const cvFormData = ref(null)
@@ -153,7 +154,16 @@ const handleSubmitSuccess = async (submitData) => {
             if (response.ok) {
                 const successMessage = actionType === 'update' ? 'CV actualizado exitosamente' : 'CV guardado exitosamente'
                 console.log(successMessage + ':', data)
-                alert(successMessage)
+                await Swal.fire({
+                    icon: 'success',
+                    title: successMessage,
+                    confirmButtonText: 'Aceptar',
+                    customClass: {
+                        popup: 'swal2-popup-custom',
+                        title: 'swal2-title-custom',
+                        confirmButton: 'swal2-confirm-custom'
+                    }
+                })
                 // También descargar la imagen localmente
                 const imageUrl = URL.createObjectURL(imageBlob)
                 const link = document.createElement('a')
@@ -166,13 +176,35 @@ const handleSubmitSuccess = async (submitData) => {
             } else {
                 const errorMessage = actionType === 'update' ? 'Error al actualizar el CV' : 'Error al guardar el CV'
                 console.error(errorMessage + ':', data.error)
-                alert(errorMessage + ': ' + (data.error || 'Error desconocido'))
+                await Swal.fire({
+                    icon: 'error',
+                    title: errorMessage,
+                    text: data.error || 'Error desconocido',
+                    confirmButtonText: 'Aceptar',
+                    customClass: {
+                        popup: 'swal2-popup-custom',
+                        title: 'swal2-title-custom',
+                        content: 'swal2-content-custom',
+                        confirmButton: 'swal2-confirm-custom'
+                    }
+                })
             }
         } catch (error) {
             console.error('Error al capturar o enviar el CV como imagen:', error)
             // Desactivar spinner en caso de error
             setSpinnerEnabled && setSpinnerEnabled(false)
-            alert('Error al procesar el CV: ' + (error.message || 'Error desconocido'))
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error al procesar el CV',
+                text: error.message || 'Error desconocido',
+                confirmButtonText: 'Aceptar',
+                customClass: {
+                    popup: 'swal2-popup-custom',
+                    title: 'swal2-title-custom',
+                    content: 'swal2-content-custom',
+                    confirmButton: 'swal2-confirm-custom'
+                }
+            })
         }
     }, 500) // Esperar 500ms para que todo se renderice
 }

@@ -10,8 +10,8 @@
                         </div>
                         <div class="cv-header-info-modern">
                             <h1 class="cv-name-modern">{{ fullName }}</h1>
-                            <h2 class="cv-job-title-modern" v-if="cvData?.personalInfo?.jobTitle">
-                                {{ cvData.personalInfo.jobTitle }}
+                            <h2 class="cv-job-title-modern" v-if="jobTitleToDisplay">
+                                {{ jobTitleToDisplay }}
                             </h2>
                             <div class="cv-contact-info-modern">
                                 <div v-if="cvData?.personalInfo?.email" class="contact-item-modern">
@@ -125,8 +125,8 @@
                             <div class="cv-name-section-dark">
                                 <h1 class="cv-name-dark">{{ firstName }}</h1>
                                 <h1 class="cv-lastname-dark">{{ lastName }}</h1>
-                                <h2 class="cv-job-title-dark" v-if="cvData?.personalInfo?.jobTitle">
-                                    {{ cvData.personalInfo.jobTitle }}
+                                <h2 class="cv-job-title-dark" v-if="jobTitleToDisplay">
+                                    {{ jobTitleToDisplay }}
                                 </h2>
                             </div>
                         </div>
@@ -144,9 +144,9 @@
                                     <i class="fa-solid fa-envelope"></i>
                                     <span>{{ cvData.personalInfo.email }}</span>
                                 </div>
-                                <div v-if="cvData?.personalInfo?.email" class="contact-item-dark">
+                                <div v-if="cvData?.personalInfo?.website" class="contact-item-dark">
                                     <i class="fa-solid fa-globe"></i>
-                                    <span>{{ cvData.personalInfo.email }}</span>
+                                    <span>{{ cvData.personalInfo.website }}</span>
                                 </div>
                                 <div v-if="fullAddress" class="contact-item-dark">
                                     <i class="fa-solid fa-location-dot"></i>
@@ -241,7 +241,7 @@
                 <div v-else-if="selectedTemplate === 'elegant'" class="cv-content-elegant">
                     <div class="cv-elegant-container">
                         <div class="cv-elegant-sidebar">
-                            <div class="cv-elegant-sidebar-content">
+                            <div class="cv-elegant-sidebar-content" :style="{ marginTop: sidebarMarginTop + 'px' }">
                                 <div v-if="cvData?.competences?.length > 0" class="cv-elegant-sidebar-section">
                                     <h3 class="cv-elegant-sidebar-title">COMPETENCIAS</h3>
                                     <div class="cv-elegant-sidebar-competences">
@@ -287,6 +287,9 @@
                                     </div>
                                     <div class="cv-elegant-info">
                                         <h1>{{ fullNameUppercase }}</h1>
+                                        <h2 v-if="jobTitleToDisplay" class="cv-elegant-job-title">
+                                            {{ jobTitleToDisplay }}
+                                        </h2>
                                         <div class="cv-elegant-contact">
                                             <div v-if="cvData?.personalInfo?.email" class="cv-elegant-contact-item">
                                                     <i class="fa-solid fa-envelope"></i>
@@ -434,7 +437,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onUnmounted, provide } from 'vue';
+import { computed, ref, onMounted, onUnmounted, onUpdated, watch, provide, nextTick } from 'vue';
 import { loadPalette } from '/src/utils/themeManager.js';
 import html2canvas from 'html2canvas';
 
@@ -445,14 +448,14 @@ const props = defineProps({
     }
 });
 
-const selectedTemplate = ref('modern');
+const selectedTemplate = ref('elegant');
 const showTemplateGallery = ref(false);
 
 // Provide selectedTemplate para que CVFormFields pueda acceder
 provide('selectedTemplate', selectedTemplate);
 
 const templates = [
-    { id: 'modern', name: 'Moderna', badge: 'Actual', thumbnailClass: 'thumb-modern' },
+    
     { id: 'elegant', name: 'Elegante', badge: 'Nuevo', thumbnailClass: 'thumb-elegant' },
     { id: 'dark', name: 'Gris Oscuro', badge: 'Nuevo', thumbnailClass: 'thumb-dark' }
 ];
@@ -556,13 +559,64 @@ const elegantColorRgba = computed(() => {
     return `rgba(${r}, ${g}, ${b}, 0.25)`;
 });
 
+// Ref para el margin-top dinámico de la sidebar
+const sidebarMarginTop = ref(290);
+
+// Función para calcular y ajustar el margin-top de la sidebar
+const adjustSidebarMargin = () => {
+    if (selectedTemplate.value !== 'elegant') return;
+    
+    nextTick(() => {
+        const header = document.querySelector('.cv-elegant-header');
+        const sidebar = document.querySelector('.cv-elegant-sidebar-content');
+        
+        if (header && sidebar) {
+            const headerHeight = header.offsetHeight;
+            // Agregar un pequeño margen adicional (20px) para separación
+            const newMarginTop = headerHeight + 20;
+            sidebarMarginTop.value = Math.max(newMarginTop, 240); // Mínimo de 240px
+        }
+    });
+};
+
+// Watch para recalcular cuando cambien los datos o el template
+watch(() => [props.cvData, selectedTemplate.value], () => {
+    adjustSidebarMargin();
+}, { deep: true });
+
+// Listener para recalcular cuando cambie el tamaño de la ventana
+let resizeObserver = null;
+
 onMounted(() => {
     loadActivePalette();
     document.addEventListener('click', handleClickOutside);
+    adjustSidebarMargin();
+    
+    // Recalcular cuando cambie el tamaño de la ventana
+    window.addEventListener('resize', adjustSidebarMargin);
+    
+    // Usar ResizeObserver para detectar cambios en el header
+    nextTick(() => {
+        const header = document.querySelector('.cv-elegant-header');
+        if (header && window.ResizeObserver) {
+            resizeObserver = new ResizeObserver(() => {
+                adjustSidebarMargin();
+            });
+            resizeObserver.observe(header);
+        }
+    });
+});
+
+onUpdated(() => {
+    adjustSidebarMargin();
 });
 
 onUnmounted(() => {
     document.removeEventListener('click', handleClickOutside);
+    window.removeEventListener('resize', adjustSidebarMargin);
+    if (resizeObserver) {
+        resizeObserver.disconnect();
+    }
 });
 
 const fullName = computed(() => {
@@ -590,6 +644,16 @@ const fullAddress = computed(() => {
     const { address, postalCode, city } = props.cvData.personalInfo;
     const parts = [address, postalCode, city].filter(Boolean);
     return parts.join(', ') || '';
+});
+
+const jobTitleToDisplay = computed(() => {
+    const info = props.cvData?.personalInfo;
+    if (!info) return '';
+    if (!info.jobTitle) return '';
+    if (info.useJobTitleAsTitle === false) {
+        return '';
+    }
+    return info.jobTitle;
 });
 
 const hasExperience = computed(() => {
@@ -1394,7 +1458,7 @@ defineExpose({
     flex-direction: column;
     gap: 24px;
     padding-top: 20px;
-    margin-top: 240px; // Más espacio para que el header no cubra las secciones del sidebar
+    // margin-top se ajusta dinámicamente via JavaScript para evitar que el header se sobreponga
 }
 
 // FOTO: contenedor blanco con foto que se superpone al sidebar
@@ -1565,10 +1629,11 @@ defineExpose({
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
     flex: 1;
-    text-align: center;
+    text-align: left;
+    padding-left: 40px; // Separar el texto de la imagen
 }
 
 .cv-elegant-info h1 {
@@ -1583,6 +1648,24 @@ defineExpose({
     word-wrap: break-word;
     overflow-wrap: break-word;
     word-break: break-word;
+    text-align: left;
+    width: 100%;
+}
+
+.cv-elegant-job-title {
+    font-size: var(--size-subtitle, 18px);
+    font-family: var(--font-primary, var(--font-base, 'Saira', 'Arial', sans-serif));
+    color: white !important;
+    margin: 8px 0 0 0;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    text-transform: none;
+    line-height: 1.4;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    text-align: left;
+    width: 100%;
 }
 
 // Contacto con iconos en header teal
@@ -1591,6 +1674,8 @@ defineExpose({
     flex-direction: column;
     gap: 12px;
     margin-top: 12px;
+    width: 100%;
+    align-items: flex-start;
 }
 
 .cv-elegant-contact-item {
@@ -1821,8 +1906,23 @@ defineExpose({
         margin: 0 auto 20px;
     }
 
+    .cv-elegant-info {
+        padding-left: 0; // Sin padding en responsive cuando la foto está arriba
+        align-items: center; // Centrar en responsive
+        text-align: center;
+    }
+
     .cv-elegant-info h1 {
         font-size: 30px;
+        text-align: center;
+    }
+
+    .cv-elegant-job-title {
+        text-align: center;
+    }
+
+    .cv-elegant-contact {
+        align-items: center;
     }
 }
 
@@ -1938,7 +2038,7 @@ defineExpose({
             }
             
             .cv-lastname-dark {
-                font-size: 2.8rem;
+                font-size: 4rem;
                 font-weight: 700;
                 color: white !important;
                 margin: 0;

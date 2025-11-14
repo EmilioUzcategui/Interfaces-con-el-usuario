@@ -134,6 +134,17 @@
                         <div v-if="errors.personalInfo?.jobTitle" class="invalid-feedback">
                             {{ errors.personalInfo.jobTitle }}
                         </div>
+                        <div class="form-check form-switch mt-2">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                id="useJobTitleAsTitle"
+                                v-model="form.personalInfo.useJobTitleAsTitle"
+                            >
+                            <label class="form-check-label" for="useJobTitleAsTitle">
+                                Usar como título
+                            </label>
+                        </div>
                     </div>
 
                     <div class="col-md-6 mb-3">
@@ -173,6 +184,25 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
+                        <label for="website" class="form-label">Página Web</label>
+                        <input 
+                            type="url" 
+                            class="form-control" 
+                            id="website" 
+                            v-model="form.personalInfo.website"
+                            :class="{ 'is-invalid': errors.personalInfo?.website }"
+                            @input="validateField('personalInfo', 'website')"
+                            @blur="validateField('personalInfo', 'website')"
+                            placeholder="https://ejemplo.com"
+                        >
+                        <div v-if="errors.personalInfo?.website" class="invalid-feedback">
+                            {{ errors.personalInfo.website }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
                         <label for="address" class="form-label">Dirección *</label>
                         <input 
                             type="text" 
@@ -188,9 +218,7 @@
                             {{ errors.personalInfo.address }}
                         </div>
                     </div>
-                </div>
 
-                <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="postalCode" class="form-label">Código Postal *</label>
                         <input 
@@ -591,7 +619,7 @@
                 <div class="competence-input mb-3 p-3 border rounded">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="competence-name" class="form-label">Habilidad</label>
+                            <label for="competence-name" class="form-label">Competencia</label>
                             <input 
                                 type="text" 
                                 class="form-control" 
@@ -600,7 +628,7 @@
                                 v-model="competenceInput.name"
                                 @blur="validateCompetenceInput"
                                 @input="clearCompetenceInputError"
-                                placeholder="Ej: JavaScript, Vue.js..."
+                                placeholder="Ej: software 01..."
                             >
                             <div v-if="competenceInputError" class="invalid-feedback">
                                 {{ competenceInputError }}
@@ -859,7 +887,7 @@ const emit = defineEmits(['submit', 'update:formData']);
 
 const setSpinnerEnabled = inject("setSpinnerEnabled", null);
 const spinnerEnabled = inject("spinnerEnabled", ref(false));
-const selectedTemplate = inject('selectedTemplate', ref('modern'));
+const selectedTemplate = inject('selectedTemplate', ref('elegant'));
 
 // Computed para determinar si mostrar la sección de habilidades
 const showSkillsSection = computed(() => {
@@ -1025,8 +1053,10 @@ const form = reactive({
         firstName: '',
         lastName: '',
         jobTitle: '',
+        useJobTitleAsTitle: true,
         email: '',
         phone: '',
+        website: '',
         address: '',
         postalCode: '',
         city: '',
@@ -1107,6 +1137,27 @@ const handlePhotoChange = (e) => {
     }
 };
 
+// Función para validar formato de teléfono venezolano
+const isValidVenezuelanPhone = (phone) => {
+    if (!phone) return false;
+    
+    // Eliminar espacios, guiones y otros caracteres no numéricos
+    const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+    
+    // Debe tener exactamente 11 dígitos
+    if (cleanPhone.length !== 11) return false;
+    
+    // Debe empezar con 0
+    if (!cleanPhone.startsWith('0')) return false;
+    
+    // El segundo dígito debe ser 2 (fijos) o 4 (móviles)
+    const secondDigit = cleanPhone.charAt(1);
+    if (secondDigit !== '2' && secondDigit !== '4') return false;
+    
+    // Todos los caracteres deben ser dígitos
+    return /^\d+$/.test(cleanPhone);
+};
+
 const validateField = (section, field = null) => {
     if (section === 'personalInfo' && field) {
         delete errors.personalInfo[field];
@@ -1141,6 +1192,16 @@ const validateField = (section, field = null) => {
             case 'phone':
                 if (!form.personalInfo.phone.trim()) {
                     errors.personalInfo.phone = 'El teléfono es requerido';
+                } else if (!isValidVenezuelanPhone(form.personalInfo.phone)) {
+                    errors.personalInfo.phone = 'El teléfono debe tener formato venezolano válido (ej: 04167367287)';
+                }
+                break;
+            case 'website':
+                if (form.personalInfo.website.trim()) {
+                    const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+                    if (!urlPattern.test(form.personalInfo.website.trim())) {
+                        errors.personalInfo.website = 'La URL no es válida (ej: https://ejemplo.com)';
+                    }
                 }
                 break;
             case 'address':
@@ -1924,7 +1985,7 @@ defineExpose({
     
     .btn-outline-primary {
         border-color: var(--secondary-color);
-        color: var(--secondary-color);
+        color: #000000;
         
         &:hover {
             background-color: var(--secondary-color);

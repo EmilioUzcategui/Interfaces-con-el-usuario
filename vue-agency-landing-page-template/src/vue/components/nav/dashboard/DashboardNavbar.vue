@@ -115,6 +115,12 @@ const dashboardLinks = ref([
         icon: 'fa-solid fa-file-alt'
     },
     {
+        id: 'multimedia',
+        label: 'Multimedia',
+        url: '/dashboard/multimedia',
+        icon: 'fa-solid fa-photo-film'
+    },
+    {
         id: 'config',
         label: 'Configuración de Apariencia',
         url: '/dashboard/appearance',

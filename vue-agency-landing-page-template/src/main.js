@@ -11,6 +11,7 @@ import CurriculumsPage from "/src/vue/content/pages/CurriculumsPage.vue"
 import LicensePage from "/src/vue/content/pages/LicensePage.vue"
 import PolicyPage from "/src/vue/content/pages/PolicyPage.vue"
 import CVPage from "/src/vue/content/pages/CVPage.vue"
+import MultimediaPage from "/src/vue/content/pages/MultimediaPage.vue"
 import { loadTypography } from './utils/loadTypography.js'
 import "./assets/styles/dynamic-colors.css"
 import { loadPalette, loadPaletteWhenReady, debugPaletteState } from './utils/themeManager.js' // 👈 Importa las funciones
@@ -92,6 +93,21 @@ const router = createRouter({
             props: {
                 label: "Curriculums",
                 faIcon: "fa-solid fa-file-alt",
+                inPageNavbar: false,
+                shouldAlwaysPreload: false,
+                breadcrumbs: [
+                    "/dashboard"
+                ]
+            }
+        },
+
+        {
+            path: "/dashboard/multimedia",
+            name: "multimedia",
+            component: MultimediaPage,
+            props: {
+                label: "Multimedia",
+                faIcon: "fa-solid fa-photo-film",
                 inPageNavbar: false,
                 shouldAlwaysPreload: false,
                 breadcrumbs: [

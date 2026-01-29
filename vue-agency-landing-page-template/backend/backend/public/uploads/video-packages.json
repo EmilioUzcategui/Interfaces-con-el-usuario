@@ -1,0 +1,96 @@
+[
+  {
+    "id": "1768945722999-144686632-260895_small.mp4",
+    "name": "small",
+    "createdAt": "2026-01-20T21:48:43.038Z",
+    "video": {
+      "filename": "1768945722999-144686632-260895_small.mp4",
+      "url": "/uploads/videos/1768945722999-144686632-260895_small.mp4"
+    },
+    "subtitles": [
+      {
+        "field": "subtitle1",
+        "filename": "1768945723038-201970086-subtitles-es.vtt",
+        "url": "/uploads/subtitles/1768945723038-201970086-subtitles-es.vtt"
+      },
+      {
+        "field": "subtitle2",
+        "filename": "1768945723038-961367067-subtitles-es.vtt",
+        "url": "/uploads/subtitles/1768945723038-961367067-subtitles-es.vtt"
+      }
+    ],
+    "audios": [
+      {
+        "field": "audio1",
+        "filename": "1768945723039-847273006-drums-loop-75bpm-3-455453.mp3",
+        "url": "/uploads/audios/1768945723039-847273006-drums-loop-75bpm-3-455453.mp3"
+      },
+      {
+        "field": "audio2",
+        "filename": "1768945723048-687650365-snare-drum-acoustic-sample-455287.mp3",
+        "url": "/uploads/audios/1768945723048-687650365-snare-drum-acoustic-sample-455287.mp3"
+      }
+    ]
+  },
+  {
+    "id": "1768948038129-77939756-305660_small.mp4",
+    "name": "holaaaa",
+    "createdAt": "2026-01-20T22:27:18.377Z",
+    "video": {
+      "filename": "1768948038129-77939756-305660_small.mp4",
+      "url": "/uploads/videos/1768948038129-77939756-305660_small.mp4"
+    },
+    "subtitles": [
+      {
+        "field": "subtitle2",
+        "filename": "1768948038373-764256870-subtitles-es.vtt",
+        "url": "/uploads/subtitles/1768948038373-764256870-subtitles-es.vtt"
+      }
+    ],
+    "audios": [
+      {
+        "field": "audio1",
+        "filename": "1768948038374-940252200-sunflower-street-drumloop-85bpm-163900.mp3",
+        "url": "/uploads/audios/1768948038374-940252200-sunflower-street-drumloop-85bpm-163900.mp3"
+      },
+      {
+        "field": "audio2",
+        "filename": "1768948038376-353033830-snare-drum-acoustic-sample-455287.mp3",
+        "url": "/uploads/audios/1768948038376-353033830-snare-drum-acoustic-sample-455287.mp3"
+      }
+    ]
+  },
+  {
+    "id": "1768948513577-961310665-318885_small.mp4",
+    "name": "video3",
+    "createdAt": "2026-01-20T22:35:14.152Z",
+    "video": {
+      "filename": "1768948513577-961310665-318885_small.mp4",
+      "url": "/uploads/videos/1768948513577-961310665-318885_small.mp4"
+    },
+    "subtitles": [
+      {
+        "field": "subtitle1",
+        "filename": "1768948514147-610730620-english.vtt",
+        "url": "/uploads/subtitles/1768948514147-610730620-english.vtt"
+      },
+      {
+        "field": "subtitle2",
+        "filename": "1768948514148-155774987-subtitles-es.vtt",
+        "url": "/uploads/subtitles/1768948514148-155774987-subtitles-es.vtt"
+      }
+    ],
+    "audios": [
+      {
+        "field": "audio1",
+        "filename": "1768948514148-807138855-snare-drum-acoustic-sample-455287.mp3",
+        "url": "/uploads/audios/1768948514148-807138855-snare-drum-acoustic-sample-455287.mp3"
+      },
+      {
+        "field": "audio2",
+        "filename": "1768948514148-904767639-sunflower-street-drumloop-85bpm-163900.mp3",
+        "url": "/uploads/audios/1768948514148-904767639-sunflower-street-drumloop-85bpm-163900.mp3"
+      }
+    ]
+  }
+]

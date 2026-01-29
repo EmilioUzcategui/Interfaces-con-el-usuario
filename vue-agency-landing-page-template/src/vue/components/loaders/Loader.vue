@@ -187,14 +187,14 @@ const _executeAnimatingLogoStep = () => {
     currentStep.value = Steps.ANIMATING_LOGO
     scheduler.schedule(() => {
         _executeAnimatingProgressStep()
-    }, 300, schedulerTag)
+    }, 150, schedulerTag)
 }
 
 const _executeAnimatingProgressStep = () => {
     currentStep.value = Steps.ANIMATING_PROGRESS
     scheduler.schedule(() => {
         _executeWaitingForCompletionStep()
-    }, 500, schedulerTag)
+    }, 150, schedulerTag)
 }
 
 const _executeWaitingForCompletionStep = () => {
@@ -214,8 +214,8 @@ const _updateProgress = (dt) => {
     loadingTime.value += dt
 
     // Calcular el porcentaje basado únicamente en el tiempo transcurrido
-    // 15 segundos (15000ms) = 100%
-    const targetPercentage = utils.clamp((loadingTime.value / 25000) * 100, 0, 100)
+    // ~1.3 segundos (1300ms) = 100% para un total cercano a 2s
+    const targetPercentage = utils.clamp((loadingTime.value / 1300) * 100, 0, 100)
     
     _incrementDisplayPercentage(targetPercentage)
 }
@@ -253,8 +253,8 @@ const _incrementDisplayPercentage = (targetPercentage) => {
         didEmitReady.value = true
     }
 
-    // Completar cuando llegue a 100% o después de 15 segundos
-    if(percentage.value >= 100 || loadingTime.value >= 25000) {
+    // Completar cuando llegue a 100% o después de ~1.3 segundos
+    if(percentage.value >= 100 || loadingTime.value >= 1300) {
         percentage.value = 100
         _onLoadingComplete()
     }
@@ -264,7 +264,7 @@ const _onLoadingComplete = () => {
     scheduler.schedule(() => {
         percentage.value = 100
         _executeLeavingStep()
-    }, 300, schedulerTag)
+    }, 100, schedulerTag)
 }
 
 const _executeLeavingStep = () => {
@@ -285,7 +285,7 @@ const _executeLeavingStep = () => {
 
     scheduler.schedule(() => {
         emit('completed')
-    }, 900, schedulerTag)
+    }, 300, schedulerTag)
 }
 </script>
 

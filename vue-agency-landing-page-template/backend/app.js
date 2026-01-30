@@ -41,12 +41,21 @@ app.get('/api/test', (req, res) => {
     res.json({ message: 'Backend funcionando correctamente' });
 });
 
+// Middleware de manejo de errores global
+app.use((err, req, res, next) => {
+    console.error('Error no capturado:', err);
+    res.status(500).json({
+        error: err.message || 'Error interno del servidor',
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+});
+
 // Probar conexión a la base de datos
 //testConnection();
 
 app.listen(PORT, async () => {
     console.log(`🚀 Servidor ejecutándose en http://localhost:${PORT}`);
-    
+
     // Inicializar paletas por defecto
     try {
         await initPalettes();

@@ -5,9 +5,46 @@ import fs from 'fs'
 
 const router = express.Router()
 
+// ========== UTILS START ==========
+function toDisplayName(name) {
+    if (!name) return ''
+    const base = String(name).split('/').filter(Boolean).pop() || ''
+    const withoutExt = base.replace(/\.[a-z0-9]+$/i, '')
+    const normalized = withoutExt.replace(/[-_]+/g, ' ').trim()
+    const parts = normalized.split(/\s+/).filter(Boolean)
+    if (parts.length && /^\d+$/.test(parts[0])) {
+        let i = 0
+        while (i < parts.length && /^\d+$/.test(parts[i])) i += 1
+        return parts.slice(i).join(' ').trim()
+    }
+    return normalized
+}
+
+async function listFilesWithStats(dirPath, allowedExts) {
+    try {
+        const entries = await fs.promises.readdir(dirPath, { withFileTypes: true })
+        const files = entries
+            .filter((e) => e.isFile())
+            .map((e) => e.name)
+            .filter((name) => allowedExts.has(path.extname(name).toLowerCase()))
+
+        const withStats = await Promise.all(
+            files.map(async (name) => {
+                const full = path.join(dirPath, name)
+                const stat = await fs.promises.stat(full)
+                return { name, mtimeMs: stat.mtimeMs }
+            })
+        )
+        return withStats
+    } catch (e) {
+        return []
+    }
+}
+// ========== UTILS END ==========
+
+
 // ========== CONFIGURACIÓN PARA FUENTES ==========
 const uploadDir = path.resolve('./backend/public/uploads/fonts')
-// asegurarse que exista la carpeta
 try { fs.mkdirSync(uploadDir, { recursive: true }) } catch (e) { }
 
 const storage = multer.diskStorage({
@@ -25,8 +62,85 @@ const upload = multer({ storage })
 
 // ========== CONFIGURACIÓN PARA IMÁGENES DE USUARIO ==========
 const userImagesDir = path.resolve('./backend/public/uploads/users')
-// asegurarse que exista la carpeta
+const userImagesManifestPath = path.resolve('./backend/public/uploads/user-images.json')
 try { fs.mkdirSync(userImagesDir, { recursive: true }) } catch (e) { }
+
+async function readUserImagesManifest() {
+    try {
+        const raw = await fs.promises.readFile(userImagesManifestPath, 'utf8')
+        const parsed = JSON.parse(raw)
+        return Array.isArray(parsed) ? parsed : []
+    } catch (e) {
+        return []
+    }
+}
+
+async function writeUserImagesManifest(items) {
+    await fs.promises.writeFile(userImagesManifestPath, JSON.stringify(items, null, 2), 'utf8')
+}
+
+// Sincroniza el manifest con los archivos reales (si se borraron manual o si hay nuevos)
+async function inferMissingUserImages(existing) {
+    const byId = new Map((existing || []).filter(e => e && e.id).map(e => [e.id, e]))
+    const allowedExts = new Set(['.jpg', '.jpeg', '.png', '.gif', '.webp'])
+
+    const files = await listFilesWithStats(userImagesDir, allowedExts)
+
+    // 1. Identificar archivos físicos que no están en el manifest
+    const merged = []
+
+    for (const f of files) {
+        // En este diseño simple, usamos el filename como ID inicial si no existe uno mapeado
+        // Ojo: si renombramos el archivo físico cambia el ID. 
+        // Para robustez ideal usaríamos un ID interno, pero para mantener simpleza:
+        // Buscamos si existe alguna entrada cuyo filename coincida
+        let entry = existing.find(e => e.filename === f.name)
+
+        if (!entry) {
+            // Crear nueva entrada
+            entry = {
+                id: f.name, // ID temporal basado en filename
+                filename: f.name,
+                name: toDisplayName(f.name),
+                url: `/uploads/users/${f.name}`,
+                createdAt: new Date(f.mtimeMs).toISOString()
+            }
+        } else if (!entry.id) {
+            // FIX: Corregir entradas corruptas que les falte ID
+            entry.id = f.name
+        }
+
+        // Actualizamos siempre la data estática
+        entry.url = `/uploads/users/${f.name}`
+        merged.push(entry)
+    }
+
+    // Si hubo cambios en la cantidad (archivos borrados o nuevos), deberíamos guardar?
+    // Para no spammear escritura, solo guardamos si "merged" tiene items nuevos que no estaban
+    // O si faltan items que sí estaban.
+    // Por simplicidad: devolvemos merged. La persistencia puede ocurrir on-demand o aqui.
+    // Vamos a guardar solo si detectamos nuevos ID que no estaban en 'byId'
+    const currentIds = new Set(merged.map(m => m.id))
+    let changed = false
+
+    // Check si hay nuevos
+    for (const m of merged) {
+        if (!byId.has(m.id)) {
+            changed = true
+            break
+        }
+    }
+    // Check si se borraron (existía en 'byId' pero no en 'currentIds')
+    if (!changed && existing.length !== merged.length) {
+        changed = true
+    }
+
+    if (changed) {
+        await writeUserImagesManifest(merged)
+    }
+
+    return merged
+}
 
 const userImageStorage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -40,18 +154,8 @@ const userImageStorage = multer.diskStorage({
     }
 })
 
-// Middleware para validar que sea una imagen
 const imageFileFilter = (req, file, cb) => {
-    // Tipos MIME permitidos para imágenes
-    const allowedMimes = [
-        'image/jpeg',
-        'image/jpg',
-        'image/png',
-        'image/gif',
-        'image/webp'
-    ]
-
-    // Extensiones permitidas
+    const allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
     const allowedExts = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
     const ext = path.extname(file.originalname).toLowerCase()
 
@@ -62,13 +166,10 @@ const imageFileFilter = (req, file, cb) => {
     }
 }
 
-// Configuración de multer para imágenes de usuario
 const uploadUserImage = multer({
     storage: userImageStorage,
     fileFilter: imageFileFilter,
-    limits: {
-        fileSize: 5 * 1024 * 1024 // 5MB máximo
-    }
+    limits: { fileSize: 5 * 1024 * 1024 }
 })
 
 // ========== CONFIGURACIÓN PARA VIDEOS + SUBTÍTULOS + AUDIO ==========
@@ -94,37 +195,7 @@ async function writeVideoPackagesManifest(items) {
     await fs.promises.writeFile(videoPackagesManifestPath, JSON.stringify(items, null, 2), 'utf8')
 }
 
-function toDisplayName(name) {
-    if (!name) return ''
-    const base = String(name).split('/').filter(Boolean).pop() || ''
-    const withoutExt = base.replace(/\.[a-z0-9]+$/i, '')
-    const normalized = withoutExt.replace(/[-_]+/g, ' ').trim()
-    const parts = normalized.split(/\s+/).filter(Boolean)
-    if (parts.length && /^\d+$/.test(parts[0])) {
-        let i = 0
-        while (i < parts.length && /^\d+$/.test(parts[i])) i += 1
-        return parts.slice(i).join(' ').trim()
-    }
-    return normalized
-}
-
-async function listFilesWithStats(dirPath, allowedExts) {
-    const entries = await fs.promises.readdir(dirPath, { withFileTypes: true })
-    const files = entries
-        .filter((e) => e.isFile())
-        .map((e) => e.name)
-        .filter((name) => allowedExts.has(path.extname(name).toLowerCase()))
-
-    const withStats = await Promise.all(
-        files.map(async (name) => {
-            const full = path.join(dirPath, name)
-            const stat = await fs.promises.stat(full)
-            return { name, mtimeMs: stat.mtimeMs }
-        })
-    )
-    return withStats
-}
-
+// Infiere packages buscando videos huerfanos en disco
 async function inferMissingVideoPackages(existing) {
     const byId = new Set((existing || []).map((e) => e?.id).filter(Boolean))
     const mp4Exts = new Set(['.mp4'])
@@ -136,7 +207,7 @@ async function inferMissingVideoPackages(existing) {
     const audios = await listFilesWithStats(audiosDir, mp3Exts)
 
     const added = []
-    const maxDeltaMs = 60_000 // 60s de ventana para asociar archivos
+    const maxDeltaMs = 60_000
 
     for (const v of videos) {
         if (byId.has(v.name)) continue
@@ -210,13 +281,13 @@ const videoPackageFilter = (req, file, cb) => {
 const uploadVideoPackage = multer({
     storage: videoPackageStorage,
     fileFilter: videoPackageFilter,
-    limits: {
-        // mp4 puede ser grande; dejamos margen
-        fileSize: 200 * 1024 * 1024
-    }
+    limits: { fileSize: 200 * 1024 * 1024 }
 })
 
-// POST /api/uploads/fonts - recibe un campo 'font' con el archivo
+
+// ========== ROUTES ==========
+
+// POST /api/uploads/fonts
 router.post('/fonts', upload.single('font'), (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
@@ -228,72 +299,90 @@ router.post('/fonts', upload.single('font'), (req, res) => {
     }
 })
 
-// POST /api/uploads/user-image - recibe un campo 'image' con la imagen del usuario
-router.post('/user-image', uploadUserImage.single('image'), (req, res) => {
+// POST /api/uploads/user-image
+router.post('/user-image', uploadUserImage.single('image'), async (req, res) => {
     try {
-        if (!req.file) {
-            return res.status(400).json({ error: 'No se subió ninguna imagen' })
-        }
+        if (!req.file) return res.status(400).json({ error: 'No se subió ninguna imagen' })
 
+        const providedName = req.body.name || ''
         const urlPath = `/uploads/users/${req.file.filename}`
+
+        // Guardar metadata en manifest
+        const manifest = await readUserImagesManifest()
+        const newEntry = {
+            id: req.file.filename,
+            filename: req.file.filename,
+            name: providedName || toDisplayName(req.file.filename),
+            url: urlPath,
+            createdAt: new Date().toISOString()
+        }
+        manifest.push(newEntry)
+        await writeUserImagesManifest(manifest)
+
         res.status(201).json({
             message: 'Imagen subida exitosamente',
             url: urlPath,
-            filename: req.file.filename
+            filename: req.file.filename,
+            entry: newEntry
         })
     } catch (err) {
         console.error('Error al subir imagen de usuario:', err)
-
-        // Manejar errores específicos de multer
         if (err instanceof multer.MulterError) {
-            if (err.code === 'LIMIT_FILE_SIZE') {
-                return res.status(400).json({ error: 'El archivo es demasiado grande. Máximo 5MB' })
-            }
+            if (err.code === 'LIMIT_FILE_SIZE') return res.status(400).json({ error: 'El archivo es demasiado grande. Máximo 5MB' })
             return res.status(400).json({ error: `Error al subir archivo: ${err.message}` })
         }
-
-        // Manejar errores de validación
-        if (err.message) {
-            return res.status(400).json({ error: err.message })
-        }
-
+        if (err.message) return res.status(400).json({ error: err.message })
         res.status(500).json({ error: 'Error al subir la imagen' })
     }
 })
 
-// GET /api/uploads/user-images - lista las imágenes disponibles en /uploads/users
+// GET /api/uploads/user-images
 router.get('/user-images', async (req, res) => {
     try {
-        const allowedExts = new Set(['.jpg', '.jpeg', '.png', '.gif', '.webp'])
-        const entries = await fs.promises.readdir(userImagesDir, { withFileTypes: true })
+        const manifest = await readUserImagesManifest()
+        const merged = await inferMissingUserImages(manifest)
+        // Ordenar por fecha (setup simple)
+        merged.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))
 
-        const files = entries
-            .filter((ent) => ent.isFile())
-            .map((ent) => ent.name)
-            .filter((name) => allowedExts.has(path.extname(name).toLowerCase()))
+        console.log('--- DEBUG: GET /user-images ---');
+        merged.forEach(m => console.log(`ID: ${m.id} | Filename: ${m.filename}`));
+        console.log('-------------------------------');
 
-        // Ordenar por fecha de modificación (más recientes primero)
-        const withStats = await Promise.all(
-            files.map(async (name) => {
-                const stat = await fs.promises.stat(path.join(userImagesDir, name))
-                return { name, mtimeMs: stat.mtimeMs }
-            })
-        )
-        withStats.sort((a, b) => b.mtimeMs - a.mtimeMs)
-
-        const images = withStats.map(({ name }) => ({
-            filename: name,
-            url: `/uploads/users/${name}`
-        }))
-
-        res.json({ images })
+        res.json({ images: merged })
     } catch (err) {
         console.error('Error listando imágenes de usuario:', err)
         res.status(500).json({ error: 'No se pudieron listar las imágenes' })
     }
 })
 
-// GET /api/uploads/video-packages - lista videos subidos con sus audios/subtítulos
+// PUT /api/uploads/user-image/:id
+router.put('/user-image/:id', async (req, res) => {
+    try {
+        const { id } = req.params
+        const { name } = req.body
+        if (!name) return res.status(400).json({ error: 'El nombre es obligatorio' })
+
+        const manifest = await readUserImagesManifest()
+        // Por si acaso, hacemos sync (aunque costoso, asegura consistencia basica)
+        const entries = await inferMissingUserImages(manifest)
+
+        const entry = entries.find(e => e.id === id)
+        if (!entry) return res.status(404).json({ error: 'Imagen no encontrada' })
+
+        entry.name = name
+
+        // Guardamos todo el array actualizado
+        await writeUserImagesManifest(entries)
+
+        res.json({ message: 'Nombre actualizado', entry })
+    } catch (e) {
+        console.error('Update image error:', e)
+        res.status(500).json({ error: 'Error actualizando imagen' })
+    }
+})
+
+
+// GET /api/uploads/video-packages
 router.get('/video-packages', async (req, res) => {
     try {
         const items = await readVideoPackagesManifest()
@@ -307,13 +396,6 @@ router.get('/video-packages', async (req, res) => {
 })
 
 // POST /api/uploads/video-package
-// Campos esperados (multipart):
-// - name (texto)
-// - video (mp4)
-// - subtitle1 (vtt) opcional
-// - subtitle2 (vtt) opcional
-// - audio1 (mp3) opcional
-// - audio2 (mp3) opcional
 router.post(
     '/video-package',
     uploadVideoPackage.fields([
@@ -352,7 +434,7 @@ router.post(
             if (a1) resp.audios.push({ field: 'audio1', filename: a1.filename, url: `/uploads/audios/${a1.filename}` })
             if (a2) resp.audios.push({ field: 'audio2', filename: a2.filename, url: `/uploads/audios/${a2.filename}` })
 
-            // Guardar manifest (para poder reconstruir el carrusel luego)
+            // Guardar manifest
             const entry = {
                 id: videoFile.filename,
                 name,
@@ -368,18 +450,41 @@ router.post(
             res.status(201).json(resp)
         } catch (err) {
             console.error('Error subiendo video-package:', err)
-
             if (err instanceof multer.MulterError) {
-                if (err.code === 'LIMIT_FILE_SIZE') {
-                    return res.status(400).json({ error: 'El archivo es demasiado grande' })
-                }
+                if (err.code === 'LIMIT_FILE_SIZE') return res.status(400).json({ error: 'El archivo es demasiado grande' })
                 return res.status(400).json({ error: `Error al subir archivo: ${err.message}` })
             }
-
             if (err.message) return res.status(400).json({ error: err.message })
             res.status(500).json({ error: 'Error al subir el video' })
         }
     }
 )
+
+// PUT /api/uploads/video-package/:id
+router.put('/video-package/:id', async (req, res) => {
+    try {
+        const { id } = req.params
+        const { name } = req.body
+        if (!name) return res.status(400).json({ error: 'El nombre es obligatorio' })
+
+        const manifest = await readVideoPackagesManifest()
+        // No forzamos inferencia acá, asumimos que existe si tiene ID.
+        // Pero para ser consistentes, si quieres que videos en disco aparezcan, 
+        // tendrías que haber hecho GET antes o correr inferencia aqui.
+        // Corremos inferencia para asegurar que "id" (que es filename en los nuevos) exista.
+        const entries = await inferMissingVideoPackages(manifest)
+
+        const entry = entries.find(e => e.id === id)
+        if (!entry) return res.status(404).json({ error: 'Video package no encontrado' })
+
+        entry.name = name
+        await writeVideoPackagesManifest(entries)
+
+        res.json({ message: 'Nombre de video actualizado', entry })
+    } catch (e) {
+        console.error('Update video error:', e)
+        res.status(500).json({ error: 'Error actualizando video' })
+    }
+})
 
 export default router

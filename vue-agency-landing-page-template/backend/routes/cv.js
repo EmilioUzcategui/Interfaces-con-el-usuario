@@ -34,16 +34,17 @@ const imageFileFilter = (req, file, cb) => {
         'image/jpg',
         'image/png',
         'image/gif',
-        'image/webp'
+        'image/webp',
+        'application/pdf'
     ];
 
-    const allowedExts = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+    const allowedExts = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.pdf'];
     const ext = path.extname(file.originalname).toLowerCase();
 
     if (allowedMimes.includes(file.mimetype) && allowedExts.includes(ext)) {
         cb(null, true);
     } else {
-        cb(new Error('Solo se permiten archivos de imagen (JPG, PNG, GIF, WEBP)'), false);
+        cb(new Error('Solo se permiten archivos de imagen (JPG, PNG, GIF, WEBP) y PDF'), false);
     }
 };
 

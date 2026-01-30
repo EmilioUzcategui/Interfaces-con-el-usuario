@@ -252,24 +252,48 @@ function cancelEdit() {
 }
 
 async function saveImageName(img) {
-  if (!editNameModel.value.trim()) return
+  console.log('=== saveImageName LLAMADO ===')
+  console.log('Imagen a editar:', img)
+  console.log('ID de la imagen:', img.id)
+  console.log('Nuevo nombre:', editNameModel.value)
+  
+  if (!editNameModel.value.trim()) {
+    console.log('Nombre vacío, no se guarda')
+    return
+  }
+  
   try {
-    const res = await fetch(`/api/uploads/user-image/${img.id}`, {
+    const url = `/api/uploads/user-image/${img.id}`
+    console.log('Enviando PUT a:', url)
+    
+    const res = await fetch(url, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: editNameModel.value })
     })
+    
+    console.log('Respuesta del servidor:', res.status, res.statusText)
+    
     if (res.ok) {
       const data = await res.json()
+      console.log('Datos recibidos del servidor:', data)
+      
       // Actualizar localmente
       const idx = imagesList.value.findIndex(i => i.id === img.id)
-      if (idx !== -1) imagesList.value[idx] = data.entry
+      console.log('Índice de la imagen en la lista:', idx)
+      
+      if (idx !== -1) {
+        imagesList.value[idx] = data.entry
+        console.log('✓ Imagen actualizada localmente en el dashboard')
+      }
       cancelEdit()
+      console.log('============================')
     } else {
+      console.error('Error en la respuesta:', res.status)
       alert('Error actualizando nombre')
     }
   } catch (e) {
-    console.error(e)
+    console.error('Error de conexión:', e)
     alert('Error de conexión')
   }
 }

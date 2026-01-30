@@ -137,398 +137,269 @@
 </template>
 
 <script setup>
-import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
-import PageSection from "/src/vue/components/layout/PageSection.vue"
-import PageSectionHeader from "/src/vue/components/layout/PageSectionHeader.vue"
-import PageSectionContent from "/src/vue/components/layout/PageSectionContent.vue"
-// Swiper (ya está en deps)
+import { ref, nextTick, onMounted, onActivated, onBeforeUnmount } from 'vue'
+import PageSection from '/src/vue/components/layout/PageSection.vue'
+import PageSectionHeader from '/src/vue/components/layout/PageSectionHeader.vue'
+import PageSectionContent from '/src/vue/components/layout/PageSectionContent.vue'
+
+// Swiper
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Navigation, Pagination } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 
+/* =======================
+   PROPS
+======================= */
 const props = defineProps({
-    id: String
+  id: String
 })
 
-const modules = [Navigation, Pagination]
-const breakpoints = {
-    1200: { slidesPerView: 3, slidesPerGroup: 3 },
-    992:  { slidesPerView: 2, slidesPerGroup: 2 },
-    0:    { slidesPerView: 1, slidesPerGroup: 1 }
-}
-
-const videoBreakpoints = {
-    1200: { slidesPerView: 3, slidesPerGroup: 3 },
-    992:  { slidesPerView: 2, slidesPerGroup: 2 },
-    0:    { slidesPerView: 1, slidesPerGroup: 1 }
-}
-
+/* =======================
+   STATE
+======================= */
 const images = ref([])
 const videos = ref([])
 
-const audioTracks = ref([
-    { id: 'original', name: 'Original', url: null }
-])
-const subtitleTracks = ref([
-    { id: 'off', name: 'Sin subtítulos', url: null }
-])
+const isPlayerOpen = ref(false)
+const isPlaying = ref(false)
+const activeVideo = ref(null)
 
+const audioTracks = ref([])
+const subtitleTracks = ref([])
 const selectedAudioId = ref('original')
 const selectedSubtitleId = ref('off')
 
 const uiVolume = ref(1)
 const uiMuted = ref(false)
 
-const isPlaying = ref(false)
-
-const isPlayerOpen = ref(false)
-const activeVideo = ref(null)
-
 const playerVideoEl = ref(null)
 const playerAudioEl = ref(null)
 
-function toDisplayName(filenameOrUrl) {
-    if (!filenameOrUrl) return ''
+/* =======================
+   SWIPER CONFIG
+======================= */
+const modules = [Navigation, Pagination]
 
-    // Si viene como URL, extraer el último segmento
-    const lastPart = String(filenameOrUrl).split('/').filter(Boolean).pop() || ''
-    const decoded = decodeURIComponent(lastPart)
-
-    // Quitar querystring y extensión
-    const noQuery = decoded.split('?')[0]
-    const withoutExt = noQuery.replace(/\.[a-z0-9]+$/i, '')
-
-    // Limpieza mínima (local): guiones/underscores -> espacios
-    const normalized = withoutExt.replace(/[-_]+/g, ' ').trim()
-
-    const parts = normalized.split(/\s+/).filter(Boolean)
-    const hasLetter = (s) => /[a-zA-ZÁÉÍÓÚÜÑáéíóúüñ]/.test(s)
-
-    // Caso típico: empieza con timestamps/ids numéricos.
-    // Ej: 1768943709239-317554929-paisaje-1.jpg => "paisaje 1"
-    if (parts.length && /^\d+$/.test(parts[0])) {
-        let i = 0
-        while (i < parts.length && /^\d+$/.test(parts[i])) i += 1
-        const tail = parts.slice(i).join(' ').trim()
-        if (tail) return tail
-    }
-
-    // "Desde que deje de haber números hacia adelante":
-    // tomar todo lo que venga después del último token que sea SOLO números.
-    const lastNumericIndex = (() => {
-        for (let i = parts.length - 1; i >= 0; i -= 1) {
-            if (/^\d+$/.test(parts[i])) return i
-        }
-        return -1
-    })()
-
-    if (lastNumericIndex !== -1 && lastNumericIndex < parts.length - 1) {
-        const tail = parts
-            .slice(lastNumericIndex + 1)
-            .map((p) => p.replace(/^\d+/, ''))
-            .filter(Boolean)
-
-        const result = tail.join(' ').trim()
-        if (result) return result
-    }
-
-    // Fallback: última parte que tenga letras (por si el nombre termina en números)
-    const lastWithLetters = [...parts].reverse().find((p) => hasLetter(p.replace(/^\d+/, '')))
-    return lastWithLetters ? lastWithLetters.replace(/^\d+/, '').trim() : ''
+const breakpoints = {
+  640: { slidesPerView: 2 },
+  1024: { slidesPerView: 3 }
 }
 
-onMounted(async () => {
-    try {
-        const resp = await fetch('/api/uploads/user-images')
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
-        const data = await resp.json()
-
-        // backend devuelve: { images: [{ filename, url }] }
-        images.value = Array.isArray(data?.images)
-            ? data.images
-                .map((img) => ({
-                    url: img?.url,
-                    name: toDisplayName(img?.filename || img?.url)
-                }))
-                .filter((img) => Boolean(img.url))
-            : []
-    } catch (e) {
-        console.error('No se pudieron cargar las imágenes de usuarios:', e)
-        images.value = []
-    }
-})
-
-onMounted(async () => {
-    try {
-        const resp = await fetch('/api/uploads/video-packages')
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
-        const data = await resp.json()
-
-        // backend: { videos: [{ id, name, createdAt, video, subtitles, audios }] }
-        videos.value = Array.isArray(data?.videos)
-            ? data.videos
-                .map((pkg) => {
-                    const url = pkg?.video?.url
-                    const name = pkg?.name || toDisplayName(pkg?.video?.filename || url)
-                    const audios = Array.isArray(pkg?.audios)
-                        ? pkg.audios.map((a, idx) => ({
-                            id: a?.url || `audio-${idx}`,
-                            url: a?.url,
-                            name: toDisplayName(a?.filename || a?.url) || `Audio ${idx + 1}`
-                        })).filter((a) => Boolean(a.url))
-                        : []
-                    const subtitles = Array.isArray(pkg?.subtitles)
-                        ? pkg.subtitles.map((s, idx) => ({
-                            id: s?.url || `sub-${idx}`,
-                            url: s?.url,
-                            name: toDisplayName(s?.filename || s?.url) || `Subtítulos ${idx + 1}`
-                        })).filter((s) => Boolean(s.url))
-                        : []
-
-                    return {
-                        id: pkg?.id || url,
-                        url,
-                        name,
-                        audios,
-                        subtitles,
-                        createdAt: pkg?.createdAt
-                    }
-                })
-                .filter((v) => Boolean(v.url))
-            : []
-    } catch (e) {
-        console.error('No se pudieron cargar los videos subidos:', e)
-        videos.value = []
-    }
-})
-
-async function openPlayer(videoItem) {
-    // defaults cada vez que se abre
-    selectedAudioId.value = 'original'
-    selectedSubtitleId.value = 'off'
-
-    // Cargar pistas por video (desde backend)
-    audioTracks.value = [
-        { id: 'original', name: 'Original', url: null },
-        ...(Array.isArray(videoItem?.audios) ? videoItem.audios : [])
-    ]
-    subtitleTracks.value = [
-        { id: 'off', name: 'Sin subtítulos', url: null },
-        ...(Array.isArray(videoItem?.subtitles) ? videoItem.subtitles : [])
-    ]
-
-    activeVideo.value = videoItem
-    isPlayerOpen.value = true
-    isPlaying.value = false
-
-    await nextTick()
-    // Inicializar controles de volumen basados en el video
-    if (playerVideoEl.value) {
-        uiVolume.value = typeof playerVideoEl.value.volume === 'number' ? playerVideoEl.value.volume : 1
-        uiMuted.value = !!playerVideoEl.value.muted
-    }
-    applySubtitleSelection()
-    applyAudioSelection()
+const videoBreakpoints = {
+  640: { slidesPerView: 1 },
+  1024: { slidesPerView: 2 }
 }
 
-function closePlayer() {
-    stopExternalAudio()
-    isPlayerOpen.value = false
-    activeVideo.value = null
-    isPlaying.value = false
-}
+/* =======================
+   HELPERS
+======================= */
+function toDisplayName(input) {
+  if (!input) return ''
 
-async function togglePlayPause() {
-    const video = playerVideoEl.value
-    if (!video) return
+  const name = String(input)
+    .split('/')
+    .pop()
+    .replace(/\.[^/.]+$/, '')
 
-    if (video.paused) {
-        try { await video.play() } catch (_) { }
-    } else {
-        try { video.pause() } catch (_) { }
+  const parts = name.split(/[\s_-]+/)
+  const hasLetter = (s) => /[a-zA-Z]/.test(s)
+
+  const lastNumericIndex = (() => {
+    for (let i = parts.length - 1; i >= 0; i--) {
+      if (/^\d+$/.test(parts[i])) return i
     }
+    return -1
+  })()
+
+  if (lastNumericIndex !== -1 && lastNumericIndex < parts.length - 1) {
+    const tail = parts
+      .slice(lastNumericIndex + 1)
+      .map((p) => p.replace(/^\d+/, ''))
+      .filter(Boolean)
+
+    const result = tail.join(' ').trim()
+    if (result) return result
+  }
+
+  const lastWithLetters = [...parts]
+    .reverse()
+    .find((p) => hasLetter(p.replace(/^\d+/, '')))
+
+  return lastWithLetters
+    ? lastWithLetters.replace(/^\d+/, '').trim()
+    : ''
 }
 
-function onKeydown(e) {
-    if (e.key === 'Escape' && isPlayerOpen.value) closePlayer()
+/* =======================
+   LOADERS
+======================= */
+async function reloadImages() {
+  try {
+    const resp = await fetch('/api/uploads/user-images')
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
+    const data = await resp.json()
+
+    images.value = Array.isArray(data?.images)
+      ? data.images
+          .map((img) => ({
+            url: img?.url,
+            name: toDisplayName(img?.filename || img?.url)
+          }))
+          .filter((img) => img.url)
+      : []
+  } catch (e) {
+    console.error('Error cargando imágenes:', e)
+    images.value = []
+  }
 }
 
+async function reloadVideos() {
+  try {
+    const resp = await fetch('/api/uploads/video-packages')
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
+    const data = await resp.json()
+
+    videos.value = Array.isArray(data?.videos)
+      ? data.videos
+          .map((pkg) => {
+            const url = pkg?.video?.url
+            return {
+              id: pkg?.id || url,
+              url,
+              name: pkg?.name || toDisplayName(pkg?.video?.filename || url),
+              audios: (pkg?.audios || []).map((a, i) => ({
+                id: a?.url || `audio-${i}`,
+                url: a?.url,
+                name: toDisplayName(a?.filename || a?.url) || `Audio ${i + 1}`
+              })),
+              subtitles: (pkg?.subtitles || []).map((s, i) => ({
+                id: s?.url || `sub-${i}`,
+                url: s?.url,
+                name: toDisplayName(s?.filename || s?.url) || `Subtítulos ${i + 1}`
+              })),
+              createdAt: pkg?.createdAt
+            }
+          })
+          .filter((v) => v.url)
+      : []
+  } catch (e) {
+    console.error('Error cargando videos:', e)
+    videos.value = []
+  }
+}
+
+/* =======================
+   LIFECYCLE
+======================= */
 onMounted(() => {
-    window.addEventListener('keydown', onKeydown)
+  reloadImages()
+  reloadVideos()
+  window.addEventListener('keydown', onKeydown)
+})
+
+onActivated(() => {
+  reloadImages()
+  reloadVideos()
 })
 
 onBeforeUnmount(() => {
-    window.removeEventListener('keydown', onKeydown)
+  window.removeEventListener('keydown', onKeydown)
 })
 
+/* =======================
+   PLAYER
+======================= */
+async function openPlayer(video) {
+  activeVideo.value = video
+  isPlayerOpen.value = true
+  isPlaying.value = false
+
+  audioTracks.value = [
+    { id: 'original', name: 'Original', url: null },
+    ...(video.audios || [])
+  ]
+  subtitleTracks.value = [
+    { id: 'off', name: 'Sin subtítulos', url: null },
+    ...(video.subtitles || [])
+  ]
+
+  selectedAudioId.value = 'original'
+  selectedSubtitleId.value = 'off'
+
+  await nextTick()
+  applySubtitleSelection()
+  applyAudioSelection()
+}
+
+function closePlayer() {
+  stopExternalAudio()
+  isPlayerOpen.value = false
+  activeVideo.value = null
+  isPlaying.value = false
+}
+
+function togglePlayPause() {
+  const video = playerVideoEl.value
+  if (!video) return
+  video.paused ? video.play() : video.pause()
+}
+
+function onKeydown(e) {
+  if (e.key === 'Escape' && isPlayerOpen.value) closePlayer()
+}
+
+/* =======================
+   AUDIO / SUBS
+======================= */
 function getSelectedAudio() {
-    return audioTracks.value.find((t) => t.id === selectedAudioId.value) || audioTracks.value[0]
+  return audioTracks.value.find((a) => a.id === selectedAudioId.value)
 }
 
 function getSelectedSubtitle() {
-    return subtitleTracks.value.find((t) => t.id === selectedSubtitleId.value) || subtitleTracks.value[0]
+  return subtitleTracks.value.find((s) => s.id === selectedSubtitleId.value)
 }
 
 function stopExternalAudio() {
-    const audio = playerAudioEl.value
-    if (!audio) return
-    try { audio.pause() } catch (_) { }
-    audio.src = ''
+  if (!playerAudioEl.value) return
+  playerAudioEl.value.pause()
+  playerAudioEl.value.src = ''
 }
 
 function applySubtitleSelection() {
-    const video = playerVideoEl.value
-    const selected = getSelectedSubtitle()
-    if (!video) return
+  const video = playerVideoEl.value
+  if (!video) return
 
-    // Limpiar tracks previos (para cambiar entre múltiples vtt)
-    Array.from(video.querySelectorAll('track')).forEach((t) => t.remove())
+  video.querySelectorAll('track').forEach((t) => t.remove())
+  const selected = getSelectedSubtitle()
+  if (!selected || selected.id === 'off') return
 
-    if (selected.id === 'off' || !selected.url) {
-        const tracks = video.textTracks
-        if (!tracks) return
-        for (let i = 0; i < tracks.length; i += 1) tracks[i].mode = 'disabled'
-        return
-    }
-
-    const trackEl = document.createElement('track')
-    trackEl.kind = 'subtitles'
-    trackEl.label = selected.name || 'Subtítulos'
-    trackEl.srclang = 'es'
-    trackEl.src = selected.url
-    trackEl.default = true
-    video.appendChild(trackEl)
-
-    // Forzar showing si el navegador lo deja
-    const tracks = video.textTracks
-    if (!tracks) return
-    for (let i = 0; i < tracks.length; i += 1) tracks[i].mode = 'showing'
+  const track = document.createElement('track')
+  track.kind = 'subtitles'
+  track.src = selected.url
+  track.default = true
+  video.appendChild(track)
 }
 
 async function applyAudioSelection() {
-    const video = playerVideoEl.value
-    const audio = playerAudioEl.value
-    if (!video || !audio) return
+  const video = playerVideoEl.value
+  const audio = playerAudioEl.value
+  if (!video || !audio) return
 
-    const selected = getSelectedAudio()
-    if (!selected || selected.id === 'original' || !selected.url) {
-        stopExternalAudio()
-        video.muted = uiMuted.value
-        video.volume = uiVolume.value
-        return
-    }
+  const selected = getSelectedAudio()
+  if (!selected || selected.id === 'original') {
+    stopExternalAudio()
+    return
+  }
 
-    // Usar audio externo: silenciar el video y sincronizar.
-    video.muted = true
-
-    const shouldPlay = !video.paused
-    audio.src = selected.url
-    audio.load()
-
-    await new Promise((resolve) => {
-        const done = () => {
-            audio.removeEventListener('loadedmetadata', done)
-            resolve()
-        }
-        audio.addEventListener('loadedmetadata', done)
-    })
-
-    try {
-        audio.currentTime = video.currentTime || 0
-    } catch (_) { }
-
-    audio.playbackRate = video.playbackRate || 1
-    audio.volume = uiVolume.value
-    audio.muted = uiMuted.value
-
-    if (shouldPlay) {
-        try { await audio.play() } catch (_) { }
-    }
-}
-
-function onPlayerLoadedMetadata() {
-    applySubtitleSelection()
-    applyAudioSelection()
-}
-
-function onPlayerPlay() {
-    isPlaying.value = true
-    const audio = playerAudioEl.value
-    const video = playerVideoEl.value
-    const selected = getSelectedAudio()
-    if (!audio || !video || selected.id === 'original') return
-    try { audio.currentTime = video.currentTime || 0 } catch (_) { }
-    audio.play().catch(() => { })
-}
-
-function onPlayerPause() {
-    isPlaying.value = false
-    const audio = playerAudioEl.value
-    const selected = getSelectedAudio()
-    if (!audio || selected.id === 'original') return
-    try { audio.pause() } catch (_) { }
-}
-
-function onPlayerEnded() {
-    isPlaying.value = false
-}
-
-function onPlayerSeek() {
-    const audio = playerAudioEl.value
-    const video = playerVideoEl.value
-    const selected = getSelectedAudio()
-    if (!audio || !video || selected.id === 'original') return
-    try { audio.currentTime = video.currentTime || 0 } catch (_) { }
-}
-
-function onPlayerRateChange() {
-    const audio = playerAudioEl.value
-    const video = playerVideoEl.value
-    const selected = getSelectedAudio()
-    if (!audio || !video || selected.id === 'original') return
-    audio.playbackRate = video.playbackRate || 1
-}
-
-function onPlayerVolumeChange() {
-    const audio = playerAudioEl.value
-    const video = playerVideoEl.value
-    const selected = getSelectedAudio()
-    if (!video) return
-
-    // Si está usando audio original, reflejar cambios del control nativo
-    if (selected.id === 'original') {
-        uiVolume.value = typeof video.volume === 'number' ? video.volume : uiVolume.value
-        uiMuted.value = !!video.muted
-        return
-    }
-
-    // Con audio externo el volumen nativo queda deshabilitado (video está muted),
-    // así que ignoramos este evento y usamos el slider propio.
-    if (!audio) return
-}
-
-function applyVolume() {
-    const video = playerVideoEl.value
-    const audio = playerAudioEl.value
-    const selected = getSelectedAudio()
-
-    if (selected.id === 'original') {
-        if (!video) return
-        video.volume = uiVolume.value
-        video.muted = uiMuted.value
-        return
-    }
-
-    if (!audio) return
-    audio.volume = uiVolume.value
-    audio.muted = uiMuted.value
+  video.muted = true
+  audio.src = selected.url
+  await audio.play()
 }
 
 function toggleMute() {
-    uiMuted.value = !uiMuted.value
-    applyVolume()
+  uiMuted.value = !uiMuted.value
 }
 </script>
 

@@ -358,21 +358,36 @@ router.get('/user-images', async (req, res) => {
 // PUT /api/uploads/user-image/:id
 router.put('/user-image/:id', async (req, res) => {
     try {
+        console.log('=== PUT /user-image/:id LLAMADO ===')
         const { id } = req.params
         const { name } = req.body
+        console.log(`ID recibido: ${id}`)
+        console.log(`Nuevo nombre: ${name}`)
+
         if (!name) return res.status(400).json({ error: 'El nombre es obligatorio' })
 
         const manifest = await readUserImagesManifest()
+        console.log(`Manifest actual tiene ${manifest.length} entradas`)
+
         // Por si acaso, hacemos sync (aunque costoso, asegura consistencia basica)
         const entries = await inferMissingUserImages(manifest)
+        console.log(`Después de inferMissingUserImages: ${entries.length} entradas`)
 
         const entry = entries.find(e => e.id === id)
-        if (!entry) return res.status(404).json({ error: 'Imagen no encontrada' })
+        if (!entry) {
+            console.log(`ERROR: No se encontró imagen con ID ${id}`)
+            return res.status(404).json({ error: 'Imagen no encontrada' })
+        }
 
+        console.log(`Imagen encontrada: ${entry.filename}`)
+        console.log(`Nombre anterior: ${entry.name}`)
         entry.name = name
+        console.log(`Nombre nuevo asignado: ${entry.name}`)
 
         // Guardamos todo el array actualizado
         await writeUserImagesManifest(entries)
+        console.log(`✓ Manifest guardado en ${userImagesManifestPath}`)
+        console.log('====================================')
 
         res.json({ message: 'Nombre actualizado', entry })
     } catch (e) {

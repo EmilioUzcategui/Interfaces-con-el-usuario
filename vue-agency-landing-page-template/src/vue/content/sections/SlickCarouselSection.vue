@@ -29,17 +29,36 @@ const images = ref([])
 const isInitialized = ref(false)
 
 async function fetchImages() {
+  console.log('=== CARRUSEL: fetchImages LLAMADO ===')
   try {
     const res = await fetch('/api/uploads/user-images')
-    if (!res.ok) return
+    console.log('Respuesta del API:', res.status, res.statusText)
+    
+    if (!res.ok) {
+      console.error('Error en la respuesta del API')
+      return
+    }
+    
     const data = await res.json()
+    console.log('Datos completos recibidos:', data)
+    console.log('Cantidad de imágenes:', data.images?.length || 0)
+    
     // Filtramos para asegurar que hay url
     images.value = (data.images || []).filter(i => i.url)
+    console.log('Imágenes después del filtro:', images.value)
+    console.log('Nombres de las imágenes:')
+    images.value.forEach(img => {
+      console.log(`  - ID: ${img.id} | Nombre: ${img.name} | Filename: ${img.filename}`)
+    })
     
     // Inicializar slick después de cargar datos
     if (images.value.length > 0) {
+      console.log('Inicializando Slick Carousel')
       nextTick(() => initSlick())
+    } else {
+      console.log('No hay imágenes para mostrar')
     }
+    console.log('====================================')
   } catch (e) {
     console.error('Error cargando carrusel:', e)
   }
@@ -75,17 +94,28 @@ function initSlick() {
 
 onMounted(() => {
   fetchImages()
+  
+  // Auto-refrescar cada 10 segundos para detectar cambios
+  const intervalId = setInterval(() => {
+    console.log('⟳ Auto-refresh del carrusel...')
+    fetchImages()
+  }, 10000) // 10 segundos
+  
+  // Guardar el ID del intervalo para limpiarlo al desmontar
+  onBeforeUnmount(() => {
+    console.log('Limpiando intervalo de auto-refresh')
+    clearInterval(intervalId)
+    
+    const $ = window.jQuery || window.$
+    if ($ && carouselEl.value) {
+      const $el = $(carouselEl.value)
+      if ($el.hasClass('slick-initialized')) {
+        $el.slick('unslick')
+      }
+    }
+  })
 })
 
-onBeforeUnmount(() => {
-  const $ = window.jQuery || window.$
-  if ($ && carouselEl.value) {
-    const $el = $(carouselEl.value)
-    if ($el.hasClass('slick-initialized')) {
-      $el.slick('unslick')
-    }
-  }
-})
 </script>
 
 <style scoped>

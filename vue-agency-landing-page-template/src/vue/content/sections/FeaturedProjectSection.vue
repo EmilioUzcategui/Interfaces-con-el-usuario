@@ -7,7 +7,7 @@
         <PageSectionContent>
             <ArticleCustomContent>
                 <!-- Banner -->
-                <ProjectInfo image="images/portfolio/project-logo-8.png">
+                <ProjectInfo fa-icon="fa-solid fa-bolt">
                     <ProjectInfoFeaturedContent title="*Zork* App"
                                                 description="<b>Zork</b> is your ultimate battery life management app, empowering you to seize control of your device's energy consumption effortlessly. With its intuitive interface, Zork provides real-time monitoring of battery status, enabling you to identify power-draining apps and processes."
                                                 :links="[

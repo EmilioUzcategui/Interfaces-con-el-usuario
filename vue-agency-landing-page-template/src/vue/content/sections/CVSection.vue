@@ -80,17 +80,17 @@ const handleSubmitSuccess = async (submitData) => {
         }
         
         try {
-            console.log('Capturando imagen del CV...')
-            // Capturar la imagen del CV
-            const imageBlob = await cvPreviewRef.value.captureCVAsImage()
+            console.log('Capturando CV como PDF...')
+            // Capturar el CV como PDF
+            const pdfBlob = await cvPreviewRef.value.captureCVAsPDF()
             
-            if (!imageBlob) {
-                console.error('No se pudo capturar la imagen del CV')
+            if (!pdfBlob) {
+                console.error('No se pudo capturar el CV como PDF')
                 setSpinnerEnabled && setSpinnerEnabled(false)
                 return
             }
 
-            console.log('Imagen capturada, tamaño:', imageBlob.size, 'bytes')
+            console.log('PDF capturado, tamaño:', pdfBlob.size, 'bytes')
 
             // Obtener datos del submit (puede ser userId o un objeto con más info)
             let userId, actionType, cvId;
@@ -120,9 +120,9 @@ const handleSubmitSuccess = async (submitData) => {
                 userId = user.id_user
             }
 
-            // Crear FormData para enviar la imagen
+            // Crear FormData para enviar el PDF
             const formData = new FormData()
-            formData.append('cvImage', imageBlob, `CV_${Date.now()}.png`)
+            formData.append('cvImage', pdfBlob, `CV_${Date.now()}.pdf`)
             
             // Determinar URL y método según la acción
             let url, method;
@@ -164,15 +164,15 @@ const handleSubmitSuccess = async (submitData) => {
                         confirmButton: 'swal2-confirm-custom'
                     }
                 })
-                // También descargar la imagen localmente
-                const imageUrl = URL.createObjectURL(imageBlob)
+                // También descargar el PDF localmente
+                const pdfUrl = URL.createObjectURL(pdfBlob)
                 const link = document.createElement('a')
-                link.href = imageUrl
-                link.download = `CV_${Date.now()}.png`
+                link.href = pdfUrl
+                link.download = `CV_${Date.now()}.pdf`
                 document.body.appendChild(link)
                 link.click()
                 document.body.removeChild(link)
-                setTimeout(() => URL.revokeObjectURL(imageUrl), 100)
+                setTimeout(() => URL.revokeObjectURL(pdfUrl), 100)
             } else {
                 const errorMessage = actionType === 'update' ? 'Error al actualizar el CV' : 'Error al guardar el CV'
                 console.error(errorMessage + ':', data.error)

@@ -3,7 +3,15 @@
         <!-- Logo Wrapper -->
         <div class="foxy-project-info-logo-wrapper"
              :class="shrinkImage ? `foxy-project-info-logo-wrapper-shrink` : ``">
-            <ImageView :src="props.image"
+            <!-- Si hay un icono, usar Font Awesome, sino usar la imagen -->
+            <div v-if="props.faIcon" class="foxy-project-info-icon-wrapper">
+                <span class="icon-stack fa-stack">
+                    <i class="fas fa-circle fa-stack-2x" style="color: var(--secondary-color, #ff5900);"/>
+                    <i class="fa-stack-1x" :class="props.faIcon" style="color: white;"/>
+                </span>
+            </div>
+            <ImageView v-else
+                       :src="props.image"
                        alt="Logo"
                        :spinner-enabled="true"/>
         </div>
@@ -19,7 +27,8 @@ import ImageView from "/src/vue/components/generic/ImageView.vue"
 
 const props = defineProps({
     image: String,
-    shrinkImage: Boolean
+    shrinkImage: Boolean,
+    faIcon: String  // Icono de Font Awesome opcional
 })
 </script>
 
@@ -62,6 +71,38 @@ div.foxy-project-info-logo-wrapper .image-view {
     margin: 0 auto;
     border-radius: 20%;
     overflow: hidden;
+}
+
+div.foxy-project-info-icon-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+div.foxy-project-info-icon-wrapper .icon-stack {
+    font-size: 8rem;
+    
+    @include media-breakpoint-down(xxl) {
+        font-size: 7rem;
+    }
+    
+    @include media-breakpoint-down(xl) {
+        font-size: 6rem;
+    }
+    
+    @include media-breakpoint-down(lg) {
+        font-size: 5rem;
+    }
+    
+    @include media-breakpoint-down(md) {
+        font-size: 4rem;
+    }
+    
+    @include media-breakpoint-down(sm) {
+        font-size: 3.5rem;
+    }
 }
 
 div.foxy-project-info-content {

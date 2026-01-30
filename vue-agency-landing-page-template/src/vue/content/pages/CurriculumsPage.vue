@@ -245,7 +245,7 @@ const columns = [
         render: function(data, type, row) {
             if (data && data !== 'No CV') {
                 const imageUrl = `http://localhost:3000/${reemplazarPrimerSlash(data)}`;
-                const fileName = data.split('/').pop() || 'CV.png';
+                const fileName = data.split('/').pop() || 'CV.pdf';
                 return `<button class="btn-download-cv" onclick="downloadCV('${imageUrl}', '${fileName}')" title="Descargar CV">
                     <i class="fa-solid fa-download"></i> Descargar
                 </button>`;
@@ -347,7 +347,7 @@ function contextDownload() {
     }
     
     const imageUrl = `http://localhost:3000/${reemplazarPrimerSlash(item.file_path)}`
-    const fileName = item.file_path.split('/').pop() || 'CV.png'
+    const fileName = item.file_path.split('/').pop() || 'CV.pdf'
     
     downloadCV(imageUrl, fileName)
     closeContextMenu()

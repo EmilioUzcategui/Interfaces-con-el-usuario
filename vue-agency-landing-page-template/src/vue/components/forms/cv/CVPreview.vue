@@ -440,6 +440,7 @@
 import { computed, ref, onMounted, onUnmounted, onUpdated, watch, provide, nextTick } from 'vue';
 import { loadPalette } from '/src/utils/themeManager.js';
 import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 const props = defineProps({
     cvData: {
@@ -860,8 +861,8 @@ const trimCanvas = (canvas) => {
     return trimmedCanvas;
 };
 
-// Función para capturar el CV como imagen
-const captureCVAsImage = async () => {
+// Función para capturar el CV como PDF
+const captureCVAsPDF = async () => {
     try {
         // Obtener el contenedor del CV (sin el toolbar y la galería)
         const cvContainer = document.querySelector('.cv-preview-container');
@@ -976,25 +977,46 @@ const captureCVAsImage = async () => {
             finalCanvas = trimCanvas(canvas);
         }
 
-        // Convertir canvas a blob
+        // Convertir canvas a PDF usando jsPDF
         return new Promise((resolve) => {
-            finalCanvas.toBlob((blob) => {
-                if (blob) {
-                    resolve(blob);
-                } else {
-                    resolve(null);
-                }
-            }, 'image/png', 1.0);
+            try {
+                const imgData = finalCanvas.toDataURL('image/png', 1.0);
+                
+                // Calcular dimensiones del PDF (A4)
+                const pdfWidth = 210; // mm (A4 width)
+                const pdfHeight = (finalCanvas.height * pdfWidth) / finalCanvas.width; // Mantener aspect ratio
+                
+                // Crear PDF
+                const pdf = new jsPDF({
+                    orientation: pdfHeight > pdfWidth ? 'portrait' : 'landscape',
+                    unit: 'mm',
+                    format: [pdfWidth, pdfHeight]
+                });
+                
+                // Agregar imagen al PDF
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                
+                // Convertir PDF a blob
+                const pdfBlob = pdf.output('blob');
+                resolve(pdfBlob);
+            } catch (error) {
+                console.error('Error al convertir a PDF:', error);
+                resolve(null);
+            }
         });
     } catch (error) {
-        console.error('Error al capturar el CV como imagen:', error);
+        console.error('Error al capturar el CV como PDF:', error);
         return null;
     }
 };
 
+// Mantener compatibilidad con el nombre anterior
+const captureCVAsImage = captureCVAsPDF;
+
 // Exponer la función para uso externo
 defineExpose({
     captureCVAsImage,
+    captureCVAsPDF,
     selectedTemplate
 });
 </script>

@@ -161,6 +161,15 @@ span[class*="text-primary"] {
   color: var(--accent-color) !important;
 }
 
+/* Estilos para el icono del proyecto (cambia de color dinámicamente) */
+.foxy-project-info-icon-wrapper .fa-circle {
+  color: var(--secondary-color, #ff5900) !important;
+}
+
+.foxy-project-info-icon-wrapper .fa-stack-1x {
+  color: white !important;
+}
+
 /* Estilos específicos para botones con máxima especificidad */
 button.foxy-dynamic-button.btn.btn-xl {
   color: white !important;
